@@ -143,27 +143,37 @@ class TransactionController extends Controller
             $nextDate = $this->nextAppointment($tblagenda->StartDate,$tblagenda->RecurrenceRule,$tblagenda->RecurrenceException,$lastDate);
         }
         if($nextDate != false){
-            tbltrans::create([
-                'notrans' => $notrans,
-                'AppointmentId' => $AppointmentId,
-                'companyid' => $companyid,
-                'userid' => $userid,
-                'statusid' => 5,
-                'SisaPok' => $tblagenda->Pokok,
-                'Pokok' => $tblagenda->Pokok,
-                'Bunga' => ($tblagenda->Pokok * $tblagenda->BungaPercent / 100),
-                'LateFee' => ($tblagenda->Pokok * $tblagenda->lateFeePercent / 100),
-                'JHT' => 0,
-                'SPokok' => $tblagenda->Pokok,
-                'SBunga' => 0,
-                'SLateFee' => 0,
-                'transdate' => now(config('app.GMT')),
-                'jatuhTempoTagihan' => $nextDate,
-                'UserInsert' => session('UIDGlob')->userid,
-                'InsertDT' => now(config('app.GMT')),
-                'UserUpdate' => session('UIDGlob')->userid,
-                'UpdateDT' => now(config('app.GMT')),
-            ]);
+            $cekIssetTrans = tbltrans::where('jatuhTempoTagihan',$nextDate)
+                                        ->where('companyid',$companyid)
+                                        ->where('userid',$userid)
+                                        ->where('AppointmentId',$AppointmentId)
+                                        ->where('statusid','<>',4)
+                                        ->first();
+            $log = new Controller;
+            $log->savelog(json_encode($cekIssetTrans));
+            if(!isset($cekIssetTrans)){ //Jika sudah ada jangan buat transaksi tagihan
+                tbltrans::create([
+                    'notrans' => $notrans,
+                    'AppointmentId' => $AppointmentId,
+                    'companyid' => $companyid,
+                    'userid' => $userid,
+                    'statusid' => 5,
+                    'SisaPok' => $tblagenda->Pokok,
+                    'Pokok' => $tblagenda->Pokok,
+                    'Bunga' => ($tblagenda->Pokok * $tblagenda->BungaPercent / 100),
+                    'LateFee' => ($tblagenda->Pokok * $tblagenda->lateFeePercent / 100),
+                    'JHT' => 0,
+                    'SPokok' => $tblagenda->Pokok,
+                    'SBunga' => 0,
+                    'SLateFee' => 0,
+                    'transdate' => now(config('app.GMT')),
+                    'jatuhTempoTagihan' => $nextDate,
+                    'UserInsert' => session('UIDGlob')->userid,
+                    'InsertDT' => now(config('app.GMT')),
+                    'UserUpdate' => session('UIDGlob')->userid,
+                    'UpdateDT' => now(config('app.GMT')),
+                ]);
+            }
         }
         return true;
     }
@@ -172,7 +182,8 @@ class TransactionController extends Controller
                             FROM tbltrans t
                             JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
                             JOIN tblmasterproduct p ON p.productCode=a.productCode
-                            WHERE t.statusid IN (5,6,11) AND t.userid = ".session('UIDGlob')->userid);
+                            WHERE t.statusid IN (5,6,11) AND t.userid = '".session('UIDGlob')->userid."'
+                            ORDER BY text, t.jatuhTempoTagihan ASC");
         return $data;
     }
     public function gettransaction(Request $request){
@@ -477,25 +488,26 @@ class TransactionController extends Controller
         Mail::to($array['email'])->send(new SendMail($data));
     }
 
-    public function eod(Request $request){
+    public function eod(){
         DB::update("UPDATE tbltrans SET 
         jht = IIF(DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP) > 0, DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP),0), 
         SLateFee = LateFee * IIF(DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP) > 0, DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP),0),
         SPokok = Pokok");
 
-        $tblagenda = collect(DB::select("SELECT t.notrans,t.jatuhTempoTagihan,a.StartDate,a.RecurrenceRule,a.RecurrenceException 
-                                        FROM tblagenda a
-                                        JOIN tbltrans t ON a.AppointmentId=t.AppointmentId
-                                        WHERE productCode IS NOT NULL
-                                        AND isBilling = 1
-                                        AND a.statusid <> 4 
-                                        AND t.statusid <> 4"));
-        //$tblagenda = select trans last (group)                               
+        $tblagenda = collect(DB::select("SELECT a.AppointmentId, t.companyid, t.userid, t.notrans,t.jatuhTempoTagihan,a.StartDate,a.RecurrenceRule,a.RecurrenceException FROM tblagenda a
+                                        JOIN (SELECT AppointmentId, userid, companyid, MAX(notrans) AS notrans,MAX(jatuhTempoTagihan) AS jatuhTempoTagihan FROM tbltrans
+                                                WHERE statusid <> 4
+                                                GROUP BY companyid, userid, AppointmentId) AS t ON a.AppointmentId=t.AppointmentId
+                                        WHERE productCode IS NOT NULL and isBilling = 1
+                                        AND a.statusid <> 4"));
         foreach ($tblagenda as $agenda) {
-            $this->nextAppointment($agenda->StartDate,$agenda->RecurrenceRule,$agenda->RecurrenceException,$agenda->jatuhTempoTagihan);
-            if(1 == 1){
-                $this->nextTransaction($tblagenda->AppointmentId,$tblagenda->userid,$tblagenda->jatuhTempoTagihan,session('UIDGlob')->companyid);
+            $nextDate = $this->nextAppointment($agenda->StartDate,$agenda->RecurrenceRule,$agenda->RecurrenceException,$agenda->jatuhTempoTagihan);
+            // $log = new Controller;
+            if( Carbon::parse($nextDate)->format('ymd') == Carbon::now(config('GMT'))->format('ymd') ){
+                // $log->savelog('create dari jatuhtempo ' . $agenda->jatuhTempoTagihan );
+                $this->nextTransaction($agenda->AppointmentId,$agenda->userid,$agenda->jatuhTempoTagihan,$agenda->companyid);
             }
         }
+        return true;
     }
 }

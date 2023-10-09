@@ -110,10 +110,10 @@ $(() => {
             colCount: 2,
             colSpan: 2,
             items: [
-                {
-                  dataField: 'productCode',
-                  validationRules: [{ type: 'required', message: 'Product Code is required' }],
-                },
+                // {
+                //   dataField: 'productCode',
+                //   validationRules: [{ type: 'required', message: 'Product Code is required' }],
+                // },
                 'productName', 
                 {
                   dataField: 'producttypeid',
@@ -149,7 +149,8 @@ $(() => {
             dataType: "string", // atau "string", "date", dll.
             calculateCellValue: data => {
                 return data.productCode;
-            }
+            },
+            visible:false
         },
         {
             dataField: 'productName',

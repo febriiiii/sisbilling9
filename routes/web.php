@@ -150,6 +150,7 @@ Route::put('/putAgenda', [AgendaController::class, 'putAgenda'])->middleware('au
 Route::delete('/deleteAgenda', [AgendaController::class, 'deleteAgenda'])->middleware('auth');
 Route::get('/dataMyagenda', [AgendaController::class, 'dataMyagenda']);
 
+Route::get('/eod', [TransactionController::class, 'eod']);
 Route::get('/voidtrans', [TransactionController::class, 'voidtrans']);
 Route::get('/getbill', [TransactionController::class, 'getbill']);
 Route::get('/gettransaction', [TransactionController::class, 'gettransaction']);

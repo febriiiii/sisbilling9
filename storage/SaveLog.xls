@@ -1,3 +1,36 @@
-[]
-[]
-[]
+null
+null
+null
+null
+null
+null
+null
+null
+null
+null
+null
+null
+null
+null
+null
+null
+null
+null
+null
+null
+null
+null
+null
+null
+null
+{"notrans":"1SU23100900005","companyid":"1","userid":"2","AppointmentId":"5","paymentid":null,"transdate":"2023-10-09 14:26:23.870","jatuhTempoTagihan":"2023-10-19 00:00:00.000","SisaPok":"100000.0","Pokok":"100000.0","Bunga":"0.0","LateFee":"0.0","JHT":"0","SPokok":"100000.0","SBunga":"0.0","SLateFee":"0.0","SisaCCL":null,"KodePay":"T","statusid":"4","isreject":"0","snap_token":null,"MIDstatus":null,"MIDstatusmsg":null,"MIDpaymenttype":null,"MIDUpdateUser":null,"MIDall":null,"UserInsert":"1","InsertDT":"2023-10-09 14:26:23.870","UserUpdate":"1","UpdateDT":"2023-10-09 15:37:34.697"}
+{"notrans":"1SU23100900001","companyid":"1","userid":"2","AppointmentId":"1","paymentid":null,"transdate":"2023-10-09 14:26:17.160","jatuhTempoTagihan":"2023-11-01 00:00:00.000","SisaPok":"135000.0","Pokok":"135000.0","Bunga":"0.0","LateFee":"0.0","JHT":"0","SPokok":"135000.0","SBunga":"0.0","SLateFee":"0.0","SisaCCL":null,"KodePay":"T","statusid":"4","isreject":"0","snap_token":null,"MIDstatus":null,"MIDstatusmsg":null,"MIDpaymenttype":null,"MIDUpdateUser":null,"MIDall":null,"UserInsert":"1","InsertDT":"2023-10-09 14:26:17.160","UserUpdate":"1","UpdateDT":"2023-10-09 15:37:54.667"}
+null
+{"notrans":"1SU23100900001","companyid":"1","userid":"2","AppointmentId":"1","paymentid":null,"transdate":"2023-10-09 15:46:56.747","jatuhTempoTagihan":"2023-11-02 00:00:00.000","SisaPok":"150000.0","Pokok":"150000.0","Bunga":"0.0","LateFee":"1500.0","JHT":"0","SPokok":"150000.0","SBunga":"0.0","SLateFee":"0.0","SisaCCL":null,"KodePay":"T","statusid":"4","isreject":"0","snap_token":null,"MIDstatus":null,"MIDstatusmsg":null,"MIDpaymenttype":null,"MIDUpdateUser":null,"MIDall":null,"UserInsert":"1","InsertDT":"2023-10-09 15:46:56.747","UserUpdate":"1","UpdateDT":"2023-10-09 15:47:23.490"}
+{"notrans":"1SU23100900001","companyid":"1","userid":"2","AppointmentId":"1","paymentid":null,"transdate":"2023-10-09 15:46:56.747","jatuhTempoTagihan":"2023-11-02 00:00:00.000","SisaPok":"150000.0","Pokok":"150000.0","Bunga":"0.0","LateFee":"1500.0","JHT":"0","SPokok":"150000.0","SBunga":"0.0","SLateFee":"0.0","SisaCCL":null,"KodePay":"T","statusid":"4","isreject":"0","snap_token":null,"MIDstatus":null,"MIDstatusmsg":null,"MIDpaymenttype":null,"MIDUpdateUser":null,"MIDall":null,"UserInsert":"1","InsertDT":"2023-10-09 15:46:56.747","UserUpdate":"1","UpdateDT":"2023-10-09 15:47:23.490"}
+{"notrans":"1SU23100900001","companyid":"1","userid":"2","AppointmentId":"1","paymentid":null,"transdate":"2023-10-09 15:46:56.747","jatuhTempoTagihan":"2023-11-02 00:00:00.000","SisaPok":"150000.0","Pokok":"150000.0","Bunga":"0.0","LateFee":"1500.0","JHT":"0","SPokok":"150000.0","SBunga":"0.0","SLateFee":"0.0","SisaCCL":null,"KodePay":"T","statusid":"4","isreject":"0","snap_token":null,"MIDstatus":null,"MIDstatusmsg":null,"MIDpaymenttype":null,"MIDUpdateUser":null,"MIDall":null,"UserInsert":"1","InsertDT":"2023-10-09 15:46:56.747","UserUpdate":"1","UpdateDT":"2023-10-09 15:47:23.490"}
+{"notrans":"1SU23100900001","companyid":"1","userid":"2","AppointmentId":"1","paymentid":null,"transdate":"2023-10-09 15:46:56.747","jatuhTempoTagihan":"2023-11-02 00:00:00.000","SisaPok":"150000.0","Pokok":"150000.0","Bunga":"0.0","LateFee":"1500.0","JHT":"0","SPokok":"150000.0","SBunga":"0.0","SLateFee":"0.0","SisaCCL":null,"KodePay":"T","statusid":"4","isreject":"0","snap_token":null,"MIDstatus":null,"MIDstatusmsg":null,"MIDpaymenttype":null,"MIDUpdateUser":null,"MIDall":null,"UserInsert":"1","InsertDT":"2023-10-09 15:46:56.747","UserUpdate":"1","UpdateDT":"2023-10-09 15:47:23.490"}
+{"notrans":"1SU23100900001","companyid":"1","userid":"2","AppointmentId":"1","paymentid":null,"transdate":"2023-10-09 15:46:56.747","jatuhTempoTagihan":"2023-11-02 00:00:00.000","SisaPok":"150000.0","Pokok":"150000.0","Bunga":"0.0","LateFee":"1500.0","JHT":"0","SPokok":"150000.0","SBunga":"0.0","SLateFee":"0.0","SisaCCL":null,"KodePay":"T","statusid":"4","isreject":"0","snap_token":null,"MIDstatus":null,"MIDstatusmsg":null,"MIDpaymenttype":null,"MIDUpdateUser":null,"MIDall":null,"UserInsert":"1","InsertDT":"2023-10-09 15:46:56.747","UserUpdate":"1","UpdateDT":"2023-10-09 15:47:23.490"}
+{"notrans":"1SU23100900001","companyid":"1","userid":"2","AppointmentId":"1","paymentid":null,"transdate":"2023-10-09 15:46:56.747","jatuhTempoTagihan":"2023-11-02 00:00:00.000","SisaPok":"150000.0","Pokok":"150000.0","Bunga":"0.0","LateFee":"1500.0","JHT":"0","SPokok":"150000.0","SBunga":"0.0","SLateFee":"0.0","SisaCCL":null,"KodePay":"T","statusid":"4","isreject":"0","snap_token":null,"MIDstatus":null,"MIDstatusmsg":null,"MIDpaymenttype":null,"MIDUpdateUser":null,"MIDall":null,"UserInsert":"1","InsertDT":"2023-10-09 15:46:56.747","UserUpdate":"1","UpdateDT":"2023-10-09 15:47:23.490"}
+{"notrans":"1SU23100900001","companyid":"1","userid":"2","AppointmentId":"1","paymentid":null,"transdate":"2023-10-09 15:46:56.747","jatuhTempoTagihan":"2023-11-02 00:00:00.000","SisaPok":"150000.0","Pokok":"150000.0","Bunga":"0.0","LateFee":"1500.0","JHT":"0","SPokok":"150000.0","SBunga":"0.0","SLateFee":"0.0","SisaCCL":null,"KodePay":"T","statusid":"4","isreject":"0","snap_token":null,"MIDstatus":null,"MIDstatusmsg":null,"MIDpaymenttype":null,"MIDUpdateUser":null,"MIDall":null,"UserInsert":"1","InsertDT":"2023-10-09 15:46:56.747","UserUpdate":"1","UpdateDT":"2023-10-09 15:47:23.490"}
+null

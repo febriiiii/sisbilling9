@@ -195,6 +195,11 @@
                     form.itemOption("lateFeePercent", "visible", f.value);
                     form.itemOption("BungaPercent", "visible", f.value);
                     form.itemOption("productCode", "visible", f.value);
+                    setTimeout(() => {
+                      form.itemOption("BungaPercent", "value", 52);
+                      form.itemOption("productCode", "value", e.appointmentData.productCode);
+                      alert(e.appointmentData.productCode)
+                    }, 5000);
                   }
                 }
               };
@@ -386,7 +391,9 @@
             setTimeout(function() {
               var data = e.form.option("formData");
               data.all_day = true;
-
+              if(e.appointmentData.isBilling != undefined){
+                data.Billing = e.appointmentData.isBilling
+              }
               e.form.updateData(data);
             }, 100);
           },

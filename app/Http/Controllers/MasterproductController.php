@@ -116,7 +116,7 @@ class MasterproductController extends Controller
             'UserUpdate' => session('UIDGlob')->userid,
             'InsertDT' => Carbon::now(config('app.GMT')),
             'UpdateDT' => Carbon::now(config('app.GMT')),
-            'productCode' => isset($request->values['productCode'])?$request->values['productCode']:'',
+            // 'productCode' => isset($request->values['productCode'])?$request->values['productCode']:'',
             'companyid' => session('UIDGlob')->companyid,
             'statusid' => 1,
             'productName' => isset($request->values['productName'])?$request->values['productName']:'',

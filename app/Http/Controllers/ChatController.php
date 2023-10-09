@@ -375,8 +375,8 @@ class ChatController extends Controller
     }
 
     public function sendimgchat(Request $request){
-        $log = new Controller;
-        $log->savelog(json_encode($_FILES));
+        // $log = new Controller;
+        // $log->savelog(json_encode($_FILES));
         $authUserid = session('UIDGlob')->userid;
         $chatdID = tblchatd::insertGetId([
             'chatid' => $request->chatid,

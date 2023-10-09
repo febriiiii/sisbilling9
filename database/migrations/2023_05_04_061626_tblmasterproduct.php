@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tblmasterproduct', function (Blueprint $table) {
-            $table->string('productCode');
+            $table->increments('productCode');
             $table->unsignedInteger('companyid'); //$table->integer('companyid');
-            $table->primary(['productCode', 'companyid']);
+            // $table->primary(['productCode', 'companyid']);
             $table->foreign('companyid')->references('companyid')->on('tblcomp');
             $table->string('productName');
             $table->unsignedInteger('statusid');
