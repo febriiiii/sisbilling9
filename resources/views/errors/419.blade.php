@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSRF Token Mismatch</title>
+</head>
+<body>
+    <div>
+        <h1>CSRF Token Mismatch</h1>
+        <p>The security token mismatched. Please refresh the page and try again.</p>
+    </div>
+    <script>
+        window.location.href = '{{url("/logout")}}';
+    </script>
+</body>
+</html>

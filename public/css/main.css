@@ -1,0 +1,95 @@
+#noty_layout__topRight div{
+  background-color: rgb(212, 229, 255) !important;
+  padding: 5px;
+  border-radius: 6px;
+}
+#noty_layout__topRight div .noty_progressbar{
+  background-color: rgb(54, 54, 54) !important;
+  border-radius: 5px;
+}
+
+.dx-scheduler-date-table-container.dx-draggable.hold {
+  pointer-events: auto !important;
+}
+.table-bordered>:not(caption)>*>*{
+  padding:0 0 0 10px;
+}
+.table-bordered p{
+  margin:0;
+}
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.blueFont{
+ color: rgb(77,103,170);
+}
+
+.whiteFont{
+ color: white;
+}
+.blueBack{
+ background-color: rgb(77,103,170);
+}
+
+input:focus {
+  outline: none;
+}
+/* .form-outline .form-control:focus~.form-notch .form-outline .form-control:focus~.form-notch{
+  background-color: red !important ;
+} */
+.select2-close-mask{
+  z-index: 9999 !important;
+}
+.select2-dropdown{
+  z-index: 9999 !important;
+}
+.normal{
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.dx-datagrid-content .dx-datagrid-table .dx-row .dx-command-edit.dx-command-edit-with-icons{
+  width: 100px;
+}
+.dx-popup-title{
+  background-color: rgb(77,103,170) !important;
+}
+.dx-popup-title div , .dx-popup-title div .dx-icon{
+  color: white;
+}
+.dx-button-text{
+  font-weight: 500 !important;
+  color: #747474 !important;
+}
+@media screen and (max-width: 450px) {
+  .dx-popup-flex-height{
+    width: fit-content !important;
+    transform: translate(0px, 346px) scale(1) !important;
+  }
+  .scedulerket{
+    font-size: 0.7em;
+  }
+  .scedulerketDot{
+    height: 15px !important;
+    width: 15px !important;
+  }
+}
+@media screen and (max-width: 500px) {
+  /* .dx-scheduler-date-table-container.dx-draggable {
+    pointer-events: none !important;
+  } */
+}
+@media screen and (max-width: 400px) {
+  .navbarCustomIcon{
+    width: 45px !important;
+  }
+}
+@media screen and (max-width: 360px) {
+  .navbarCustomIcon{
+    width:35px !important;
+    padding:4px !important;
+  }
+}

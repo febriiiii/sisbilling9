@@ -1,0 +1,20 @@
+{
+  "name": "Sis Billing",
+  "short_name": "Billing",
+  "description": "Aplikasi Tagihan & Agenda",
+  "icons": [
+    {
+      "src": "public/icon192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "public/icon512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000"
+}

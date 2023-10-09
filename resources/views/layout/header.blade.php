@@ -1,0 +1,87 @@
+<style>
+    .headericon{
+        background-color: white;
+        border-radius: 7px;
+        padding:3px;
+        opacity: 0.8px;
+    }
+</style>
+<header>
+    <nav class="navbar navbar-expand-lg blueBack" style="padding: 10px 0 0 0;">
+      <div class="container-fluid row">
+        <div class="col-4" style="display: flex; flex-direction: column; align-items: start;">
+            <a class="headericonX" onclick="opnhome()">
+                {{-- <img src="{{asset('public/pivot.png')}}" width="30" height="30"> --}}
+                <lord-icon
+                    src="https://cdn.lordicon.com/icxqolmx.json"
+                    trigger="click"
+                    colors="primary:#ffffff"
+                    style="width:30px;height:30px">
+                </lord-icon>
+            </a>
+        </div>
+        <div class="col-4">
+            <center>
+                <a id="title" class="whiteFont" href="#" style="font-weight: bold; font-size:1.1em">Sis Billing</a>
+            </center>
+        </div>
+        <div class="col-4">
+            <div style="display: flex; justify-content: flex-end; margin-right:-30px;">
+                <div id="contentlonceng">
+                    
+                </div>
+                <a href="{{url('/logout')}}" class="ms-3 headericonX">
+                    {{-- <span><img src="{{asset('public/logout.png')}}" width="30" height="30"></span> --}}
+                    <lord-icon
+                        src="https://cdn.lordicon.com/nhfyhmlt.json"
+                        trigger="click"
+                        colors="primary:#ffffff"
+                        style="width:30px;height:30px">
+                    </lord-icon>
+                </a>
+            </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <script>
+    renderlonceng()
+    function renderlonceng(){
+        $.ajax({
+            type: 'GET',
+            cache: false,
+            url: '{{url("/viewlonceng")}}',
+            success: function(data) {
+                $('#contentlonceng').html(data)
+            },
+            error: function(xhr, status, error) {
+                new Noty({
+                    text: error,
+                    timeout: 10000 
+                }).show();
+            }
+        });
+    }
+    function opnhome(){
+        $.ajax({
+            type: 'GET',
+            cache: false,
+            url: '{{url("/viewhome")}}',
+            success: function(data) {
+                openmodal("Report",data)
+                $('#contentbill1').hide()
+                $('#contentbill1').slideDown('slow')
+                querysaled()
+                querysaledBil()
+            },
+            error: function(xhr, status, error) {
+                new Noty({
+                    text: error,
+                    timeout: 10000 
+                }).show();
+            }
+        });
+    }
+  </script>
+  
