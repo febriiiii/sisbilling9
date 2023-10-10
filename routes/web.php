@@ -52,6 +52,7 @@ Route::post('/updateDevice',[ChatController::class,'updateDevice'])->name('updat
 Route::get('nextAppointment', [TransactionController::class, 'nextAppointment'])->middleware('auth');
 
 Route::get('', [Controller::class, 'index'])->middleware('auth');
+Route::get('/home', [Controller::class, 'index'])->middleware('auth');
 Route::get('/login', [Controller::class, 'login'])->name('login')->middleware('guest');
 Route::post('/auuten', [Controller::class, 'auuten']);
 Route::get('/logout', [Controller::class, 'logout']);

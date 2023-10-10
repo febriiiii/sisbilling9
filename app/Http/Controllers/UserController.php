@@ -54,7 +54,7 @@ class UserController extends Controller
             'hp' => $request->hp,
             'alamatSingkat' => $request->alamatSingkat,
             'alamatLengkap' => $request->alamatLengkap,
-            'infoTambahan' => $request->infoTambahan,
+            'infoTambahan' => $request->InfoTambahan,
             'profileImg' => "user/user.png",
         ];
         $data = tbluser::create($data);

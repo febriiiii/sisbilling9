@@ -1,7 +1,7 @@
 <div class="container">
   <div class="row mb-2">
-      <div class="col-sm mt-2"><h5 style="position: absolute; z-index:100;">Daftar Produk</h5><div id="userOut"></div></div>
-      <div class="col-sm mt-2"><h5 style="position: absolute; z-index:100;">Penggunaan {{explode(" ", $nama)[0]}}</h5><div id="userIn"></div></div>
+      <div class="col-sm mt-2"><h6>Daftar Produk</h6><div id="userOut"></div></div>
+      <div class="col-sm mt-2"><h6>Penggunaan {{explode(" ", $nama)[0]}}</h6><div id="userIn"></div></div>
   </div>
   <hr>
   <div class="card" style="background-color: rgb(252, 253, 244)">
@@ -62,7 +62,7 @@
       width: "100%",
   }).dxScrollView("instance");
 
-  var userid = 2;
+  var userid = $('#primarymodal').attr('val');
   $('#formAgendaBill').submit(function(event){
     event.preventDefault();
     if($('#viewformbillingPK').val() == ''){
@@ -114,12 +114,12 @@
   
   $('#userOut').dxDataGrid(getDataGridConfiguration(0))
   $('#userIn').dxDataGrid(getDataGridConfiguration(1))
-                                    
-  function onAdd(a) {
+  
+  function switcheds(key,values){
     $.ajax({
       type: 'GET',
       cache: false,
-      url: '{{url("/getPokok?AppointmentId=")}}' + a.itemData.AppointmentId, 
+      url: '{{url("/getPokok?AppointmentId=")}}' + key, 
       success: function(agenda) {
           if(agenda[0].Pokok <= 1 ){
               new Noty({
@@ -128,8 +128,6 @@
               }).show();
               return false
           }else{
-            var key = a.itemData.AppointmentId;
-            var values = { isUsed: a.toData };
             if(values.isUsed == 1){
                 tempUserpinjam.push(key)
             }else{
@@ -152,6 +150,28 @@
           }).show();
       }
     });
+  }
+  function onAdd(a) {
+    var key = a.itemData.AppointmentId;
+    var values = { isUsed: a.toData };
+    if(values.isUsed == 0){
+      Swal.fire({
+        title: 'Apakah Kamu Yakin?',
+        text: "Ingin Menghapus Tagihan",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Tidak',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          switcheds(key,values)
+        }
+      })
+    }else{
+      switcheds(key,values)
+    }
   }
   function getDataGridConfiguration(index) {
     var config = {

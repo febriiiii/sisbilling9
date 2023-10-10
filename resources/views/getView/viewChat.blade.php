@@ -59,7 +59,23 @@
         
     </ul>
 </div>
+
+<!-- Fullscreen Modal PHOTO VIEW-->
+<div id="modal-media-image" class="uk-flex-top" uk-modal>
+    <div class="uk-modal-dialog uk-width-auto uk-margin-auto-vertical">
+        <button class="uk-modal-close-outside" type="button" uk-close></button>
+        <img id="imgView" src="" width="1800" height="1200" alt="">
+    </div>
+</div>
+
 <script>
+    // start open modal image
+    function openmodalImage(url){
+        $('#modal-media-image').css('z-index','11100')
+        UIkit.modal('#modal-media-image').show()
+        $('#imgView').prop('src',url)
+    }
+    // end open modal image
     var chatid = $('#primarymodal').attr('val')
     var scrollView = $("#primarymodal").dxScrollView({
         height: "100%",
@@ -204,7 +220,7 @@
                 if(e.description != "!@##@!IMG!@##@!"){
                     msg = e.description+"<small>"+e.timef+"</small>"
                 }else{
-                    msg = `<div style="background-image: url('{{asset('/public/storage/chatimg')}}/`+e.id+`.png'); background-size: cover; width: 180px; height:130px;"></div>
+                    msg = `<div onclick="openmodalImage('{{asset('/public/storage/chatimg')}}/`+e.id+`.png')" style="cursor:pointer; background-image: url('{{asset('/public/storage/chatimg')}}/`+e.id+`.png'); background-size: cover; width: 180px; height:130px;"></div>
                         <small style="display: block; text-align:end;">`+e.timef+`</small>`;
                 }
                 var chat = "<li class='message item "+position+"'> " +

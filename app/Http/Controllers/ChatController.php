@@ -422,7 +422,7 @@ class ChatController extends Controller
         }
         $this->sendFcm($userTarget,$authNama,$desc,false);
         
-        $this->GlobalPush("notif",$authUserid);
+        $this->GlobalPush("notif",$userTarget);
         return true;
     }
 }

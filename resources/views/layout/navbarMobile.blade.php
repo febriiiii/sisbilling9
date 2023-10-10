@@ -230,6 +230,16 @@
                   tblcustomer()
               }else if(title == "Sis Billing"){
                   reloadDashboard()
+              }else if(title == 'Profile'){
+                var formElement = document.getElementById("myprofile-formcompany");
+                var inputElements = formElement.querySelectorAll("input");
+                var ti = 1000
+                inputElements.forEach(function(inputElement) {
+                  setTimeout(() => {
+                    $(inputElement).click()
+                  }, ti);
+                  ti = ti + 1000;
+                });
               }
               $('title').text(title);
               $('#title').text(title);

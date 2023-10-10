@@ -27,7 +27,7 @@
     try {
       const permission = await Notification.requestPermission();
       if (permission !== 'granted') {
-        alert('Permission denied by user');
+        // alert('Permission denied by user');
         return;
       }
       const token = await getToken(messaging);
@@ -39,7 +39,7 @@
         }
       });
     } catch (error) {
-      alert(`Token Error :: ${error}`);
+      // alert(`Token Error :: ${error}`);
     }
   }
 

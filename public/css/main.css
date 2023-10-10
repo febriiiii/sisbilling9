@@ -7,7 +7,19 @@
   background-color: rgb(54, 54, 54) !important;
   border-radius: 5px;
 }
-
+/* sweetalert2 */
+.swal2-container {
+  z-index: 10000;
+}
+.form-outline *{
+  border: none !important;
+}
+.form-outline{
+  background-color: rgb(251, 246, 246);
+  /* border: 1px solid rgb(200, 190, 255); */
+  border-radius: 5px;
+  box-shadow: 1px 1px 1px rgb(237, 230, 255);
+}
 .dx-scheduler-date-table-container.dx-draggable.hold {
   pointer-events: auto !important;
 }

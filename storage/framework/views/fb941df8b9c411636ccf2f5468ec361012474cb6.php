@@ -195,11 +195,6 @@
                     form.itemOption("lateFeePercent", "visible", f.value);
                     form.itemOption("BungaPercent", "visible", f.value);
                     form.itemOption("productCode", "visible", f.value);
-                    setTimeout(() => {
-                      form.itemOption("BungaPercent", "value", 52);
-                      form.itemOption("productCode", "value", e.appointmentData.productCode);
-                      alert(e.appointmentData.productCode)
-                    }, 5000);
                   }
                 }
               };
@@ -337,7 +332,7 @@
                 ],
                 editorOptions: {
                   dataSource: DevExpress.data.AspNet.createStore({
-                    key: 'productCode',
+                    key: 'id',
                     loadUrl: '<?php echo e(url("getproduct")); ?>',
                     onBeforeSend: function(method, ajaxOptions) {
                       ajaxOptions.xhrFields = { withCredentials: true };
@@ -345,8 +340,11 @@
                   }),
                   valueExpr: "id",
                   displayExpr: "text",
+                  // onValueChanged: function(e) {
+                  //   // console.log(e);
+                  // }
                 },
-                dataField: "productCode"
+                dataField: "productCode",
               };
               let lateFeePercent = {
                 colSpan: 1,

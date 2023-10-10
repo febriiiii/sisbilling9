@@ -1,4 +1,4 @@
-<div id="myModal" class="dx-popup dx-popup-fullscreen"></div>
+<div id="myModal" class="dx-popup dx-popup-fullscreen" style="min-width: 500px;"></div>
 
 <script>
     function openmodal(title, content, val) {
@@ -7,6 +7,8 @@
         popup.option('contentTemplate', function() {
             return $('<div id="primarymodal" val="'+val+'">').html(content); 
         });
+        popup.option("width", "auto");
+        popup.option("minWidth", "500px");
         popup.option('showCloseButton', true); 
         if (DevExpress.devices.current().deviceType === "phone" || DevExpress.devices.current().deviceType === "tablet") {
             popup.option("fullScreen", true);

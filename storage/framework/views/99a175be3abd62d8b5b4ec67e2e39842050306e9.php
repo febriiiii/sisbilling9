@@ -47,5 +47,4 @@
         // Mengatur tinggi awal elemen saat halaman dimuat
         updatePopupHeight();
     });
-</script>
-<?php /**PATH C:\xampp\htdocs\sisbilling9\resources\views/modal/mainModal2.blade.php ENDPATH**/ ?>
+</script><?php /**PATH C:\xampp\htdocs\sisbilling9\resources\views/modal/mainModal2.blade.php ENDPATH**/ ?>

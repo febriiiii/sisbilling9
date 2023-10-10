@@ -4,7 +4,7 @@
         <button onclick="createChatHeader()" class="col-auto btn btn-secondary">Chat</button>
     </div>
     <?php $__currentLoopData = $tblchat; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $c): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-        <div class="card mt-2" onclick="opnchat(<?php echo e($c->chatid); ?>)" style="height: 80px; overflow:hidden; cursor: pointer; background-color: rgb(253, 255, 240)">
+        <div class="mt-2" onclick="opnchat(<?php echo e($c->chatid); ?>)" style="border-radius:5px; height: 70px; overflow:hidden; cursor: pointer; background-color: rgb(239, 239, 239)">
             <div class="row">
                 <div class="col-auto" style="margin:0; padding:15px;">
                     <img src="<?php echo e(asset('public/storage/'.$c->profileImg)); ?>" width="40" height="40" style="border-radius:100%;">

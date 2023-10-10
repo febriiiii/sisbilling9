@@ -1,7 +1,7 @@
 <div class="container">
     <div class="row mb-2">
-        <div class="col-sm mt-2"><h5 style="position: absolute; z-index:100;">Daftar Customer</h5><div id="userOut"></div></div>
-        <div class="col-sm mt-2"><h5 style="position: absolute; z-index:100;">Daftar Pengguna</h5><div id="userIn"></div></div>
+        <div class="col-sm mt-2"><h6>Daftar Customer</h6><div id="userOut"></div></div>
+        <div class="col-sm mt-2"><h6>Daftar Pengguna</h6><div id="userIn"></div></div>
     </div>
     <hr>
     <div class="card" style="background-color: rgb(252, 253, 244)">
@@ -108,8 +108,8 @@
     
     $('#userOut').dxDataGrid(getDataGridConfiguration(0))
     $('#userIn').dxDataGrid(getDataGridConfiguration(1))
-                                      
-    function onAdd(a) {
+    
+    function switcheds(key,values){
         $.ajax({
             type: 'GET',
             url: '<?php echo e(url("/getPokok?AppointmentId=").$agenda->AppointmentId); ?>', 
@@ -121,8 +121,6 @@
                     }).show();
                     return false
                 }else{
-                    var key = a.itemData.userid;
-                    var values = { isUsed: a.toData };
                     if(values.isUsed == 1){
                         tempUserpinjam.push(key)
                     }else{
@@ -145,6 +143,28 @@
                 }).show();
             }
         });
+    }
+    function onAdd(a) {
+        var key = a.itemData.userid;
+        var values = { isUsed: a.toData };
+        if(values.isUsed == 0){
+            Swal.fire({
+                title: 'Apakah Kamu Yakin?',
+                text: "Ingin Menghapus Tagihan",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Tidak',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    switcheds(key,values)
+                }
+            })
+        }else{
+            switcheds(key,values)
+        }
     }
     function getDataGridConfiguration(index) {
         return {
