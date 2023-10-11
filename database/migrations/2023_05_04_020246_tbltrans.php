@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('tbltrans', function (Blueprint $table) {
             $table->string('notrans')->primary();
+            $table->string('notransExpire')->nullable();
             $table->unsignedInteger('companyid');
             $table->foreign('companyid')->references('companyid')->on('tblcomp');
             $table->unsignedInteger('userid');

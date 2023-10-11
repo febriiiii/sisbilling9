@@ -331,6 +331,8 @@ class TransactionController extends Controller
     }
     public function confirmPembayaranMID(Request $request){
         $MID = $this->cekstatusMID($request->notrans);
+        $transG = null;
+        $snapToken = null;
         try {
             DB::beginTransaction();
             $tbltrans = tbltrans::find($request->notrans);
@@ -378,35 +380,85 @@ class TransactionController extends Controller
                 }else{
                     $statusTrans = $tbltrans->statusid;
                 }
-                if($MID->status_code == 407){
+                if($MID->status_code == 407){// Expire midtrans
+                    // $trans = tbltrans::select('notrans','tblcomp.companyname','tblagenda.text','tbluser.userid','tbluser.nama','tbluser.email','tbluser.hp','tbluser.alamatSingkat','tbltrans.companyid','tbltrans.statusid','jatuhTempoTagihan' ,'tbltrans.Pokok',DB::raw('tbltrans.SPokok + tbltrans.SBunga + tbltrans.SLateFee as Amount'),DB::raw('CONCAT(tblagenda.productCode, tblagenda.companyid) as kodebarang'))
+                    // ->join('tbluser','tbluser.userid','=','tbltrans.userid')
+                    // ->join('tblagenda','tblagenda.AppointmentId','=','tbltrans.AppointmentId')
+                    // ->join('tblcomp','tblcomp.companyid','=','tblagenda.companyid')
+                    // ->where('notrans',$tbltrans->notrans)->first();
+                    // $trans->snap_token = null;
+                    // $midtrans = new CreateSnapTokenService($trans);
+                    // $snapToken = $midtrans->getSnapToken();
+                    // $tbltrans->update(['snap_token' => $snapToken]);
+                    // $MID = $this->cekstatusMID($request->notrans);
+                    // disini buat trans baru
+                    $transOld = tbltrans::where('notrans',$tbltrans->notrans)->first();
+                    $tblcomp = tblcomp::find($transOld->companyid);
+                    $notransHeader = $transOld->companyid.strtoupper(substr($tblcomp->companyname, 0, 2)).Carbon::now(config('app.GMT'))->format('ymd');
+                    $lastTrans = DB::select("SELECT ISNULL(MAX(CAST(SUBSTRING(notrans, LEN('$notransHeader') + 1, LEN(notrans)) AS INT)) + 1, 1) AS maxNotrans
+                                                FROM tbltrans
+                                                WHERE notrans LIKE '".$notransHeader."%'");
+
+                    $notrans = $notransHeader.sprintf("%05d", $lastTrans[0]->maxNotrans);
+                    while ($this->cekstatusMID($notrans)->status_code != 404) {
+                        $notrans = intval(substr($notrans, strlen($notransHeader))); // Mengambil angka dari nomor transaksi
+                        $notrans++; // Increment nomor transaksi jika sudah dipakai di MIDTRANS
+                        $notrans = $notransHeader.sprintf("%05d", $notrans); // Menggabungkan kembali nomor transaksi yang telah di-increment
+                    }
+                    $transNew = tbltrans::create([
+                        'notrans' => $notrans,
+                        'notransExpire' => $transOld->notrans,
+                        'AppointmentId' => $transOld->AppointmentId,
+                        'companyid' => $transOld->companyid,
+                        'userid' => $transOld->userid,
+                        'statusid' => 5,
+                        'SisaPok' => $transOld->SisaPok,
+                        'Pokok' => $transOld->Pokok,
+                        'Bunga' => $transOld->Bunga,
+                        'LateFee' => $transOld->LateFee,
+                        'JHT' => $transOld->JHT,
+                        'SPokok' => $transOld->SPokok,
+                        'SBunga' => $transOld->SBunga,
+                        'SLateFee' => $transOld->SLateFee,
+                        'transdate' => $transOld->transdate,
+                        'snap_token' => null,
+                        'jatuhTempoTagihan' => $transOld->jatuhTempoTagihan,
+                        'UserInsert' => session('UIDGlob')->userid,
+                        'InsertDT' => now(config('app.GMT')),
+                        'UserUpdate' => session('UIDGlob')->userid,
+                        'UpdateDT' => now(config('app.GMT')),
+                    ]);
                     $trans = tbltrans::select('notrans','tblcomp.companyname','tblagenda.text','tbluser.userid','tbluser.nama','tbluser.email','tbluser.hp','tbluser.alamatSingkat','tbltrans.companyid','tbltrans.statusid','jatuhTempoTagihan' ,'tbltrans.Pokok',DB::raw('tbltrans.SPokok + tbltrans.SBunga + tbltrans.SLateFee as Amount'),DB::raw('CONCAT(tblagenda.productCode, tblagenda.companyid) as kodebarang'))
                     ->join('tbluser','tbluser.userid','=','tbltrans.userid')
                     ->join('tblagenda','tblagenda.AppointmentId','=','tbltrans.AppointmentId')
                     ->join('tblcomp','tblcomp.companyid','=','tblagenda.companyid')
-                    ->where('notrans',$tbltrans->notrans)->first();
-                    $trans->snap_token = null;
+                    ->where('notrans',$notrans)->first();
+
+                    $transOld->update(['statusid' => 4]);
+                    $transG = $notrans;
                     $midtrans = new CreateSnapTokenService($trans);
                     $snapToken = $midtrans->getSnapToken();
-                    $tbltrans->update(['snap_token' => $snapToken]);
+                    $transNew->update(['snap_token' => $snapToken]);
                     $MID = $this->cekstatusMID($request->notrans);
                 }
                 $tbltrans->update([
                     'statusid' => $statusTrans, 
                     'MIDstatus' => $MID->status_code, 
-                    'MIDstatusmsg' => $MID->transaction_status, 
+                    'MIDstatusmsg' => isset($MID->transaction_status)?$MID->transaction_status:'', 
                     'MIDUpdateUser' => session('UIDGlob')->userid,
-                    'MIDpaymenttype' => $MID->payment_type,
+                    'MIDpaymenttype' => isset($MID->payment_type)?$MID->payment_type:'',
                     'MIDall' => json_encode($MID),
                 ]);
-                $snapToken = $tbltrans->snap_token;
                 DB::commit();
                 return [
+                    'transG' => $transG,
                     'snapToken' => $snapToken,
                     'status' => $MID->status_code,
-                    'msg' => $MID->transaction_status,
+                    'msg' => isset($MID->transaction_status)?$MID->transaction_status:'Invoice Expire - Generate Ulang Invoice ', 
                 ];
             }
             return [
+                'transG' => null,
                 'snapToken' => null,
                 'status' => null,
                 'msg' => "Tagihan Tidak Berlaku",
@@ -415,6 +467,7 @@ class TransactionController extends Controller
         }catch (\Exception $e) {
             DB::rollBack();
             $tbltrans->update(['statusid' => 5,'paymentid' => 2]); //12
+            // dd($e); // hidupkan untuk debug
             return [
                 'status' => 404,
                 'msg' => "Transaction Rollback",

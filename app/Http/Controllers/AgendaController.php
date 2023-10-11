@@ -35,7 +35,7 @@ class AgendaController extends Controller
     }
 
     public function getproduct(){
-            $product = tblmasterproduct::select('productCode as id','productName as text')
+            $product = tblmasterproduct::select('productCode','productName')
                         ->where('statusid','!=', 4)
                         ->where('companyid', session('UIDGlob')->companyid)
                         ->get();

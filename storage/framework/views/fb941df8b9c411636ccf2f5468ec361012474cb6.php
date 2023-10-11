@@ -108,7 +108,16 @@
     });
   }
   var tempUserpinjam = [];
+  var getproductdata
+  
   function dxsceduler(){
+      $.ajax({
+        url: '<?php echo e(url("/getproduct")); ?>?stamp=' + new Date().getTime(),
+        method: 'GET',
+        success: function (data) {
+          getproductdata = data
+        }
+    });
     $(() => {
         const scheduler = $('#showscheduler').dxScheduler({
           timeZone: 'Asia/Jakarta',
@@ -322,6 +331,7 @@
               //   dataField: "bolehTungak",
               //   visible: false,
               // };
+              
               let productCode = {
                 colSpan: 1,
                 label: { text: "Product" },
@@ -331,18 +341,13 @@
                   { type: "required", message: "Product is required" },
                 ],
                 editorOptions: {
-                  dataSource: DevExpress.data.AspNet.createStore({
-                    key: 'id',
-                    loadUrl: '<?php echo e(url("getproduct")); ?>',
-                    onBeforeSend: function(method, ajaxOptions) {
-                      ajaxOptions.xhrFields = { withCredentials: true };
-                    }
+                  inputAttr: { 'aria-label': 'Product productCode' },
+                  dataSource: new DevExpress.data.ArrayStore({
+                      data: getproductdata,
+                      key: 'productCode',
                   }),
-                  valueExpr: "id",
-                  displayExpr: "text",
-                  // onValueChanged: function(e) {
-                  //   // console.log(e);
-                  // }
+                  displayExpr: "productName",
+                  valueExpr: "productCode",
                 },
                 dataField: "productCode",
               };

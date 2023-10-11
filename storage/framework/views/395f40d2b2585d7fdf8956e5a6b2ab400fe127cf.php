@@ -55,7 +55,7 @@
     <h6 class="mt-4">Metode Pembayaran</h6><hr>
     <div class="col-6">
         <label class="mt-2" for="">Invoice No.</label>
-        <input type="text" class="form-control" name="notrans" value="<?php echo e($trans->notrans); ?>" readonly>
+        <input id="transG" type="text" class="form-control" name="notrans" value="<?php echo e($trans->notrans); ?>" readonly>
     </div>
     <div class="col-6">
         <label class="mt-2" for="">Tagihan</label>
@@ -122,7 +122,7 @@
     <div id="PayloadMID"></div>
 </form>
 <script>
-    // paymentsuccess('<?php echo e($trans->notrans); ?>')
+    var transG = '<?php echo e($trans->notrans); ?>'
     var snapToken = '<?php echo e($snapToken); ?>';
     $('#viewpayment-submit').submit(function(event){
         $('#loader').show('slow')
@@ -134,7 +134,7 @@
 
         // Tambahkan data lain yang diperlukan ke dalam FormData
         form.append('paymentid', $('#viewpayment-paymentid').val());
-        form.append('notrans', '<?php echo e($trans->notrans); ?>');
+        form.append('notrans', transG);
         form.append('reject', $('button[name="reject"]:focus').val());
 
         var xhr = new XMLHttpRequest();
@@ -197,22 +197,23 @@
     if(payButton != null){
         payButton.addEventListener('click', function(e) {
             e.preventDefault();
+            alert(snapToken)
             snap.pay(snapToken, {
                 onSuccess: function(result) {
                     console.log('onSuccess',result)
-                    paymentsuccess("<?php echo e($trans->notrans); ?>")
+                    paymentsuccess(transG)
                 },
                 onPending: function(result) {
                     console.log('onPending',result)
-                    paymentsuccess("<?php echo e($trans->notrans); ?>")
+                    paymentsuccess(transG)
                 },
                 onError: function(result) {
                     console.log('onError',result)
-                    paymentsuccess("<?php echo e($trans->notrans); ?>")
+                    paymentsuccess(transG)
                 },
                 onClose: function(result){
                     console.log('onclose',result)
-                    paymentsuccess("<?php echo e($trans->notrans); ?>")
+                    paymentsuccess(transG)
                 }
             });
         });
@@ -243,7 +244,11 @@
                 }
                 loadbilling()
                 if(data.status == 407){
-                    snapToken = data.snapToken
+                    snapToken = data.snapToken //update dari tbltrans terbaru 
+                    alert('new ' + snapToken)
+                    transG = data.transG //update dari tbltrans terbaru
+                    $('#transG').val(transG)
+                    closemodal()
                 }
                 if(data.status == 200){
                     closemodal()

@@ -51,19 +51,23 @@
           }
       });
     }
-    $(() => {
-        const searchBox = $('#searchBox').dxSelectBox({
-            dataSource: {
-                store: {
-                    type: 'odata',
-                    url: "<?php echo e(url('')); ?>/chatHeader?stamp=" + new Date().getTime(),
+    
+    $.ajax({
+        url: '<?php echo e(url("/chatHeader")); ?>?stamp=' + new Date().getTime(),
+        method: 'GET',
+        success: function (data) {
+            $('#searchBox').dxSelectBox({
+                inputAttr: { 'aria-label': 'Product userid' },
+                dataSource: new DevExpress.data.ArrayStore({
+                    data: data,
                     key: 'userid',
-                },
-            },
-            displayExpr: 'nama',
-            inputAttr: { 'aria-label': 'Product' },
-            valueExpr: 'userid',
-            searchEnabled: true,
-        }).dxSelectBox('instance');
-    })
+                }),
+                displayExpr: 'nama',
+                valueExpr: 'userid',
+                searchEnabled: true,
+                value: '2',
+            });
+        }
+    });
+    
 </script><?php /**PATH C:\xampp\htdocs\sisbilling9\resources\views/getView/viewHeaderchat.blade.php ENDPATH**/ ?>
