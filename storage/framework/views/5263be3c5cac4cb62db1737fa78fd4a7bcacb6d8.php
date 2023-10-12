@@ -29,7 +29,7 @@
             </tr>
             <tr>
                 <td>No Trans </td>
-                <td> : <?php echo e($trans->notrans); ?></td>
+                <td id="transGR"> : <?php echo e($trans->notrans); ?></td>
             </tr>
             <tr>
                 <td>Angsuran </td>
@@ -83,25 +83,25 @@
     </div><!--End Invoice-->
 
     <script>
-      downloadReceipt()
-      function downloadReceipt() {
-        const data = document.getElementById('invoice-POS');
-        // console.log(data);
+      // downloadReceipt()
+      // function downloadReceipt() {
+      //   const data = document.getElementById('invoice-POS');
+      //   // console.log(data);
       
-        html2canvas(data).then((canvas) => {
-          // Few necessary setting options
-          const imgWidth = 208;
-          const pageHeight = 295;
-          const imgHeight = canvas.height * imgWidth / canvas.width;
-          const heightLeft = imgHeight;
+      //   html2canvas(data).then((canvas) => {
+      //     // Few necessary setting options
+      //     const imgWidth = 208;
+      //     const pageHeight = 295;
+      //     const imgHeight = canvas.height * imgWidth / canvas.width;
+      //     const heightLeft = imgHeight;
       
-          const contentDataURL = canvas.toDataURL('image/png');
-          const pdf = new jspdf('p', 'mm', 'a4'); // A4 size page of PDF
-          const position = 0;
-          pdf.addImage(contentDataURL, 'PNG', 0, position, imgWidth, imgHeight);
-          pdf.save('ikismail.pdf'); // Generated PDF
-        });
-      }
+      //     const contentDataURL = canvas.toDataURL('image/png');
+      //     const pdf = new jspdf('p', 'mm', 'a4'); // A4 size page of PDF
+      //     const position = 0;
+      //     pdf.addImage(contentDataURL, 'PNG', 0, position, imgWidth, imgHeight);
+      //     pdf.save('ikismail.pdf'); // Generated PDF
+      //   });
+      // }
       
       // Panggil fungsi downloadReceipt() saat halaman dimuat (opsional)
       // window.onload = downloadReceipt;

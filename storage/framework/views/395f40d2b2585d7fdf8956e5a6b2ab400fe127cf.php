@@ -98,11 +98,21 @@
     </div>
     <?php if($trans->statusid == 5 || $trans->statusid == 11): ?>
         <?php if($trans->companyid != session('UIDGlob')->companyid): ?>
+        <div class="onpay row">
             <button type="submit" class="col-5 btn btn-success mt-4" name="reject" value="0">Bayar Tagihan</button>
             <div class="col-2"></div>
-            <button type="button" class="col-5 btn btn-primary mt-4" id="pay-button" name="reject" value="0">Gunakan Payment Gateway</button>
+            <button id="gatewayClose" type="button" class="col-5 btn btn-primary mt-4" onclick="payGateway(event)" name="reject" value="0">Gunakan Payment Gateway</button>
+            <div id="gatewayOpen" class="col-5 mt-4" style="display: none;">
+                <div class="btn-group" style="width: 110%;">
+                    <button type="button" onclick="payGateway(event)" class="btn btn-primary">Menungu Pembayaran</button>
+                    <button type="button" onclick="payExpire()" class="btn btn-danger">Tutup Pembayaran</button>
+                </div>
+            </div>
+        </div>
         <?php else: ?>
-            <button type="button" onclick="voidtrans('<?php echo e($trans->notrans); ?>')" class="btn btn-danger mt-4" name="reject" value="0">Void</button>
+        <div class="onpay">
+            <button type="button" onclick="voidtrans()" class="btn btn-danger mt-4" name="reject" value="0">Void</button>
+        </div>
         <?php endif; ?>
     <?php elseif($trans->statusid == 6): ?>
         <?php if($trans->companyid == session('UIDGlob')->companyid): ?>
@@ -111,9 +121,9 @@
             <button type="submit" class="col-5 btn btn-success mt-4" name="reject" value="0">Konfirmasi Pembayaran</button>
         <?php endif; ?>
     <?php elseif($trans->statusid == 7): ?>
-        <center>
-            <h3 class="mt-4" style="color:red;">LUNAS</h3>
-        </center>
+            <center>
+                <h3 class="mt-4" style="color:red;">LUNAS</h3>
+            </center>
     <?php elseif($trans->statusid == 13): ?>
         <center>
             <h3 class="mt-4" style="color:red;">VOID</h3>
@@ -169,12 +179,12 @@
         xhr.send(form);
     }) 
     
-    function voidtrans(notrans){
+    function voidtrans(){
         $.ajax({
             type: 'GET',
             cache: false,
             url: '<?php echo e(url("/voidtrans")); ?>', //status = 13
-            data: {notrans},
+            data: {transG},
             success: function(data) {
                 if (typeof querysaled === 'function') {
                     querysaled()
@@ -193,33 +203,39 @@
             }
         });
     }
-    var payButton = document.querySelector('#pay-button');
-    if(payButton != null){
-        payButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            alert(snapToken)
-            snap.pay(snapToken, {
-                onSuccess: function(result) {
-                    console.log('onSuccess',result)
-                    paymentsuccess(transG)
-                },
-                onPending: function(result) {
-                    console.log('onPending',result)
-                    paymentsuccess(transG)
-                },
-                onError: function(result) {
-                    console.log('onError',result)
-                    paymentsuccess(transG)
-                },
-                onClose: function(result){
-                    console.log('onclose',result)
-                    paymentsuccess(transG)
-                }
-            });
+    function payGateway(event){
+        event.preventDefault();
+        if(snapToken == null || snapToken == ''){
+            closemodal2()
+            new Noty({
+                text: 'Jaringan Bermasalah,Tolong Buka ulang Tagihan',
+                timeout: 5000,
+            }).show();
+            return false
+        }
+        snap.pay(snapToken, {
+            onSuccess: function(result) {
+                console.log('onSuccess',result)
+                paymentsuccess(transG)
+            },
+            onPending: function(result) {
+                console.log('onPending',result)
+                paymentsuccess(transG)
+                $('#gatewayClose').hide()
+                $('#gatewayOpen').show()
+            },
+            onError: function(result) {
+                console.log('onError',result)
+                paymentsuccess(transG)
+            },
+            onClose: function(result){
+                console.log('onclose',result)
+                paymentsuccess(transG)
+            }
         });
     }
-    function paymentsuccess(notrans){
-        // $('#loader').show('slow')
+    function paymentsuccess(){
+        $('#loader').show('slow')
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -229,7 +245,7 @@
             type: 'POST',
             cache: false,
             url: '<?php echo e(url("/confirmPembayaranMID")); ?>',
-            data: {notrans},
+            data: {'notrans' : transG},
             success: function(data) {
                 new Noty({
                     text: data.msg,
@@ -245,22 +261,54 @@
                 loadbilling()
                 if(data.status == 407){
                     snapToken = data.snapToken //update dari tbltrans terbaru 
-                    alert('new ' + snapToken)
                     transG = data.transG //update dari tbltrans terbaru
                     $('#transG').val(transG)
-                    closemodal()
+                    $('#transGR').html(' : '+transG)
+                    $('#gatewayClose').show()
+                    $('#gatewayOpen').hide()
+                }else if(data.status == 200){
+                    $('.onpay').html(`<center>
+                                        <h3 class="mt-4" style="color:red;">LUNAS</h3>
+                                    </center>`)
                 }
-                if(data.status == 200){
-                    closemodal()
-                }
-                // $('#loader').hide('slow')
+                $('#loader').hide('slow')
             },
             error: function(xhr, status, error) {
                 new Noty({
                     text: error,
                     timeout: 10000 
                 }).show();
-                // $('#loader').hide('slow')
+                $('#loader').hide('slow')
+            }
+        });
+    }
+    function payExpire(){
+        $('#loader').show('slow')
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        $.ajax({
+            type: 'POST',
+            cache: false,
+            url: '<?php echo e(url("/confirmPembayaranMID")); ?>',
+            data: {'notrans' : transG, 'type' : 'expire'},
+            success: function(data) {
+                snapToken = data.snapToken //update dari tbltrans terbaru 
+                transG = data.transG //update dari tbltrans terbaru
+                $('#transG').val(transG)
+                $('#transGR').html(' : '+transG)
+                $('#gatewayClose').show()
+                $('#gatewayOpen').hide()
+                $('#loader').hide('slow')
+            },
+            error: function(xhr, status, error) {
+                new Noty({
+                    text: error,
+                    timeout: 10000 
+                }).show();
+                $('#loader').hide('slow')
             }
         });
     }

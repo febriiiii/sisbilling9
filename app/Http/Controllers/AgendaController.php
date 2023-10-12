@@ -65,7 +65,7 @@ class AgendaController extends Controller
                 $this->createTrans($request->key,$request->AppointmentId);
             }else{
                 tblbilling::where('userid',$request->key)->where('AppointmentId',$request->AppointmentId)->delete();
-                $data = tbltrans::where('AppointmentId',$request->AppointmentId)->where('userid',$request->key)->where('statusid',5)->get();
+                $data = tbltrans::where('AppointmentId',$request->AppointmentId)->where('userid',$request->key)->where('statusid',5)->where('MIDstatus','<>',500)->get();
                 foreach ($data as $d) {
                     $d->update(['statusid' => 4, 'UserUpdate' => session('UIDGlob')->userid, 'UpdateDT' => Carbon::now(config('app.GMT'))]);
                 }
@@ -85,7 +85,7 @@ class AgendaController extends Controller
                 $this->createTrans($request->userid,$request->key);
             }else{
                 tblbilling::where('userid',$request->userid)->where('AppointmentId',$request->key)->delete();
-                $data = tbltrans::where('AppointmentId',$request->key)->where('userid',$request->userid)->where('statusid',5)->get();
+                $data = tbltrans::where('AppointmentId',$request->key)->where('userid',$request->userid)->where('statusid',5)->where('MIDstatus','<>',500)->get();
                 foreach ($data as $d) {
                     $d->update(['statusid' => 4, 'UserUpdate' => session('UIDGlob')->userid, 'UpdateDT' => Carbon::now(config('app.GMT'))]);
                 }
