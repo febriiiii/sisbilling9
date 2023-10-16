@@ -23,6 +23,7 @@ return new class extends Migration
             $table->unsignedInteger('paymentid')->nullable();
             $table->foreign('paymentid')->references('paymentid')->on('tblpaymentmethod');
             $table->dateTime('transdate');
+            $table->boolean('onEOD')->default(0);
             $table->dateTime('jatuhTempoTagihan');
             $table->double('SisaPok');
             $table->double('Pokok');

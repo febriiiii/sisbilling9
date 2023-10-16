@@ -66,3 +66,11 @@ null
 null
 null
 null
+{"notrans":"1SU23101200011","notransExpire":null,"companyid":"1","userid":"2","AppointmentId":"1","paymentid":"2","transdate":"2023-10-12 16:54:34.430","jatuhTempoTagihan":"2023-11-01 00:00:00.000","SisaPok":"10000.0","Pokok":"10000.0","Bunga":"0.0","LateFee":"100.0","JHT":"0","SPokok":"10000.0","SBunga":"0.0","SLateFee":"0.0","SisaCCL":null,"KodePay":"T","statusid":"7","isreject":"0","snap_token":"36f092b2-1e5f-4fb7-ba21-a2696c0c80c5","MIDstatus":"200","MIDstatusmsg":"settlement","MIDpaymenttype":"bank_transfer","MIDUpdateUser":"2","MIDall":"{\"status_code\":\"200\",\"transaction_id\":\"f96fd69d-f0be-4d5c-bdb4-b0ca97789012\",\"gross_amount\":\"10000.00\",\"currency\":\"IDR\",\"order_id\":\"1SU23101200011\",\"payment_type\":\"bank_transfer\",\"signature_key\":\"afb69564a5c776efac90d26036a67be461ea3b5c6af0adc3b7e9cca7db6a733b51dfa82440c95c9526207f1349dd92c7724b5b4ec35dfccd0cdc246aed0e4242\",\"transaction_status\":\"settlement\",\"fraud_status\":\"accept\",\"status_message\":\"Success, transaction is found\",\"merchant_id\":\"G191353295\",\"va_numbers\":[{\"bank\":\"bca\",\"va_number\":\"53295547841\"}],\"payment_amounts\":[],\"transaction_time\":\"2023-10-12 16:55:56\",\"settlement_time\":\"2023-10-12 16:56:08\",\"expiry_time\":\"2023-10-13 16:55:56\"}","UserInsert":"1","InsertDT":"2023-10-12 16:54:34.430","UserUpdate":"1","UpdateDT":"2023-10-12 16:54:34.430"}
+null
+null
+null
+{"notrans":"1SU23101300001","notransExpire":null,"companyid":"1","userid":"2","AppointmentId":"1","paymentid":null,"transdate":"2023-10-13 08:29:51.777","jatuhTempoTagihan":"2023-11-01 00:00:00.000","SisaPok":"10000.0","Pokok":"10000.0","Bunga":"0.0","LateFee":"100.0","JHT":"0","SPokok":"10000.0","SBunga":"0.0","SLateFee":"0.0","SisaCCL":null,"KodePay":"T","statusid":"5","isreject":"0","snap_token":null,"MIDstatus":null,"MIDstatusmsg":null,"MIDpaymenttype":null,"MIDUpdateUser":null,"MIDall":null,"UserInsert":"1","InsertDT":"2023-10-13 08:29:51.777","UserUpdate":"1","UpdateDT":"2023-10-13 08:29:51.777"}
+null
+null
+null

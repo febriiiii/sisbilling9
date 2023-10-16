@@ -50,7 +50,7 @@
     <div class="col-auto me-4">
       <div class="row">
         <div class="col-auto" style="padding:0">
-          <div class="scedulerketDot" style="background-color: #FB0822; height:20px; width:20px; border-radius:100%;"></div>
+          <div class="scedulerketDot" style="background-color: #08e7fb; height:20px; width:20px; border-radius:100%;"></div>
         </div>
         <div class="col" style="padding:0 0 0 5px;">
           <div>Menunggu Pembayaran</div>
@@ -75,7 +75,7 @@
                       if(e.statusid == 6){
                           color = "#FFE569";
                       }else if(e.statusid == 11){
-                        color = "#FB0822";
+                        color = "#08e7fb";
                       }
                       var content = `<div class="card box" style="border-radius:15px; margin-top:0;margin-bottom:15px;">` +
                                       `<div class="ribbon-2" style="background:`+color+`">`+e.productName+`</div>` +

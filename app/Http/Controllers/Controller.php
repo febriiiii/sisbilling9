@@ -71,6 +71,8 @@ class Controller extends BaseController
     }
 
     public function login(){
+        $eod = new TransactionController;
+        $eod->eod();
         return view('displayLogin');
     }
     

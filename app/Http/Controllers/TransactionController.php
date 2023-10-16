@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendMail;
+use App\Models\tblsyspara;
 use App\Models\tbluser;
 use GuzzleHttp\Client;
 use Symfony\Component\Translation\Extractor\Visitor\TransMethodVisitor;
@@ -165,7 +166,7 @@ class TransactionController extends Controller
                     'LateFee' => ($tblagenda->Pokok * $tblagenda->lateFeePercent / 100),
                     'JHT' => 0,
                     'SPokok' => $tblagenda->Pokok,
-                    'SBunga' => 0,
+                    'SBunga' => ($tblagenda->Pokok * $tblagenda->BungaPercent / 100),
                     'SLateFee' => 0,
                     'transdate' => now(config('app.GMT')),
                     'jatuhTempoTagihan' => $nextDate,
@@ -372,7 +373,7 @@ class TransactionController extends Controller
                     'transG' => $transG,
                     'snapToken' => $snapToken,
                     'status' => $MID->status_code,
-                    'msg' => isset($MID->transaction_status)?$MID->transaction_status:'Jaringan Error, Coba Kembali Beberapa Saat', 
+                    'msg' => isset($MID->transaction_status)?$MID->transaction_status:'', 
                 ];
             }
             return [
@@ -394,26 +395,31 @@ class TransactionController extends Controller
     }
     private function expirePayment($notrans)
     {
-        $midtransServerKey = config('app.serverKey');
-        $client = new Client(); 
-        $url = "https://api.sandbox.midtrans.com/v2/{$notrans}/expire";
-        $headers = [
-            'Authorization' => 'Basic ' . base64_encode($midtransServerKey . ':'),
-            'Accept' => 'application/json',
-            'Content-Type' => 'application/json',
-        ];
-        $cekTrans = tbltrans::find($notrans); // cek jika transaksi milik user tersebut
-        if($cekTrans->userid == session('UIDGlob')->userid){
-            $response = $client->request('POST', $url, [
-                'headers' => $headers,
-            ]);
-            $statusCode = $response->getStatusCode();
-            if ($statusCode == 200) {
-                return true;
-            } else {
-                return false; //'Payment Expire Failed: ' . $data->message;
+        try {
+            $midtransServerKey = config('app.serverKey');
+            $client = new Client(); 
+            $url = config('app.URLmidv2').$notrans."/expire";
+            $headers = [
+                'Authorization' => 'Basic ' . base64_encode($midtransServerKey . ':'),
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ];
+            $cekTrans = tbltrans::find($notrans); // cek jika transaksi milik user tersebut
+            if($cekTrans->userid == session('UIDGlob')->userid){
+                $response = $client->request('POST', $url, [
+                    'headers' => $headers,
+                ]);
+                $statusCode = $response->getStatusCode();
+                if ($statusCode == 200) {
+                    return true;
+                } else {
+                    return false; //'Payment Expire Failed: ' . $data->message;
+                }
             }
+        } catch (\Throwable $th) {
+            return false;
         }
+        
     }
     private function MIDsuccess($tbltrans,$payType){
         $tbltrans->update(['statusid' => 7,'paymentid' => 2]);
@@ -564,25 +570,37 @@ class TransactionController extends Controller
     }
 
     public function eod(){
-        DB::update("UPDATE tbltrans SET 
-        jht = IIF(DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP) > 0, DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP),0), 
-        SLateFee = LateFee * IIF(DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP) > 0, DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP),0),
-        SPokok = Pokok");
-
-        $tblagenda = collect(DB::select("SELECT a.AppointmentId, t.companyid, t.userid, t.notrans,t.jatuhTempoTagihan,a.StartDate,a.RecurrenceRule,a.RecurrenceException FROM tblagenda a
-                                        JOIN (SELECT AppointmentId, userid, companyid, MAX(notrans) AS notrans,MAX(jatuhTempoTagihan) AS jatuhTempoTagihan FROM tbltrans
-                                                WHERE statusid <> 4
-                                                GROUP BY companyid, userid, AppointmentId) AS t ON a.AppointmentId=t.AppointmentId
-                                        WHERE productCode IS NOT NULL and isBilling = 1
-                                        AND a.statusid <> 4"));
-        foreach ($tblagenda as $agenda) {
-            $nextDate = $this->nextAppointment($agenda->StartDate,$agenda->RecurrenceRule,$agenda->RecurrenceException,$agenda->jatuhTempoTagihan);
-            // $log = new Controller;
-            if( Carbon::parse($nextDate)->format('ymd') == Carbon::now(config('GMT'))->format('ymd') ){
-                // $log->savelog('create dari jatuhtempo ' . $agenda->jatuhTempoTagihan );
-                $this->nextTransaction($agenda->AppointmentId,$agenda->userid,$agenda->jatuhTempoTagihan,$agenda->companyid);
+        $sysDT = (tblsyspara::first()->sysDate != null) ? Carbon::parse(tblsyspara::first()->sysDate) : Carbon::parse('2022-01-01');
+        $currentDate = Carbon::now(config('app.GMT'));
+        if($sysDT->format('y-m-d') != $currentDate->format('y-m-d')){
+            DB::update("UPDATE tbltrans SET 
+            statusid = IIF(jht <> IIF(DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP) > 0, DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP),0),4,statusid),
+            onEOD = IIF(jht <> IIF(DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP) > 0, DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP),0),1,0),
+            jht = IIF(DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP) > 0, DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP),0), 
+            SLateFee = LateFee * IIF(DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP) > 0, DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP),0),
+            SPokok = Pokok WHERE statusid = 5");
+            
+            $tbltranss = tbltrans::where('onEOD',1)->where('statusid',4)->get();
+            foreach ($tbltranss as $tbltrans) {
+                $this->MIDexpire($tbltrans);
             }
+            DB::update("UPDATE tbltrans SET onEOD = 0");
+            $tblagenda = collect(DB::select("SELECT a.AppointmentId, t.companyid, t.userid, t.notrans,t.jatuhTempoTagihan,a.StartDate,a.RecurrenceRule,a.RecurrenceException FROM tblagenda a
+                                            JOIN (SELECT AppointmentId, userid, companyid, MAX(notrans) AS notrans,MAX(jatuhTempoTagihan) AS jatuhTempoTagihan FROM tbltrans
+                                                    WHERE statusid <> 4
+                                                    GROUP BY companyid, userid, AppointmentId) AS t ON a.AppointmentId=t.AppointmentId
+                                            WHERE productCode IS NOT NULL and isBilling = 1
+                                            AND a.statusid <> 4"));
+            foreach ($tblagenda as $agenda) {
+                $nextDate = $this->nextAppointment($agenda->StartDate,$agenda->RecurrenceRule,$agenda->RecurrenceException,$agenda->jatuhTempoTagihan);
+                // $log = new Controller;
+                if( Carbon::parse($nextDate)->format('ymd') == Carbon::now(config('GMT'))->format('ymd') ){
+                    // $log->savelog('create dari jatuhtempo ' . $agenda->jatuhTempoTagihan );
+                    $this->nextTransaction($agenda->AppointmentId,$agenda->userid,$agenda->jatuhTempoTagihan,$agenda->companyid);
+                }
+            }
+            tblsyspara::first()->update(['sysDate' => Carbon::now(config('app.GMT'))]);
+            return true;
         }
-        return true;
     }
 }

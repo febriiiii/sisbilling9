@@ -266,10 +266,12 @@
             url: '{{url("/confirmPembayaranMID")}}',
             data: {'notrans' : transG},
             success: function(data) {
-                new Noty({
-                    text: data.msg,
-                    timeout: 2000 
-                }).show();
+                if(data.msg != ''){
+                    new Noty({
+                        text: data.msg,
+                        timeout: 2000 
+                    }).show();
+                }
                 renderlonceng()
                 if (typeof querysaled === 'function') {
                     querysaled()
