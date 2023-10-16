@@ -279,8 +279,10 @@ class AgendaController extends Controller
                                     productName,
                                     pokok,
                                     CASE
-                                        WHEN CHARINDEX('FREQ=', RecurrenceRule) > 0 THEN
+                                        WHEN CHARINDEX('FREQ=', RecurrenceRule) > 0 AND CHARINDEX(';', RecurrenceRule, CHARINDEX('FREQ=', RecurrenceRule) + LEN('FREQ=')) - (CHARINDEX('FREQ=', RecurrenceRule) + LEN('FREQ=')) >= 0 THEN
                                             SUBSTRING(RecurrenceRule, CHARINDEX('FREQ=', RecurrenceRule) + LEN('FREQ='), CHARINDEX(';', RecurrenceRule, CHARINDEX('FREQ=', RecurrenceRule) + LEN('FREQ=')) - (CHARINDEX('FREQ=', RecurrenceRule) + LEN('FREQ=')))
+                                        WHEN CHARINDEX('FREQ=', RecurrenceRule) > 0 AND CHARINDEX(';', RecurrenceRule, CHARINDEX('FREQ=', RecurrenceRule) + LEN('FREQ=')) - (CHARINDEX('FREQ=', RecurrenceRule) + LEN('FREQ=')) < 0 THEN 
+                                            SUBSTRING('FREQ=DAILY', CHARINDEX('=', 'FREQ=DAILY') + 1, LEN('FREQ=DAILY'))
                                         ELSE
                                             ''
                                     END AS frequency

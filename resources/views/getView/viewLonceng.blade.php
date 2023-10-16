@@ -41,13 +41,13 @@
             <li onclick="opnchat({{$c->chatid}})"><a class="dropdown-item card mt-1" href="#">{{$c->total}} Pesan Dari {{$limitedString}} </a></li>
         @endforeach
         @foreach ($notif['invoice'] as $i)
-            <li onclick="payment('{{$i->notrans}}')"><a class="dropdown-item card mt-1" href="#">Invoice : {{$i->notrans}} </a></li>
+            <li onclick="payment('{{$i->notrans}}')"><a class="dropdown-item card mt-1" href="#">Tagihan : {{$i->Text}} </a></li>
         @endforeach
         @foreach ($notif['invoiceReject'] as $i)
-            <li onclick="payment('{{$i->notrans}}')"><a class="dropdown-item card mt-1" href="#">Reject : {{$i->notrans}} </a></li>
+            <li onclick="payment('{{$i->notrans}}')"><a class="dropdown-item card mt-1" href="#">Reject {{$i->Text}} : {{$i->notrans}} </a></li>
         @endforeach
         @foreach ($notif['invoiceWaiting'] as $i)
-            <li onclick="payment('{{$i->notrans}}')"><a class="dropdown-item card mt-1" href="#">Approval : {{$i->notrans}} </a></li>
+            <li onclick="payment('{{$i->notrans}}')"><a class="dropdown-item card mt-1" href="#">Approval {{$i->Text}} : {{$i->notrans}} </a></li>
         @endforeach
     </ul>
 </div>

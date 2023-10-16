@@ -29,7 +29,7 @@
 <link href="{{asset('public/noty/lib/noty.css')}}" rel="stylesheet">
 <script src="{{asset('public/noty/lib/noty.js')}}" type="text/javascript"></script>
 {{-- MIDTRANS --}}
-<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('app.clientKey') }}"></script>
+<script src="{{env('linkHeader')}}" data-client-key="{{ config('app.clientKey') }}"></script>
 {{-- PWA --}}
 {{-- <link rel="manifest" href="{{url('/manifest.json')}}"> --}}
 {{-- headerscript --}}

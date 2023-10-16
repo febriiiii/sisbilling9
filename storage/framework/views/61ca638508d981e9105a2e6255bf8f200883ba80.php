@@ -116,11 +116,13 @@
   $('#userIn').dxDataGrid(getDataGridConfiguration(1))
   
   function switcheds(key,values){
+    $('#loader').show()
     $.ajax({
       type: 'GET',
       cache: false,
       url: '<?php echo e(url("/getPokok?AppointmentId=")); ?>' + key, 
       success: function(agenda) {
+          $('#loader').hide()
           if(agenda[0].Pokok <= 1 ){
               new Noty({
                   text: "Pokok Tidak Boleh Kosong",
@@ -148,6 +150,7 @@
               text: error,
               timeout: 2000 
           }).show();
+          $('#loader').hide()
       }
     });
   }

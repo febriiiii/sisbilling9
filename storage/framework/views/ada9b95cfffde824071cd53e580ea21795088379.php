@@ -29,7 +29,7 @@
 <link href="<?php echo e(asset('public/noty/lib/noty.css')); ?>" rel="stylesheet">
 <script src="<?php echo e(asset('public/noty/lib/noty.js')); ?>" type="text/javascript"></script>
 
-<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="<?php echo e(config('app.clientKey')); ?>"></script>
+<script src="<?php echo e(env('linkHeader')); ?>" data-client-key="<?php echo e(config('app.clientKey')); ?>"></script>
 
 
 

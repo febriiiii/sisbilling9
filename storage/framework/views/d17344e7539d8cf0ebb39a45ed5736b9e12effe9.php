@@ -24,6 +24,7 @@
   const URLreadchat = '<?php echo e(url("/readchat")); ?>'
   const URLupdateDevice = '<?php echo e(route("updateDevice")); ?>'
   const URLserviceworker = '<?php echo e(url("/service-worker.js")); ?>'
+  const URLsse = '<?php echo e(url("/sse")); ?>'
 </script>
 <script type="text/javascript" src="<?php echo e(asset('public/js/footerscript.js')); ?>" ></script>
 <script type="module" src="<?php echo e(asset('public/js/module.js')); ?>" ></script>

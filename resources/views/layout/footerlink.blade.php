@@ -24,6 +24,7 @@
   const URLreadchat = '{{url("/readchat")}}'
   const URLupdateDevice = '{{ route("updateDevice") }}'
   const URLserviceworker = '{{url("/service-worker.js")}}'
+  const URLsse = '{{ url("/sse") }}'
 </script>
 <script type="text/javascript" src="{{asset('public/js/footerscript.js')}}" ></script>
 <script type="module" src="{{asset('public/js/module.js')}}" ></script>

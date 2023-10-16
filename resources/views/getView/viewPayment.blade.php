@@ -46,7 +46,7 @@
 }
 </style>
 
-
+<button onclick="paymentsuccess(transG)">Check</button>
 <form class="row" style="padding: 0 20px 0 20px; margin:0;" id="viewpayment-submit">
     @csrf
     <h6>Informasi</h6><hr>
@@ -150,6 +150,7 @@
     @endif
     <div id="PayloadMID"></div>
 </form>
+
 <script>
     var transG = '{{$trans->notrans}}'
     var snapToken = '{{ $snapToken }}';
@@ -292,6 +293,7 @@
                                         <h3 class="mt-4" style="color:red;">LUNAS</h3>
                                     </center>`)
                 }
+                renderlonceng()
                 $('#loader').hide('slow')
             },
             error: function(xhr, status, error) {

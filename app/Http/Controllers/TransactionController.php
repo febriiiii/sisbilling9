@@ -134,6 +134,15 @@ class TransactionController extends Controller
 
         $notrans = $notransHeader.sprintf("%05d", $lastTrans[0]->maxNotrans);
         while ($this->cekstatusMID($notrans)->status_code != 404) {
+            if($this->cekstatusMID($notrans)->status_code == 401){
+                dd(
+                    $this->cekstatusMID($notrans), 
+                    config('app.serverKey'), 
+                    "base64_encode : " . base64_encode(config('app.serverKey').':'), 
+                    config('app.URLmidv2'),
+                    "isProduction : ".config('app.isProduction')
+                ); // Stop Looping
+            }
             $notrans = intval(substr($notrans, strlen($notransHeader))); // Mengambil angka dari nomor transaksi
             $notrans++; // Increment nomor transaksi jika sudah dipakai di MIDTRANS
             $notrans = $notransHeader.sprintf("%05d", $notrans); // Menggabungkan kembali nomor transaksi yang telah di-increment
@@ -150,9 +159,10 @@ class TransactionController extends Controller
                                         ->where('userid',$userid)
                                         ->where('AppointmentId',$AppointmentId)
                                         ->where('statusid','<>',4)
+                                        ->where('statusid','<>',7)
                                         ->first();
-            $log = new Controller;
-            $log->savelog(json_encode($cekIssetTrans));
+            // $log = new Controller;
+            // $log->savelog(json_encode($cekIssetTrans));
             if(!isset($cekIssetTrans)){ //Jika sudah ada jangan buat transaksi tagihan
                 tbltrans::create([
                     'notrans' => $notrans,
@@ -396,11 +406,10 @@ class TransactionController extends Controller
     private function expirePayment($notrans)
     {
         try {
-            $midtransServerKey = config('app.serverKey');
             $client = new Client(); 
             $url = config('app.URLmidv2').$notrans."/expire";
             $headers = [
-                'Authorization' => 'Basic ' . base64_encode($midtransServerKey . ':'),
+                'Authorization' => 'Basic ' . base64_encode(config('app.serverKey') . ':'),
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
             ];
@@ -506,7 +515,8 @@ class TransactionController extends Controller
         $url = config('app.URLmidv2').$notrans.'/status';
         $headers = array(
             'Accept: application/json',
-            'Authorization: Basic U0ItTWlkLXNlcnZlci03STQ3NGV6QUE4QXZiejlzT0VHTW81bnc6'
+            // 'Authorization: Basic U0ItTWlkLXNlcnZlci03STQ3NGV6QUE4QXZiejlzT0VHTW81bnc6'
+            'Authorization: Basic ' . base64_encode(config('app.serverKey') . ':')
         );
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
@@ -527,7 +537,8 @@ class TransactionController extends Controller
 
         $headers = array(
             'Accept: application/json',
-            'Authorization: Basic U0ItTWlkLXNlcnZlci03STQ3NGV6QUE4QXZiejlzT0VHTW81bnc6'
+            // 'Authorization: Basic U0ItTWlkLXNlcnZlci03STQ3NGV6QUE4QXZiejlzT0VHTW81bnc6'
+            'Authorization: Basic ' . base64_encode(config('app.serverKey') . ':')
         );
 
         $curl = curl_init();
@@ -567,6 +578,11 @@ class TransactionController extends Controller
             'trans' => $array['trans'],
         ];
         Mail::to($array['email'])->send(new SendMail($data));
+    }
+    public function paymentWebHook(Request $request){
+        $log = new Controller;
+        $log->savelog(Carbon::now(config('app.GMT')).' WeebHook MID : '. json_encode($request->all()));
+        return json_encode($request->all());
     }
 
     public function eod(){

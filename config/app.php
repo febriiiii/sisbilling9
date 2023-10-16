@@ -222,8 +222,8 @@ return [
 
     'serverKey' => env('Server_Key'),
     'clientKey' => env('Client_Key'),
-    'isProduction' => false,
+    'isProduction' => env('isProduction'),
     'isSanitized' => true,
     'is3ds' => true,
-    'URLmidv2' => 'https://api.sandbox.midtrans.com/v2/',
+    'URLmidv2' => env('URLmidv2'),
 ];

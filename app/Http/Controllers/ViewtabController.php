@@ -101,7 +101,7 @@ class ViewtabController extends Controller
     }
     public function viewpayment(Request $request){
         $trans = tbltrans::select('notrans','tblcomp.companyname','tblagenda.text','tbluser.userid','tbluser.nama','tbluser.email','tbluser.hp','tbluser.alamatSingkat','tbltrans.companyid','tbltrans.statusid','jatuhTempoTagihan','tbltrans.Pokok',DB::raw('tbltrans.SPokok + tbltrans.SBunga + tbltrans.SLateFee as Amount'),DB::raw('CONCAT(tblagenda.productCode, tblagenda.companyid) as kodebarang'))
-        ->addSelect(DB::raw('(SELECT COUNT(notrans) + 1 FROM tbltrans s WHERE AppointmentId = tbltrans.AppointmentId AND userid = tbltrans.userid AND jatuhTempoTagihan <= tbltrans.jatuhTempoTagihan) as angsuran'))
+        ->addSelect(DB::raw('(SELECT COUNT(notrans) FROM tbltrans s WHERE AppointmentId = tbltrans.AppointmentId AND userid = tbltrans.userid AND jatuhTempoTagihan <= tbltrans.jatuhTempoTagihan) as angsuran'))
         ->join('tbluser','tbluser.userid','=','tbltrans.userid')
         ->join('tblagenda','tblagenda.AppointmentId','=','tbltrans.AppointmentId')
         ->join('tblcomp','tblcomp.companyid','=','tblagenda.companyid')
@@ -146,18 +146,24 @@ class ViewtabController extends Controller
                                                 AND ".session('UIDGlob')->userid." NOT IN (SELECT value FROM STRING_SPLIT(usersRead, ','))                                    
                                                 AND statusid NOT IN (4)");
         
-        $notif['invoice'] = DB::select("SELECT * FROM tbltrans WHERE statusid NOT IN (8, 9, 4) 
-                                        AND companyid IN (".$cid.") 
-                                        AND userid = ".session('UIDGlob')->userid." 
-                                        AND DATEADD(DAY, -7, jatuhTempoTagihan) < '".now()->toDateTimeString()."'");
+        $notif['invoice'] = DB::select("SELECT t.*, a.Text FROM tbltrans t
+                                        JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
+                                        WHERE t.statusid NOT IN (7, 8, 9, 4) 
+                                        AND t.companyid IN (".$cid.") 
+                                        AND t.userid = ".session('UIDGlob')->userid." 
+                                        AND DATEADD(DAY, -7, t.jatuhTempoTagihan) < '".now()->toDateTimeString()."'");
         
-        $notif['invoiceReject'] = DB::select("SELECT * FROM tbltrans WHERE statusid NOT IN (8, 9, 4) 
-                                        AND companyid IN (".$cid.") 
-                                        AND userid = ".session('UIDGlob')->userid." 
-                                        AND isreject = 1");
+        $notif['invoiceReject'] = DB::select("SELECT t.*, a.Text FROM tbltrans t
+                                        JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
+                                        WHERE t.statusid NOT IN (8, 9, 4) 
+                                        AND t.companyid IN (".$cid.") 
+                                        AND t.userid = ".session('UIDGlob')->userid." 
+                                        AND t.isreject = 1");
 
         $mycompanyid =  isset(session('UIDGlob')->companyid)? session('UIDGlob')->companyid : 0 . " ";
-        $notif['invoiceWaiting'] = DB::select("SELECT * FROM tbltrans WHERE statusid = 6 AND companyid = " . $mycompanyid);
+        $notif['invoiceWaiting'] = DB::select("SELECT t.*, a.Text FROM tbltrans t
+                                            JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
+                                            WHERE t.statusid = 6 AND t.companyid = " . $mycompanyid);
         
         $notif['count'] = count($notif['chat'])+count($notif['pengumuman'])+count($notif['invoice'])+count($notif['invoiceReject'])+count($notif['invoiceWaiting']);
         return view('getView.viewLonceng',compact('notif'))->render();

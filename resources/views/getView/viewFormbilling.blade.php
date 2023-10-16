@@ -116,6 +116,7 @@
   $('#userIn').dxDataGrid(getDataGridConfiguration(1))
   
   function switcheds(key,values){
+    $('#loader').show()
     $.ajax({
       type: 'GET',
       cache: false,
@@ -142,12 +143,14 @@
                 }]);
             });
           }
+          $('#loader').hide()
       },
       error: function(xhr, status, error) {
           new Noty({
               text: error,
               timeout: 2000 
           }).show();
+          $('#loader').hide()
       }
     });
   }

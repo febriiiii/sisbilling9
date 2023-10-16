@@ -46,7 +46,7 @@
 }
 </style>
 
-
+<button onclick="paymentsuccess(transG)">Check</button>
 <form class="row" style="padding: 0 20px 0 20px; margin:0;" id="viewpayment-submit">
     <?php echo csrf_field(); ?>
     <h6>Informasi</h6><hr>
@@ -273,6 +273,7 @@
                                         <h3 class="mt-4" style="color:red;">LUNAS</h3>
                                     </center>`)
                 }
+                renderlonceng()
                 $('#loader').hide('slow')
             },
             error: function(xhr, status, error) {

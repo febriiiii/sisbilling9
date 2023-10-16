@@ -41,13 +41,13 @@
             <li onclick="opnchat(<?php echo e($c->chatid); ?>)"><a class="dropdown-item card mt-1" href="#"><?php echo e($c->total); ?> Pesan Dari <?php echo e($limitedString); ?> </a></li>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         <?php $__currentLoopData = $notif['invoice']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <li onclick="payment('<?php echo e($i->notrans); ?>')"><a class="dropdown-item card mt-1" href="#">Invoice : <?php echo e($i->notrans); ?> </a></li>
+            <li onclick="payment('<?php echo e($i->notrans); ?>')"><a class="dropdown-item card mt-1" href="#">Tagihan : <?php echo e($i->Text); ?> </a></li>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         <?php $__currentLoopData = $notif['invoiceReject']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <li onclick="payment('<?php echo e($i->notrans); ?>')"><a class="dropdown-item card mt-1" href="#">Reject : <?php echo e($i->notrans); ?> </a></li>
+            <li onclick="payment('<?php echo e($i->notrans); ?>')"><a class="dropdown-item card mt-1" href="#">Reject <?php echo e($i->Text); ?> : <?php echo e($i->notrans); ?> </a></li>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         <?php $__currentLoopData = $notif['invoiceWaiting']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <li onclick="payment('<?php echo e($i->notrans); ?>')"><a class="dropdown-item card mt-1" href="#">Approval : <?php echo e($i->notrans); ?> </a></li>
+            <li onclick="payment('<?php echo e($i->notrans); ?>')"><a class="dropdown-item card mt-1" href="#">Approval <?php echo e($i->Text); ?> : <?php echo e($i->notrans); ?> </a></li>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </ul>
 </div>
