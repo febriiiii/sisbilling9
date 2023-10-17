@@ -180,9 +180,9 @@ class TransactionController extends Controller
                     'SLateFee' => 0,
                     'transdate' => now(config('app.GMT')),
                     'jatuhTempoTagihan' => $nextDate,
-                    'UserInsert' => session('UIDGlob')->userid,
+                    'UserInsert' => $userid,
                     'InsertDT' => now(config('app.GMT')),
-                    'UserUpdate' => session('UIDGlob')->userid,
+                    'UserUpdate' => $userid,
                     'UpdateDT' => now(config('app.GMT')),
                 ]);
             }
@@ -234,23 +234,24 @@ class TransactionController extends Controller
             DB::beginTransaction();
             $chatcontroller = new ChatController;
             $tbltrans = tbltrans::find($request->notrans);
+            $user = tbluser::find($tbltrans->userid);
             $status = 1;
             if($tbltrans->statusid != 13){
                 if($tbltrans->statusid == 5 || $tbltrans->statusid == 11){
-                    if(session('UIDGlob')->companyid != $tbltrans->companyid){
+                    if($user->companyid != $tbltrans->companyid){
                         //MELAKUKAN PEMBAYARAN
                         if ($request->hasFile('files')) {
                             if($request->paymentid == null){
                                 $status = 4;
                             }
-                            $path = storage_path('app/public/user/'.session('UIDGlob')->userid.'/notrans/'.$request->notrans.'.*');
+                            $path = storage_path('app/public/user/'.$user->userid.'/notrans/'.$request->notrans.'.*');
                             $files = glob($path);
                             foreach($files as $f){
                                 File::delete($f);
                             }
                             $file = $request->file('files');
                             $exten = $file->getClientOriginalExtension();
-                            $file->storeAs('public/user/'.session('UIDGlob')->userid.'/notrans', $request->notrans.'.'.$exten);
+                            $file->storeAs('public/user/'.$user->userid.'/notrans', $request->notrans.'.'.$exten);
                             $tbltrans->update(['statusid' => 6, 'isreject' => 0, 'paymentid' => $request->paymentid]);
                             $chatcontroller->GlobalPush("notif",$tbltrans->UserInsert);
                         }else{
@@ -260,13 +261,13 @@ class TransactionController extends Controller
                         $status = 2;
                     }
                 }else if($tbltrans->statusid == 6){
-                    if(session('UIDGlob')->companyid == $tbltrans->companyid){
+                    if($user->companyid == $tbltrans->companyid){
                         if($request->reject == 1){
                             //TOLAK PEMBAYARAN
                             $tbltrans->update([
                                 'isreject' => 1, 
                                 'statusid' => 5, 
-                                'UserUpdate' => session('UIDGlob')->userid,
+                                'UserUpdate' => $user->userid,
                                 'UpdateDT' => Carbon::now(config('app.GMT')),
                             ]);
                             $chatcontroller->GlobalPush("notif",$tbltrans->userid);
@@ -284,12 +285,12 @@ class TransactionController extends Controller
                                 'payment_type' => tblpaymentmethod::find($tbltrans->paymentid)->paymentName,
                                 'total' => $total,
                                 'totalPay' => $total,
-                                'UserInsert' => session('UIDGlob')->userid,
+                                'UserInsert' => $user->userid,
                                 'InsertDT' => Carbon::now(config('app.GMT')),
-                                'UserUpdate' => session('UIDGlob')->userid,
+                                'UserUpdate' => $user->userid,
                                 'UpdateDT' => Carbon::now(config('app.GMT')),
                             ]);
-                            $this->nextTransaction($tbltrans->AppointmentId,$tbltrans->userid,$tbltrans->jatuhTempoTagihan,session('UIDGlob')->companyid);
+                            $this->nextTransaction($tbltrans->AppointmentId,$tbltrans->userid,$tbltrans->jatuhTempoTagihan,$user->companyid);
                             $chatcontroller->GlobalPush("renderMyBilling",$tbltrans->userid);
                             $transMail = tbltrans::select('notrans','tblcomp.companyname','tblagenda.text','tbluser.userid','tbluser.nama','tbluser.email','tbluser.hp','tbluser.alamatSingkat','tbltrans.companyid','tbltrans.statusid','jatuhTempoTagihan','tbltrans.Pokok',DB::raw('tbltrans.SPokok + tbltrans.SBunga + tbltrans.SLateFee as Amount'),DB::raw('CONCAT(tblagenda.productCode, tblagenda.companyid) as kodebarang'))
                                                     ->addSelect(DB::raw('(SELECT COUNT(notrans) + 1 FROM tbltrans s WHERE AppointmentId = tbltrans.AppointmentId AND userid = tbltrans.userid AND jatuhTempoTagihan <= tbltrans.jatuhTempoTagihan) as angsuran'))
@@ -341,22 +342,91 @@ class TransactionController extends Controller
             return 'Please Contact Team Suport';
         // }
     }
-    public function confirmPembayaranMID(Request $request){
+    public function sendPaymentRequest()
+    {
+        $payload = [
+            'transaction_type' => 'off-us',
+            'transaction_time' => '2023-10-17 14:53:15',
+            'transaction_status' => 'settlement',
+            'transaction_id' => '7502a437-f280-4323-bf30-18bd83174a19',
+            'status_message' => 'midtrans payment notification',
+            'status_code' => '200',
+            'signature_key' => 'b6402ff061b67e1960e2cc51b4aed1c494a07e5a7458919d6485d88ae594062a7457166bde557436f33dbd96761e6d2aa321822a4811f38245f22c92ab866f6c',
+            'settlement_time' => '2023-10-17 14:54:09',
+            'payment_type' => 'qris',
+            'order_id' => '1SU23101700024',
+            'merchant_id' => 'G191353295',
+            'issuer' => 'BCA',
+            'gross_amount' => '10000.00',
+            'fraud_status' => 'accept',
+            'expiry_time' => '2023-10-17 15:08:15',
+            'currency' => 'IDR',
+            'acquirer' => 'gopay',
+        ];
+
+        $url = 'http://192.168.36.12:8080/sisbilling9/paymentWebHook'; // Gantilah dengan URL yang sesuai
+
+        $client = new Client();
+
+        // Kirim permintaan POST
+        $response = $client->post($url, [
+            'json' => $payload,
+            'headers' => [
+                'Content-Type' => 'application/json',
+            ],
+        ]);
+
+        return $response->getBody();
+    }
+    public function paymentWebHook(Request $request){
+        if (null !== tblpaymenttrans::where('notrans', $request->order_id)->first()) {
+            return [
+                'status' => 200,
+                'msg' => "Transaction Finish",
+                'order' => $request->order_id,
+            ];
+        }
+        $controller = new Controller;
+        $pusher = $controller->setupPUSHER();
+        $controller->savelog(Carbon::now(config('app.GMT')).' WeebHook MID : '. json_encode($request->all()));
         $transG = null;
         $snapToken = null;
         try {
             DB::beginTransaction();
+            $tbltrans = tbltrans::find($request->order_id);
+            $user = tbluser::find($tbltrans->userid);
             if(isset($request->type)){
-                $this->expirePayment($request->notrans);
+                $this->expirePayment($request->order_id,$user);
             }
-            $MID = $this->cekstatusMID($request->notrans);
-            $tbltrans = tbltrans::find($request->notrans);
+            $MID = $this->cekstatusMID($request->order_id);
+            if($MID->status_code == 404){// 404 TRANSAKSI TIDAK DITEMUKAN
+                $trans = tbltrans::select('notrans','tblcomp.companyname','tblagenda.text','tbluser.userid','tbluser.nama','tbluser.email','tbluser.hp','tbluser.alamatSingkat','tbltrans.companyid','tbltrans.statusid','jatuhTempoTagihan','tbltrans.Pokok',DB::raw('tbltrans.SPokok + tbltrans.SBunga + tbltrans.SLateFee as Amount'),DB::raw('CONCAT(tblagenda.productCode, tblagenda.companyid) as kodebarang'))
+                                ->addSelect(DB::raw('(SELECT COUNT(notrans) FROM tbltrans s WHERE AppointmentId = tbltrans.AppointmentId AND userid = tbltrans.userid AND jatuhTempoTagihan <= tbltrans.jatuhTempoTagihan) as angsuran'))
+                                ->join('tbluser','tbluser.userid','=','tbltrans.userid')
+                                ->join('tblagenda','tblagenda.AppointmentId','=','tbltrans.AppointmentId')
+                                ->join('tblcomp','tblcomp.companyid','=','tblagenda.companyid')
+                                ->where('notrans',$request->order_id)->first();
+                $midtrans = new CreateSnapTokenService($trans);
+                $snapToken = $midtrans->getSnapToken();
+                $tbltrans->update(['snap_token' => $snapToken]);
+                $data['type'] = "midtransHook";
+                $data['authuser'] = $tbltrans->userid;
+                $data['transG'] = $transG;
+                $data['snapToken'] = $snapToken;
+                $data['status'] = $MID->status_code;
+                $data['msg'] = "Tagihan Akan Digenerate Ulang, Mohon Buka Kembali";
+                $pusher->trigger('my-channel', 'my-event', $data);
+                return [
+                    'status' => 200,
+                    'msg' => "Transaction Generate",
+                ];
+            }
             if($tbltrans->statusid != 13){
-                $cid = explode(',', session('UIDGlob')->companyidArray);
+                $cid = explode(',', $user->companyidArray);
                 array_pop($cid);
                 if (in_array($tbltrans->companyid, $cid) && $MID->status_code == '200' && $MID->transaction_status == 'settlement') {
                     //KONFIRMASI PEMBAYARAN SUCCESS
-                    $this->MIDsuccess($tbltrans,$MID->payment_type);
+                    $this->MIDsuccess($tbltrans,$MID->payment_type,$user);
                 }
                 if($MID->status_code == '201'){
                     $statusTrans = 11 ; // Pending Midtrans
@@ -364,7 +434,99 @@ class TransactionController extends Controller
                     $statusTrans = $tbltrans->statusid;
                 }
                 if($MID->status_code == 407){// Expire midtrans
-                    $trans = $this->MIDexpire($tbltrans);
+                    $trans = $this->MIDexpire($tbltrans,$user);
+                    $MID = $this->cekstatusMID($request->order_id);
+                    $transG = $trans->notrans;
+                    $snapToken = $trans->snapToken;
+                    $statusTrans = 4;
+                }
+                $tbltrans->update([
+                    'statusid' => $statusTrans, 
+                    'MIDstatus' => $MID->status_code, 
+                    'MIDstatusmsg' => isset($MID->transaction_status)?$MID->transaction_status:'', 
+                    'MIDUpdateUser' => $user->userid,
+                    'MIDpaymenttype' => isset($MID->payment_type)?$MID->payment_type:'',
+                    'MIDall' => json_encode($MID),
+                ]);
+                DB::commit();
+                $data['type'] = "midtransHook";
+                $data['authuser'] = $tbltrans->userid;
+                $data['transG'] = $transG;
+                $data['snapToken'] = $snapToken;
+                $data['status'] = $MID->status_code;
+                $data['msg'] = isset($MID->transaction_status)?$MID->transaction_status:'';
+                $pusher->trigger('my-channel', 'my-event', $data);
+                return [
+                    'status' => 200,
+                    'msg' => "Transaction Commit",
+                ];
+            }
+            $data['type'] = "midtransHook";
+            $data['authuser'] = $tbltrans->userid;
+            $data['transG'] = null;
+            $data['snapToken'] = null;
+            $data['status'] = null;
+            $data['msg'] = "Tagihan Tidak Berlaku";
+            $pusher->trigger('my-channel', 'my-event', $data);
+            
+            return [
+                'status' => 200,
+                'msg' => "Transaction Commit",
+            ];
+            
+        }catch (\Exception $e) {
+            DB::rollBack();
+            $controller->savelog(Carbon::now(config('app.GMT')).' WeebHook MID Err: '. json_encode($e));
+            $tbltrans->update(['statusid' => 5,'paymentid' => 2]); //12
+            return [
+                'status' => 404,
+                'msg' => "Transaction Rollback",
+            ];
+        }
+    }
+    public function confirmPembayaranMID(Request $request){
+        $transG = null;
+        $snapToken = null;
+        // try {
+        //     DB::beginTransaction();
+            
+            $tbltrans = tbltrans::find($request->notrans);
+            $user = tbluser::find($tbltrans->userid);
+            if(isset($request->type)){
+                $this->expirePayment($request->notrans,$user);
+            }
+            $MID = $this->cekstatusMID($request->notrans);
+            if($MID->status_code == 404){// 404 TRANSAKSI TIDAK DITEMUKAN
+                $trans = tbltrans::select('notrans','tblcomp.companyname','tblagenda.text','tbluser.userid','tbluser.nama','tbluser.email','tbluser.hp','tbluser.alamatSingkat','tbltrans.companyid','tbltrans.statusid','jatuhTempoTagihan','tbltrans.Pokok',DB::raw('tbltrans.SPokok + tbltrans.SBunga + tbltrans.SLateFee as Amount'),DB::raw('CONCAT(tblagenda.productCode, tblagenda.companyid) as kodebarang'))
+                                ->addSelect(DB::raw('(SELECT COUNT(notrans) FROM tbltrans s WHERE AppointmentId = tbltrans.AppointmentId AND userid = tbltrans.userid AND jatuhTempoTagihan <= tbltrans.jatuhTempoTagihan) as angsuran'))
+                                ->join('tbluser','tbluser.userid','=','tbltrans.userid')
+                                ->join('tblagenda','tblagenda.AppointmentId','=','tbltrans.AppointmentId')
+                                ->join('tblcomp','tblcomp.companyid','=','tblagenda.companyid')
+                                ->where('notrans',$request->notrans)->first();
+                $midtrans = new CreateSnapTokenService($trans);
+                $snapToken = $midtrans->getSnapToken();
+                tbltrans::find($request->notrans)->update(['snap_token' => $snapToken]);
+                return [
+                    'transG' => $request->notrans,
+                    'snapToken' => $snapToken,
+                    'status' => $MID->status_code,
+                    'msg' => "Tagihan Akan Digenerate Ulang, Mohon Buka Kembali", 
+                ];
+            }
+            if($tbltrans->statusid != 13){
+                $cid = explode(',', $user->companyidArray);
+                array_pop($cid);
+                if (in_array($tbltrans->companyid, $cid) && $MID->status_code == '200' && $MID->transaction_status == 'settlement') {
+                    //KONFIRMASI PEMBAYARAN SUCCESS
+                    $this->MIDsuccess($tbltrans,$MID->payment_type,$user);
+                }
+                if($MID->status_code == '201'){
+                    $statusTrans = 11 ; // Pending Midtrans
+                }else{
+                    $statusTrans = $tbltrans->statusid;
+                }
+                if($MID->status_code == 407){// Expire midtrans
+                    $trans = $this->MIDexpire($tbltrans,$user);
                     $MID = $this->cekstatusMID($request->notrans);
                     $transG = $trans->notrans;
                     $snapToken = $trans->snapToken;
@@ -374,7 +536,7 @@ class TransactionController extends Controller
                     'statusid' => $statusTrans, 
                     'MIDstatus' => $MID->status_code, 
                     'MIDstatusmsg' => isset($MID->transaction_status)?$MID->transaction_status:'', 
-                    'MIDUpdateUser' => session('UIDGlob')->userid,
+                    'MIDUpdateUser' => $user->userid,
                     'MIDpaymenttype' => isset($MID->payment_type)?$MID->payment_type:'',
                     'MIDall' => json_encode($MID),
                 ]);
@@ -393,17 +555,17 @@ class TransactionController extends Controller
                 'msg' => "Tagihan Tidak Berlaku",
             ];
             
-        }catch (\Exception $e) {
-            DB::rollBack();
-            // dd($e); // hidupkan untuk debug
-            $tbltrans->update(['statusid' => 5,'paymentid' => 2]); //12
-            return [
-                'status' => 404,
-                'msg' => "Transaction Rollback",
-            ];
-        }
+        // }catch (\Exception $e) {
+        //     DB::rollBack();
+        //     // dd($e); // hidupkan untuk debug
+        //     $tbltrans->update(['statusid' => 5,'paymentid' => 2]); //12
+        //     return [
+        //         'status' => 404,
+        //         'msg' => "Transaction Rollback",
+        //     ];
+        // }
     }
-    private function expirePayment($notrans)
+    private function expirePayment($notrans,$user)
     {
         try {
             $client = new Client(); 
@@ -414,7 +576,7 @@ class TransactionController extends Controller
                 'Content-Type' => 'application/json',
             ];
             $cekTrans = tbltrans::find($notrans); // cek jika transaksi milik user tersebut
-            if($cekTrans->userid == session('UIDGlob')->userid){
+            if($cekTrans->userid == $user->userid){
                 $response = $client->request('POST', $url, [
                     'headers' => $headers,
                 ]);
@@ -430,7 +592,7 @@ class TransactionController extends Controller
         }
         
     }
-    private function MIDsuccess($tbltrans,$payType){
+    private function MIDsuccess($tbltrans,$payType,$user){
         $tbltrans->update(['statusid' => 7,'paymentid' => 2]);
         tblpaymenttrans::create([
             'notrans' => $tbltrans->notrans,
@@ -441,9 +603,9 @@ class TransactionController extends Controller
             'payment_type' => $payType,
             'total' => $tbltrans->SPokok + $tbltrans->SBunga + $tbltrans->SLateFee,
             'totalPay' => $tbltrans->SPokok + $tbltrans->SBunga + $tbltrans->SLateFee,
-            'UserInsert' => session('UIDGlob')->userid,
+            'UserInsert' => $user->userid,
             'InsertDT' => Carbon::now(config('app.GMT')),
-            'UserUpdate' => session('UIDGlob')->userid,
+            'UserUpdate' => $user->userid,
             'UpdateDT' => Carbon::now(config('app.GMT')),
         ]);
         $this->nextTransaction($tbltrans->AppointmentId,$tbltrans->userid,$tbltrans->jatuhTempoTagihan,$tbltrans->companyid);
@@ -465,7 +627,7 @@ class TransactionController extends Controller
         ];
         $this->sendMailPayment($arrayMail2);
     }
-    private function MIDexpire($tbltrans){
+    private function MIDexpire($tbltrans,$user){
         $tblcomp = tblcomp::find($tbltrans->companyid);
         $notransHeader = $tbltrans->companyid.strtoupper(substr($tblcomp->companyname, 0, 2)).Carbon::now(config('app.GMT'))->format('ymd');
         $lastTrans = DB::select("SELECT ISNULL(MAX(CAST(SUBSTRING(notrans, LEN('$notransHeader') + 1, LEN(notrans)) AS INT)) + 1, 1) AS maxNotrans
@@ -495,9 +657,9 @@ class TransactionController extends Controller
             'transdate' => $tbltrans->transdate,
             'snap_token' => null,
             'jatuhTempoTagihan' => $tbltrans->jatuhTempoTagihan,
-            'UserInsert' => session('UIDGlob')->userid,
+            'UserInsert' => $user->userid,
             'InsertDT' => now(config('app.GMT')),
-            'UserUpdate' => session('UIDGlob')->userid,
+            'UserUpdate' => $user->userid,
             'UpdateDT' => now(config('app.GMT')),
         ]);
         $trans = tbltrans::select('notrans','tblcomp.companyname','tblagenda.text','tbluser.userid','tbluser.nama','tbluser.email','tbluser.hp','tbluser.alamatSingkat','tbltrans.companyid','tbltrans.statusid','jatuhTempoTagihan' ,'tbltrans.Pokok',DB::raw('tbltrans.SPokok + tbltrans.SBunga + tbltrans.SLateFee as Amount'),DB::raw('CONCAT(tblagenda.productCode, tblagenda.companyid) as kodebarang'))
@@ -560,16 +722,17 @@ class TransactionController extends Controller
     }
     public function voidtrans(Request $request){
         $tbltrans = tbltrans::find($request->notrans);
-        if($tbltrans->companyid != session('UIDGlob')->companyid){
+        $user = tbluser::find($tbltrans->userid);
+        if($tbltrans->companyid != $user->companyid){
             return "tidak bisa akses!";
         }
         $tbltrans->update([
             'statusid' => 13,
-            'UserUpdate' => session('UIDGlob')->userid,
+            'UserUpdate' => $user->userid,
             'UpdateDT' => Carbon::now(config('app.GMT')),
         ]);
         $this->cancleMID($request->notrans);
-        $this->nextTransaction($tbltrans->AppointmentId,$tbltrans->userid,$tbltrans->jatuhTempoTagihan,session('UIDGlob')->companyid);
+        $this->nextTransaction($tbltrans->AppointmentId,$tbltrans->userid,$tbltrans->jatuhTempoTagihan,$user->companyid);
         return true;
     }
     private function sendMailPayment($array){
@@ -578,11 +741,6 @@ class TransactionController extends Controller
             'trans' => $array['trans'],
         ];
         Mail::to($array['email'])->send(new SendMail($data));
-    }
-    public function paymentWebHook(Request $request){
-        $log = new Controller;
-        $log->savelog(Carbon::now(config('app.GMT')).' WeebHook MID : '. json_encode($request->all()));
-        return json_encode($request->all());
     }
 
     public function eod(){
@@ -598,7 +756,8 @@ class TransactionController extends Controller
             
             $tbltranss = tbltrans::where('onEOD',1)->where('statusid',4)->get();
             foreach ($tbltranss as $tbltrans) {
-                $this->MIDexpire($tbltrans);
+                $user = tbltrans::find($tbltrans->userid);
+                $this->MIDexpire($tbltrans,$user);
             }
             DB::update("UPDATE tbltrans SET onEOD = 0");
             $tblagenda = collect(DB::select("SELECT a.AppointmentId, t.companyid, t.userid, t.notrans,t.jatuhTempoTagihan,a.StartDate,a.RecurrenceRule,a.RecurrenceException FROM tblagenda a

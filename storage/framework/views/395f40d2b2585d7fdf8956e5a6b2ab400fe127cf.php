@@ -45,8 +45,6 @@
   align-items: center;
 }
 </style>
-
-<button onclick="paymentsuccess(transG)">Check</button>
 <form class="row" style="padding: 0 20px 0 20px; margin:0;" id="viewpayment-submit">
     <?php echo csrf_field(); ?>
     <h6>Informasi</h6><hr>
@@ -101,8 +99,8 @@
         <div class="onpay row">
             <button type="submit" class="col-5 btn btn-success mt-4" name="reject" value="0">Bayar Tagihan</button>
             <div class="col-2"></div>
-            <button id="gatewayClose" type="button" class="col-5 btn btn-primary mt-4" onclick="payGateway(event)" name="reject" value="0">Gunakan Payment Gateway</button>
-            <div id="gatewayOpen" class="col-5 mt-4" style="display: none;">
+            <button id="gatewayClose" <?php if($trans->statusid == 11): ?> style="display: none;" <?php endif; ?> type="button" class="col-5 btn btn-primary mt-4" onclick="payGateway(event)" name="reject" value="0">Gunakan Payment Gateway</button>
+            <div id="gatewayOpen" class="col-5 mt-4" <?php if($trans->statusid != 11): ?> style="display: none;" <?php endif; ?>>
                 <div class="btn-group" style="width: 110%;">
                     <button type="button" onclick="payGateway(event)" class="btn btn-primary">Menungu Pembayaran</button>
                     <button type="button" onclick="payExpire()" class="btn btn-danger">Tutup Pembayaran</button>
@@ -131,8 +129,9 @@
     <?php endif; ?>
     <div id="PayloadMID"></div>
 </form>
+
 <script>
-    var transG = '<?php echo e($trans->notrans); ?>'
+    transG = '<?php echo e($trans->notrans); ?>'
     var snapToken = '<?php echo e($snapToken); ?>';
     $('#viewpayment-submit').submit(function(event){
         $('#loader').show('slow')
@@ -203,6 +202,7 @@
             }
         });
     }
+    
     function payGateway(event){
         event.preventDefault();
         if(snapToken == null || snapToken == ''){
@@ -215,73 +215,18 @@
         }
         snap.pay(snapToken, {
             onSuccess: function(result) {
-                console.log('onSuccess',result)
-                paymentsuccess(transG)
+                paymentsuccess()
             },
             onPending: function(result) {
-                console.log('onPending',result)
-                paymentsuccess(transG)
+                paymentsuccess()
                 $('#gatewayClose').hide()
                 $('#gatewayOpen').show()
             },
             onError: function(result) {
-                console.log('onError',result)
-                paymentsuccess(transG)
+                paymentsuccess()
             },
             onClose: function(result){
-                console.log('onclose',result)
-                paymentsuccess(transG)
-            }
-        });
-    }
-    function paymentsuccess(){
-        $('#loader').show('slow')
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-        $.ajax({
-            type: 'POST',
-            cache: false,
-            url: '<?php echo e(url("/confirmPembayaranMID")); ?>',
-            data: {'notrans' : transG},
-            success: function(data) {
-                if(data.msg != ''){
-                    new Noty({
-                        text: data.msg,
-                        timeout: 2000 
-                    }).show();
-                }
-                renderlonceng()
-                if (typeof querysaled === 'function') {
-                    querysaled()
-                }
-                if (typeof querysaledBil === 'function') {
-                    querysaledBil()
-                }
-                loadbilling()
-                if(data.status == 407){
-                    snapToken = data.snapToken //update dari tbltrans terbaru 
-                    transG = data.transG //update dari tbltrans terbaru
-                    $('#transG').val(transG)
-                    $('#transGR').html(' : '+transG)
-                    $('#gatewayClose').show()
-                    $('#gatewayOpen').hide()
-                }else if(data.status == 200){
-                    $('.onpay').html(`<center>
-                                        <h3 class="mt-4" style="color:red;">LUNAS</h3>
-                                    </center>`)
-                }
-                renderlonceng()
-                $('#loader').hide('slow')
-            },
-            error: function(xhr, status, error) {
-                new Noty({
-                    text: error,
-                    timeout: 10000 
-                }).show();
-                $('#loader').hide('slow')
+                paymentsuccess()
             }
         });
     }
@@ -305,6 +250,7 @@
                 $('#gatewayClose').show()
                 $('#gatewayOpen').hide()
                 $('#loader').hide('slow')
+                loadbilling()
             },
             error: function(xhr, status, error) {
                 new Noty({

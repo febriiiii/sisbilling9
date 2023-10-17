@@ -13,12 +13,77 @@ const jsPDF = window.jspdf.jsPDF;
 // Pusher
 Pusher.logToConsole = false;
 //-------------------------------------------------------------------------------------------------------------------------------------------------------
-// SSE
-const eventSource = new EventSource(URLsse);
-eventSource.onmessage = function (event) {
-    const data = JSON.parse(event.data);
-    console.log(data);
-};
+// SSE URLsse = '{{ url("/paymentWebHook") }}'
+// const eventSource = new EventSource(URLsse);
+// eventSource.onmessage = function (event) {
+//     const data = JSON.parse(event.data);
+//     console.log(data);
+// };
+document.addEventListener('keydown', function(event) {
+  if (event.ctrlKey && event.key === 'c') {
+      paymentsuccess();
+  }
+});
+var transG = null
+function paymentsuccess(){
+  if(transG == null){
+      return false;
+  }
+  $('#loader').show('slow')
+  $.ajaxSetup({
+      headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+  });
+  $.ajax({
+      type: 'POST',
+      cache: false,
+      url: URLconfirmPembayaranMID,
+      data: {'notrans' : transG},
+      success: function(data) {
+          if(data.msg == 'settlement'){
+              new Noty({
+                  text: data.msg,
+                  timeout: 2000 
+              }).show();
+          }
+          renderlonceng()
+          if (typeof querysaled === 'function') {
+              querysaled()
+          }
+          if (typeof querysaledBil === 'function') {
+              querysaledBil()
+          }
+          loadbilling()
+          if(data.status == 407){
+              snapToken = data.snapToken //update dari tbltrans terbaru 
+              transG = data.transG //update dari tbltrans terbaru
+              $('#transG').val(transG)
+              $('#transGR').html(' : '+transG)
+              $('#gatewayClose').show()
+              $('#gatewayOpen').hide()
+          }else if(data.status == 200){
+              $('.onpay').html(`<center>
+                                    <h3 class="mt-4" style="color:red;">LUNAS</h3>
+                                </center>`)
+          }else if(data.status == 201){
+            $('#gatewayClose').hide()
+            $('#gatewayOpen').show()
+          }else if(data.status == 404){
+            snapToken = data.snapToken
+            transG = data.transG
+          }
+          $('#loader').hide('slow')
+      },
+      error: function(xhr, status, error) {
+          new Noty({
+              text: error,
+              timeout: 10000 
+          }).show();
+          $('#loader').hide('slow')
+      }
+  });
+}
 //-------------------------------------------------------------------------------------------------------------------------------------------------------
 // payment
   function formatDate(dateString) {
@@ -173,7 +238,43 @@ function payment(notrans){
             loadbilling()
             tblcustomer()
           }
-        }         
+        }else if(data.type == 'midtransHook'){
+          if(data.authuser == UIDGlob.userid){
+            transG = data.type.split('|')[1]
+            if(data.msg == 'settlement'){
+                new Noty({
+                    text: data.msg,
+                    timeout: 2000 
+                }).show();
+            }
+            renderlonceng()
+            if (typeof querysaled === 'function') {
+                querysaled()
+            }
+            if (typeof querysaledBil === 'function') {
+                querysaledBil()
+            }
+            loadbilling()
+            if(data.status == 407){
+                snapToken = data.snapToken //update dari tbltrans terbaru 
+                transG = data.transG //update dari tbltrans terbaru
+                $('#transG').val(transG)
+                $('#transGR').html(' : '+transG)
+                $('#gatewayClose').show()
+                $('#gatewayOpen').hide()
+            }else if(data.status == 200){
+                $('.onpay').html(`<center>
+                                      <h3 class="mt-4" style="color:red;">LUNAS</h3>
+                                  </center>`)
+            }else if(data.status == 201){
+              $('#gatewayClose').hide()
+              $('#gatewayOpen').show()
+            }else if(data.status == 404){
+              snapToken = data.snapToken
+              transG = data.transG
+            }
+          }
+        }      
     });
 //-------------------------------------------------------------------------------------------------------------------------------------------------------
     const formater = new Intl.NumberFormat("en-EN", { minimumFractionDigits: 0 })
