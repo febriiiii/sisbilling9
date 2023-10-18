@@ -16,8 +16,10 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendMail;
+use App\Models\tblbilling;
 use App\Models\tblsyspara;
 use App\Models\tbluser;
+use DateInterval;
 use GuzzleHttp\Client;
 use Symfony\Component\Translation\Extractor\Visitor\TransMethodVisitor;
 
@@ -124,6 +126,30 @@ class TransactionController extends Controller
             return false;
         }
     }
+    public function transDate($recurenceRule,$nextDate){
+        $recurenceRule = explode(";",$recurenceRule);
+        foreach($recurenceRule as $val){
+            $recurs = explode("=",$val);
+            $Recurr[$recurs[0]] = $recurs[1];
+        }
+        switch ($Recurr['FREQ']) {
+            case 'HOURLY':
+                return $nextDate->copy()->sub(new DateInterval('PT1H')); // Mengurangkan 1 jam
+                break;
+            case 'DAILY':
+                return $nextDate->copy()->sub(new DateInterval('P1D')); // Mengurangkan 1 hari
+                break;
+            case 'WEEKLY':
+                return $nextDate->copy()->sub(new DateInterval('P7D')); // Mengurangkan 1 minggu
+                break;
+            case 'MONTHLY':
+                return $nextDate->copy()->sub(new DateInterval('P1M')); // Mengurangkan 1 bulan
+                break;
+            case 'YEARLY':
+                return $nextDate->copy()->sub(new DateInterval('P1Y')); // Mengurangkan 1 tahun
+                break;
+        }
+    }
     public function nextTransaction($AppointmentId,$userid,$lastDate,$companyid){ 
         // note: jika lastdate tidak ada maka tidak ada recuren
         $tblcomp = tblcomp::find($companyid);
@@ -161,30 +187,36 @@ class TransactionController extends Controller
                                         ->where('statusid','<>',4)
                                         ->where('statusid','<>',7)
                                         ->first();
+            $cekIsUsingBilling = tblbilling::where('userid',$userid)
+                                            ->where('AppointmentId',$AppointmentId)
+                                            ->where('statusid','<>',4)
+                                            ->first();
             // $log = new Controller;
             // $log->savelog(json_encode($cekIssetTrans));
             if(!isset($cekIssetTrans)){ //Jika sudah ada jangan buat transaksi tagihan
-                tbltrans::create([
-                    'notrans' => $notrans,
-                    'AppointmentId' => $AppointmentId,
-                    'companyid' => $companyid,
-                    'userid' => $userid,
-                    'statusid' => 5,
-                    'SisaPok' => $tblagenda->Pokok,
-                    'Pokok' => $tblagenda->Pokok,
-                    'Bunga' => ($tblagenda->Pokok * $tblagenda->BungaPercent / 100),
-                    'LateFee' => ($tblagenda->Pokok * $tblagenda->lateFeePercent / 100),
-                    'JHT' => 0,
-                    'SPokok' => $tblagenda->Pokok,
-                    'SBunga' => ($tblagenda->Pokok * $tblagenda->BungaPercent / 100),
-                    'SLateFee' => 0,
-                    'transdate' => now(config('app.GMT')),
-                    'jatuhTempoTagihan' => $nextDate,
-                    'UserInsert' => $userid,
-                    'InsertDT' => now(config('app.GMT')),
-                    'UserUpdate' => $userid,
-                    'UpdateDT' => now(config('app.GMT')),
-                ]);
+                if (isset($cekIsUsingBilling)) {// Jika memiliki billing, buatkan transaksi
+                    tbltrans::create([
+                        'notrans' => $notrans,
+                        'AppointmentId' => $AppointmentId,
+                        'companyid' => $companyid,
+                        'userid' => $userid,
+                        'statusid' => 5,
+                        'SisaPok' => $tblagenda->Pokok,
+                        'Pokok' => $tblagenda->Pokok,
+                        'Bunga' => ($tblagenda->Pokok * $tblagenda->BungaPercent / 100),
+                        'LateFee' => ($tblagenda->Pokok * $tblagenda->lateFeePercent / 100),
+                        'JHT' => 0,
+                        'SPokok' => $tblagenda->Pokok,
+                        'SBunga' => ($tblagenda->Pokok * $tblagenda->BungaPercent / 100),
+                        'SLateFee' => 0,
+                        'transdate' => $this->transDate($tblagenda->RecurrenceRule,$nextDate),
+                        'jatuhTempoTagihan' => $nextDate,
+                        'UserInsert' => $userid,
+                        'InsertDT' => now(config('app.GMT')),
+                        'UserUpdate' => $userid,
+                        'UpdateDT' => now(config('app.GMT')),
+                    ]);
+                }
             }
         }
         return true;
@@ -760,14 +792,14 @@ class TransactionController extends Controller
                 $this->MIDexpire($tbltrans,$user);
             }
             DB::update("UPDATE tbltrans SET onEOD = 0");
-            $tblagenda = collect(DB::select("SELECT a.AppointmentId, t.companyid, t.userid, t.notrans,t.jatuhTempoTagihan,a.StartDate,a.RecurrenceRule,a.RecurrenceException FROM tblagenda a
-                                            JOIN (SELECT AppointmentId, userid, companyid, MAX(notrans) AS notrans,MAX(jatuhTempoTagihan) AS jatuhTempoTagihan FROM tbltrans
+            $tblagenda = collect(DB::select("SELECT a.AppointmentId, t.companyid, t.userid, t.notrans,t.transdate,t.jatuhTempoTagihan,a.StartDate,a.RecurrenceRule,a.RecurrenceException FROM tblagenda a
+                                            JOIN (SELECT AppointmentId, userid, companyid, MAX(notrans) AS notrans,MAX(transdate) AS transdate, max(jatuhTempoTagihan) as jatuhTempoTagihan FROM tbltrans
                                                     WHERE statusid <> 4
                                                     GROUP BY companyid, userid, AppointmentId) AS t ON a.AppointmentId=t.AppointmentId
                                             WHERE productCode IS NOT NULL and isBilling = 1
                                             AND a.statusid <> 4"));
             foreach ($tblagenda as $agenda) {
-                $nextDate = $this->nextAppointment($agenda->StartDate,$agenda->RecurrenceRule,$agenda->RecurrenceException,$agenda->jatuhTempoTagihan);
+                $nextDate = $this->nextAppointment($agenda->StartDate,$agenda->RecurrenceRule,$agenda->RecurrenceException,$agenda->transdate);
                 // $log = new Controller;
                 if( Carbon::parse($nextDate)->format('ymd') == Carbon::now(config('GMT'))->format('ymd') ){
                     // $log->savelog('create dari jatuhtempo ' . $agenda->jatuhTempoTagihan );

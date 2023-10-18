@@ -68,7 +68,7 @@
         <div class="col-lg-4"></div>
     </div>
 </div>
-<img src="{{asset('public/wave.svg')}}" style="bottom:0; position: fixed;">
+<img src="{{asset('public/wave.svg')}}" style="bottom:0; position: fixed; z-index:-1">
 
 <script>
     if (caches && caches.keys) {

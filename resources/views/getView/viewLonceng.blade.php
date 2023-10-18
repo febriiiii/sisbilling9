@@ -12,6 +12,9 @@
         @endif
     </a>
     <ul class="dropdown-menu" style="position: absolute; left:-170px;">
+        @foreach ($notif['myAgendda'] as $i)
+            <li onclick=""><a class="dropdown-item card mt-1" href="#">{{$i->text}} </a></li>
+        @endforeach
         @foreach ($notif['pengumuman'] as $p)
             @php
                 if (strlen($p->judul) > 20) {

@@ -220,7 +220,7 @@
                 if(e.description != "!@##@!IMG!@##@!"){
                     msg = e.description+"<small>"+e.timef+"</small>"
                 }else{
-                    msg = `<div onclick="openmodalImage('<?php echo e(asset('/public/storage/chatimg')); ?>/`+e.id+`.png')" style="background-image: url('<?php echo e(asset('/public/storage/chatimg')); ?>/`+e.id+`.png'); background-size: cover; width: 180px; height:130px;"></div>
+                    msg = `<div onclick="openmodalImage('<?php echo e(asset('/public/storage/chatimg')); ?>/`+e.id+`.png')" style="cursor:pointer; background-image: url('<?php echo e(asset('/public/storage/chatimg')); ?>/`+e.id+`.png'); background-size: cover; width: 180px; height:130px;"></div>
                         <small style="display: block; text-align:end;">`+e.timef+`</small>`;
                 }
                 var chat = "<li class='message item "+position+"'> " +

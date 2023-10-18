@@ -54,7 +54,7 @@ return new class extends Migration
             'isTutor' => '0',
             'infoTambahan' => 'Suka memasak',
             'companyid' => 1,
-            'profileImg' => 'user/user.png',
+            'profileImg' => 'user/avatarHalloProfile.png',
             'password' => Hash::make('admadm'),
             'UserInsert' => 'system',
             'InsertDT' => now(),

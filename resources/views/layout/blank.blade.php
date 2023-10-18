@@ -7,7 +7,7 @@
     <title class="title">Document</title>
     @include('layout.headerlink')
 </head>
-<body>
+<body style="background-color: transparent">
     @yield('content')
     @include('layout.footerlink')
 </body>

@@ -132,7 +132,8 @@ class ViewtabController extends Controller
     public function viewlonceng(){
         $controller = new Controller;
         $cid = $controller->inCidNotSelf();
-        $notif['chat'] = DB::select("SELECT count(d.userid) as total,d.userid,max(u.nama) as nama, max(h.chatid) as chatid
+        $notif['myAgendda'] = DB::select("SELECT text FROM tblagenda WHERE userid = 2 AND isBilling = 0 AND EndDate <= GETDATE()");
+        $notif['chat'] = DB::select("SELECT count(d.userid) AS total,d.userid,max(u.nama) AS nama, max(h.chatid) AS chatid
                                     FROM tblchat h 
                                     JOIN tblchatd d ON h.chatid=d.chatid
                                     JOIN tbluser u ON u.userid=d.userid
@@ -165,7 +166,7 @@ class ViewtabController extends Controller
                                             JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
                                             WHERE t.statusid = 6 AND t.companyid = " . $mycompanyid);
         
-        $notif['count'] = count($notif['chat'])+count($notif['pengumuman'])+count($notif['invoice'])+count($notif['invoiceReject'])+count($notif['invoiceWaiting']);
+        $notif['count'] = count($notif['myAgendda'])+count($notif['chat'])+count($notif['pengumuman'])+count($notif['invoice'])+count($notif['invoiceReject'])+count($notif['invoiceWaiting']);
         return view('getView.viewLonceng',compact('notif'))->render();
     }
     public function viewHeaderchat(){

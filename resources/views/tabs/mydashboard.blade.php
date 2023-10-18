@@ -5,6 +5,16 @@
     <div class="col-auto me-4">
       <div class="row">
         <div class="col-auto" style="padding:0">
+          <div class="scedulerketDot" style="background-color: yellow; height:20px; width:20px; border-radius:100%;"></div>
+        </div>
+        <div class="col" style="padding:0 0 0 5px;">
+          <div>Hari Ini</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-auto me-4">
+      <div class="row">
+        <div class="col-auto" style="padding:0">
           <div class="scedulerketDot" style="background-color: #337AB7; height:20px; width:20px; border-radius:100%;"></div>
         </div>
         <div class="col" style="padding:0 0 0 5px;">
@@ -175,6 +185,23 @@
           allDayExpr: 'all_day',
           recurrenceRuleExpr: 'RecurrenceRule',
           recurrenceExceptionExpr: 'RecurrenceException',
+          dataCellTemplate(cellData, index, container) {
+            const startDateString = cellData.startDate;
+            const currentDate = new Date();
+            currentDate.setHours(0, 0, 0, 0); // Menghapus jam, menit, detik, dan milidetik
+            startDateString.setHours(0, 0, 0, 0);
+            const isToday = startDateString.getTime() === currentDate.getTime();
+            const wrapper = $('<div>').appendTo(container);
+            const cell = $('<div>')
+              .text(cellData.text)
+              .addClass('day-cell');
+
+            if (isToday) {
+              cell.css('background-color', 'yellow');
+            }
+
+            wrapper.append(cell);
+          },
           onAppointmentFormOpening(e){
             var AppointmentId = e.appointmentData.AppointmentId;
             // tempUserpinjam = [];

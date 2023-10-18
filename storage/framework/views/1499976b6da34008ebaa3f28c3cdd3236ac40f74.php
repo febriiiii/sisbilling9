@@ -75,7 +75,7 @@ unset($__errorArgs, $__bag); ?>
         <div class="col-lg-4"></div>
     </div>
 </div>
-<img src="<?php echo e(asset('public/wave.svg')); ?>" style="bottom:0; position: fixed;">
+<img src="<?php echo e(asset('public/wave.svg')); ?>" style="bottom:0; position: fixed; z-index:-1">
 
 <script>
     if (caches && caches.keys) {

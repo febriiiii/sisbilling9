@@ -7,7 +7,7 @@
     <title class="title">Document</title>
     <?php echo $__env->make('layout.headerlink', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 </head>
-<body>
+<body style="background-color: transparent">
     <?php echo $__env->yieldContent('content'); ?>
     <?php echo $__env->make('layout.footerlink', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 </body>
