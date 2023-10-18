@@ -72,6 +72,34 @@
   </div>
 </div>
 <script>
+  const holidays = [
+                    { day: 1, month: 1, name: 'Tahun Baru' },
+                    { day: 12, month: 2, name: 'Tahun Baru Imlek (Cap Go Meh)' },
+                    { day: 1, month: 3, name: 'Hari Kehutanan Sedunia' },
+                    { day: 21, month: 3, name: 'Hari Hutan Internasional' },
+                    { day: 6, month: 4, name: 'Hari Nelayan Nasional' },
+                    { day: 21, month: 4, name: 'Hari Kartini' },
+                    { day: 22, month: 4, name: 'Hari Bumi' },
+                    { day: 1, month: 5, name: 'Hari Buruh Internasional (May Day)' },
+                    { day: 2, month: 5, name: 'Hari Pendidikan Nasional' },
+                    { day: 5, month: 5, name: 'Hari Sumpah Pemuda' },
+                    { day: 10, month: 5, name: 'Hari Kebangkitan Nasional' },
+                    { day: 20, month: 5, name: 'Hari Kebangkitan Nasional Aceh' },
+                    { day: 21, month: 5, name: 'Hari Raja Keraton Surakarta' },
+                    { day: 27, month: 5, name: 'Hari Agraria Nasional' },
+                    { day: 1, month: 6, name: 'Hari Lahir Pancasila' },
+                    { day: 5, month: 6, name: 'Hari Lingkungan Hidup Sedunia' },
+                    { day: 30, month: 6, name: 'Hari Bhinneka Tunggal Ika' },
+                    { day: 6, month: 7, name: 'Hari Bhayangkara (HUT Polri)' },
+                    { day: 20, month: 7, name: 'Hari Ulang Tahun Kabupaten Lombok Barat' },
+                    { day: 17, month: 8, name: 'Hari Kemerdekaan Republik Indonesia (HUT RI)' },
+                    { day: 21, month: 8, name: 'Hari Pers Nasional' },
+                    { day: 23, month: 9, name: 'Hari Santri Nasional' },
+                    { day: 27, month: 9, name: 'Hari Pariwisata Sedunia' },
+                    { day: 5, month: 10, name: 'Hari Batik Nasional' },
+                    { day: 10, month: 11, name: 'Hari Pahlawan Nasional' },
+                    { day: 25, month: 12, name: 'Hari Raya Natal' },
+                  ];
   function openkomentarpengumuman(pengumumanid,judul){
     $.ajax({
         type: 'GET',
@@ -195,10 +223,27 @@
             const cell = $('<div>')
               .text(cellData.text)
               .addClass('day-cell');
+            const nowMonth = currentDate.getMonth() + 1;
+            const nowDay = currentDate.getDate();
+            const startMonth = startDateString.getMonth() + 1;
+            const startDay = startDateString.getDate();
 
             if (isToday) {
+              // for (var i = 0; i < holidays.length; i++) {
+              //   if (nowDay === holidays[i].day && nowMonth === holidays[i].month) {
+              //     cell.prepend($('<marquee style="z-index:-1;width:78%; font-size:.7em;">').text(holidays[i].name));
+              //     break; // Jika hari besar sudah ditemukan, hentikan pencarian.
+              //   }
+              // }
               cell.css('background-color', 'yellow');
             }
+            for (var i = 0; i < holidays.length; i++) {
+              if (startDay === holidays[i].day && startMonth === holidays[i].month) {
+                cell.prepend($('<marquee style="z-index:-1;width:78%; font-size:.7em;">').text(holidays[i].name));
+                break; // Jika hari besar sudah ditemukan, hentikan pencarian.
+              }
+            }
+            
 
             wrapper.append(cell);
           },
@@ -221,8 +266,14 @@
                 label: { text: "Billing" },
                 editorType: "dxSwitch",
                 dataField: "Billing",
+                // value: false,
                 editorOptions: {
                   onValueChanged: function(f) {
+                    if(f.value == true){
+                      var swBil = 1
+                    }else{
+                      var swBil = 0
+                    }
                     // form.itemOption("SisaPok", "visible", f.value);
                     form.itemOption("Pokok", "visible", f.value);
                     // form.itemOption("userIn", "visible", f.value);
@@ -231,6 +282,7 @@
                     form.itemOption("lateFeePercent", "visible", f.value);
                     form.itemOption("BungaPercent", "visible", f.value);
                     form.itemOption("productCode", "visible", f.value);
+                    e.form.option("formData").isBilling = swBil
                   }
                 }
               };
@@ -325,7 +377,7 @@
               // };
               // let sisaPok = {
               //   colSpan: 1,
-              //   label: { text: "Total Pinjaman" },
+              //   label: { text: "Total Tagihan" },
               //   editorType: "dxNumberBox",
               //   dataField: "SisaPok",
               //   editorOptions: { 
@@ -333,8 +385,8 @@
               //   },
               //   visible: false,
               //   validationRules: [
-              //     { type: "required", message: "Total Pinjaman is required" },
-              //     { type: "range", min: 1, message: "Total Pinjaman > 1" }
+              //     { type: "required", message: "Total Tagihan is required" },
+              //     { type: "range", min: 1, message: "Total Tagihan > 1" }
               //   ],
               // };
               let Pokok = {
@@ -348,7 +400,7 @@
                 visible: false,
                 validationRules: [
                   { type: "required", message: "Total Tagihan is required" },
-                  { type: "range", min: 1, message: "Total Pinjaman > 1" }
+                  { type: "range", min: 1, message: "Total Tagihan > 1" }
                 ],
               };
               // let bolehTungak = {
@@ -422,7 +474,8 @@
               var data = e.form.option("formData");
               data.all_day = true;
               if(e.appointmentData.isBilling != undefined){
-                data.Billing = e.appointmentData.isBilling
+                data.Billing = e.appointmentData.isBilling == 1
+                data.isBilling = e.appointmentData.isBilling
               }
               e.form.updateData(data);
             }, 100);
@@ -605,6 +658,8 @@
         }).dxScheduler('instance');
     });
   }
+
+ 
 
 </script>
 

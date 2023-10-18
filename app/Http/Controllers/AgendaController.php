@@ -18,7 +18,7 @@ use PhpParser\Node\Expr\Cast\Double;
 class AgendaController extends Controller
 {
     public function getAgenda(Request $request)
-    {        
+    {   
         $array = explode(",", session('UIDGlob')->companyidArray);
         array_pop($array);
         $agendas = tblagenda::whereIn('companyid', $array)

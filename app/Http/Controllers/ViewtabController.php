@@ -132,7 +132,7 @@ class ViewtabController extends Controller
     public function viewlonceng(){
         $controller = new Controller;
         $cid = $controller->inCidNotSelf();
-        $notif['myAgendda'] = DB::select("SELECT text FROM tblagenda WHERE userid = 2 AND isBilling = 0 AND EndDate <= GETDATE()");
+        $notif['myAgendda'] = DB::select("SELECT text FROM tblagenda WHERE userid = ".session('UIDGlob')->userid." AND isBilling = 0 AND CONVERT(VARCHAR, GETDATE(), 12) = CONVERT(VARCHAR, EndDate, 12)");
         $notif['chat'] = DB::select("SELECT count(d.userid) AS total,d.userid,max(u.nama) AS nama, max(h.chatid) AS chatid
                                     FROM tblchat h 
                                     JOIN tblchatd d ON h.chatid=d.chatid

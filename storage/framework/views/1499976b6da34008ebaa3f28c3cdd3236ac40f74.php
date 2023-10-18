@@ -78,13 +78,13 @@ unset($__errorArgs, $__bag); ?>
 <img src="<?php echo e(asset('public/wave.svg')); ?>" style="bottom:0; position: fixed; z-index:-1">
 
 <script>
-    if (caches && caches.keys) {
-        caches.keys().then(function(names) {
-        names.forEach(function(name) {
-            caches.delete(name);
-        });
-        });
-    }
+    // if (caches && caches.keys) {
+    //     caches.keys().then(function(names) {
+    //     names.forEach(function(name) {
+    //         caches.delete(name);
+    //     });
+    //     });
+    // }
 
   // Membersihkan localStorage
   localStorage.clear();
