@@ -572,4 +572,11 @@ button {
   
   </section>
   
-    </a><?php /**PATH C:\xampp\htdocs\sisbilling9\resources\views/errors/404.blade.php ENDPATH**/ ?>
+    </a>
+
+
+    <script>
+      setTimeout(() => {
+        window.location.href = "<?php echo e(url('')); ?>"
+      }, 3000);
+    </script><?php /**PATH C:\xampp\htdocs\sisbilling9\resources\views/errors/404.blade.php ENDPATH**/ ?>

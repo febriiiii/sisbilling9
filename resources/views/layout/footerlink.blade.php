@@ -26,6 +26,7 @@
   const URLserviceworker = '{{url("/service-worker.js")}}'
   const URLsse = '{{ url("/paymentWebHook") }}'
   const URLconfirmPembayaranMID = '{{url("/confirmPembayaranMID")}}'
+  const URLlogout = '{{url("/logout")}}'
 </script>
 <script type="text/javascript" src="{{asset('public/js/footerscript.js')}}" ></script>
 <script type="module" src="{{asset('public/js/module.js')}}" ></script>

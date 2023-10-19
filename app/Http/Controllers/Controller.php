@@ -43,7 +43,15 @@ class Controller extends BaseController
                 JOIN tbluser u ON u.userid = p.UserInsert
                 JOIN tblcomp c ON c.companyid = p.companyid
                 WHERE p.statusid <> 4 
-                    AND p.companyid IN ({$cid}) 
+                    AND p.UserInsert = 1
+                    AND p.InsertDT > '{$dateExpression}'
+                UNION
+                SELECT p.*, c.companyname, u.userid, u.nama, u.profileImg, CASE WHEN u.companyid IS NULL THEN 0 ELSE 1 END AS ispengelola 
+                FROM tblpengumuman p
+                JOIN tbluser u ON u.userid = p.UserInsert
+                JOIN tblcomp c ON c.companyid = p.companyid
+                WHERE p.statusid <> 4 
+                    AND p.companyid IN ({$cid}) AND p.companyid <> 1
                     AND p.InsertDT > '{$dateExpression}'
                 ORDER BY InsertDT DESC";
         $tblpengumuman = DB::select($query);

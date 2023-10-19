@@ -29,15 +29,10 @@
         @include('modal.mainModal2')
         @include('modal.mainModalSelect') 
         
-        {{-- TUTOR --}}
-        @if ($UIDGlob->isTutor == 1)
-            @include('tutor')
-        @endif
-
+        {{-- HATI HATI MENGINCLUDE FILE, TES SUBMIT FORM APAKAH BEKERJA, CONTOH FORM PADA PENGATURAN->PERUSAHAAN --}}
         <div class="body" style="padding-bottom:20vh; padding-top:30px;">
             <div class="container">
                 @include('loader')
-                
                 <ul class="uk-switcher switcher-navbarCustom uk-margin">
                     <li>@include('tabs.mydashboard')</li>
                     @if ($UIDGlob->companyid != '')
@@ -49,6 +44,10 @@
                 </ul>
             </div>
         </div>
+        {{-- TUTOR --}}
+        @if ($UIDGlob->isTutor == 1)
+            @include('tutor')
+        @endif
         {{-- <script>
                 const mobileMediaQuery = window.matchMedia("(max-width: 767px)");
                 var name = "navbarMobile"
@@ -63,10 +62,7 @@
                         $('#navbarSwitches').html(data)
                     },
                     error: function(xhr, status, error) {
-                        new Noty({
-                            text: "Navigation Error",
-                            timeout: 10000 
-                        }).show();
+                        
                     }
                 });
         </script>

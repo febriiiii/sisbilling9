@@ -146,10 +146,7 @@
                     $('#image-previewmsg').hide();
                 },
                 error: function(xhr, status, error) {
-                    new Noty({
-                        text: error,
-                        timeout: 10000 
-                    }).show();
+                    showNty(error,10000)
                 }
             });
         })
@@ -175,10 +172,7 @@
                     $('#message-input').val("")
                 },
                 error: function(xhr, status, error) {
-                    new Noty({
-                        text: error,
-                        timeout: 10000 
-                    }).show();
+                    showNty(error,10000)
                 }
             });
         })
@@ -233,10 +227,7 @@
             $('#message-input').focus()
         },
         error: function(xhr, status, error) {
-            new Noty({
-                text: error,
-                timeout: 10000 
-            }).show();
+            showNty(error,10000)
         }
     });
 

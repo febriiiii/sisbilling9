@@ -8,7 +8,7 @@ $(() => {
         dataSource: {
         store: {
           type: 'odata',
-          url: "{{url('/getcomp')}}?stamp=" + new Date().getTime(),
+          url: "<?php echo e(url('/getcomp')); ?>?stamp=" + new Date().getTime(),
           key: 'email',
         },
       },
@@ -44,8 +44,8 @@ $(() => {
       onSelectionChanged(selectedItems) {
         const data = selectedItems.selectedRowsData[0];
         if (data) {
-          $(`#{{$data['id']}}`).val(data.email)
-          $(`#{{$data['name']}}`).val(data.companyname)
+          $(`#<?php echo e($data['id']); ?>`).val(data.email)
+          $(`#<?php echo e($data['name']); ?>`).val(data.companyname)
         }
       },
       scrolling: {
@@ -74,3 +74,4 @@ $(() => {
   });
 
 </script>
+<?php /**PATH C:\xampp\htdocs\sisbilling9\resources\views/getView/selectCompany.blade.php ENDPATH**/ ?>

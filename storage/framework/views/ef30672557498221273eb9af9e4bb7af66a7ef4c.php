@@ -191,10 +191,7 @@
                         openmodal("Tagihan "+options.data.nama,data,options.data.userid)
                       },
                       error: function(xhr, status, error) {
-                          new Noty({
-                              text: error,
-                              timeout: 10000 
-                          }).show();
+                        showNty(error,10000)
                       }
                   });
                   });
@@ -291,10 +288,7 @@
                         openmodal("Pengguna "+options.data.Text,data,options.data.AppointmentId)
                       },
                       error: function(xhr, status, error) {
-                          new Noty({
-                              text: error,
-                              timeout: 10000 
-                          }).show();
+                        showNty(error,10000)
                       }
                   });
                   });

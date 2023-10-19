@@ -259,6 +259,7 @@ class UserController extends Controller
     }
     public function updateTutor(){
         tbluser::find(session('UIDGlob')->userid)->update(['isTutor' => 0]);
+        session('UIDGlob')->isTutor = 0;
         return 1;
     }
 }

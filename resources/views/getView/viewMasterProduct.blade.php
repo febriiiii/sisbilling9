@@ -38,10 +38,7 @@ $(() => {
             },
             success: function(data) {
               if (data == 0) {
-                new Noty({
-                    text: "Kode Produck (Product Code) Telah Digunakan",
-                    timeout: 2000 
-                }).show();
+                showNty("Kode Produck (Product Code) Telah Digunakan")
                 return false
               }
             }

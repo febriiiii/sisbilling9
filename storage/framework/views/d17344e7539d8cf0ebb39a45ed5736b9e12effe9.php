@@ -26,6 +26,7 @@
   const URLserviceworker = '<?php echo e(url("/service-worker.js")); ?>'
   const URLsse = '<?php echo e(url("/paymentWebHook")); ?>'
   const URLconfirmPembayaranMID = '<?php echo e(url("/confirmPembayaranMID")); ?>'
+  const URLlogout = '<?php echo e(url("/logout")); ?>'
 </script>
 <script type="text/javascript" src="<?php echo e(asset('public/js/footerscript.js')); ?>" ></script>
 <script type="module" src="<?php echo e(asset('public/js/module.js')); ?>" ></script>

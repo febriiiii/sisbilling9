@@ -200,10 +200,7 @@
                 openmodal('Tambah Customer',data)
             },
             error: function(xhr, status, error) {
-                new Noty({
-                    text: error,
-                    timeout: 10000 
-                }).show();
+                showNty(error,10000)
             }
         });
     }
@@ -216,10 +213,7 @@
                 openmodal('Tambah Pengelola',data)
             },
             error: function(xhr, status, error) {
-                new Noty({
-                    text: error,
-                    timeout: 10000 
-                }).show();
+                showNty(error,10000)
             }
         });
     }
@@ -233,10 +227,7 @@
                 openmodal('Master Product',data)
             },
             error: function(xhr, status, error) {
-                new Noty({
-                    text: error,
-                    timeout: 10000 
-                }).show();
+                showNty(error,10000)
             }
         });
     }
@@ -249,10 +240,7 @@
                 openmodal('Product Type',data)
             },
             error: function(xhr, status, error) {
-                new Noty({
-                    text: error,
-                    timeout: 10000 
-                }).show();
+                showNty(error,10000)
             }
         });
     }
@@ -265,10 +253,7 @@
                 openmodal('Payment Method',data)
             },
             error: function(xhr, status, error) {
-                new Noty({
-                    text: error,
-                    timeout: 10000 
-                }).show();
+                showNty(error,10000)
             }
         });
     }
@@ -301,10 +286,7 @@
     $('#formctu').submit(function(g){
         g.preventDefault()
         if($('#myprofile_companyaddE').val() == ''){
-            new Noty({
-                text: "Tolong Pilih Pengelola",
-                timeout: 2000 
-            }).show();
+            showNty("Tolong Pilih Pengelola")
             return false;
         }else{
             this.submit();
@@ -322,17 +304,11 @@
                 xhr.setRequestHeader('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
             },
             success: function(data) {
-                new Noty({
-                    text: data,
-                    timeout: 2000 
-                }).show();
+                showNty(data)
                 $('#loader').hide('slow')
             },
             error: function(xhr, status, error) {
-                new Noty({
-                    text: error,
-                    timeout: 10000 
-                }).show();
+                showNty(error,10000)
             }
         });
     });
@@ -362,16 +338,10 @@
                 console.log(data);
                 $('#imagePreview').css('background-image', 'url(' + data + ')');
                 $('#myprofile-saveimage').hide()
-                new Noty({
-                    text: 'Success Change Profile',
-                    timeout: 2000 
-                }).show();
+                showNty('Success Change Profile')
             },
             error: function(xhr, status, error) {
-                new Noty({
-                    text: error,
-                    timeout: 10000 
-                }).show();
+                showNty(error,10000)
             }
         });
     })
@@ -413,16 +383,10 @@
                 $('#myprofile_alamatSingkat').val(data.alamatSingkat);
                 $('#myprofile_alamatLengkap').val(data.alamatLengkap);
                 $('#myprofile_infoTambahan').val(data.infoTambahan);
-                new Noty({
-                    text: 'Success Save',
-                    timeout: 2000 
-                }).show();
+                showNty('Success Save')
             },
             error: function(xhr, status, error) {
-                new Noty({
-                    text: error,
-                    timeout: 10000 
-                }).show();
+                showNty(error,10000)
             }
         });
     });
@@ -442,17 +406,11 @@
         var myprofile_Password2 = $('#myprofile_Password2').val()
 
         if(myprofile_Passwordold == "" && myprofile_Password == "" && myprofile_Password2 == ""){
-            new Noty({
-                text: 'Please Input Password',
-                timeout: 2000 
-            }).show();
+            showNty('Please Input Password')
             return false
         }
         if (myprofile_Password.length < 6) {
-            new Noty({
-                text: 'The password must consist of a minimum of 6 characters',
-                timeout: 2000 
-            }).show();
+            showNty('The password must consist of a minimum of 6 characters')
             return false;
         }
 
@@ -472,25 +430,16 @@
             },
             success: function(data) {
                 if(data == 0){
-                    new Noty({
-                        text: 'Old password is incorrect',
-                        timeout: 2000 
-                    }).show();
+                    showNty('Old password is incorrect')
                     return false
                 }
                 $('#myprofile_Passwordold').val("");
                 $('#myprofile_Password').val("");
                 $('#myprofile_Password2').val("");
-                new Noty({
-                    text: 'Success Save',
-                    timeout: 2000 
-                }).show();
+                showNty('Success Save')
             },
             error: function(xhr, status, error) {
-                new Noty({
-                    text: error,
-                    timeout: 10000 
-                }).show();
+                showNty(error,10000)
             }
         });
     })

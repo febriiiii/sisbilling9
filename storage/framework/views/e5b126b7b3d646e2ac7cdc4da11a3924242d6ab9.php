@@ -30,14 +30,9 @@
         <?php echo $__env->make('modal.mainModalSelect', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?> 
         
         
-        <?php if($UIDGlob->isTutor == 1): ?>
-            <?php echo $__env->make('tutor', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-        <?php endif; ?>
-
         <div class="body" style="padding-bottom:20vh; padding-top:30px;">
             <div class="container">
                 <?php echo $__env->make('loader', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-                
                 <ul class="uk-switcher switcher-navbarCustom uk-margin">
                     <li><?php echo $__env->make('tabs.mydashboard', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?></li>
                     <?php if($UIDGlob->companyid != ''): ?>
@@ -49,6 +44,10 @@
                 </ul>
             </div>
         </div>
+        
+        <?php if($UIDGlob->isTutor == 1): ?>
+            <?php echo $__env->make('tutor', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+        <?php endif; ?>
         
 
         

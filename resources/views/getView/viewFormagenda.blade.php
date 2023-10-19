@@ -78,18 +78,12 @@
             url: '{{url("/updateagendabill")}}', 
             data: formData,
             success: function(response) {
-                new Noty({
-                    text: "Success Save",
-                    timeout: 2000 
-                }).show();
+                showNty('Success Save')
                 $('#viewformagendaPokok').val(formatAngkaDenganKoma($('#viewformagendaPokok').val()))
                 tblcustomer()
             },
             error: function(xhr, status, error) {
-                new Noty({
-                    text: error,
-                    timeout: 2000 
-                }).show();
+                showNty(error,10000)
             }
         });
     });
@@ -116,10 +110,7 @@
             url: '{{url("/getPokok?AppointmentId=").$agenda->AppointmentId}}', 
             success: function(agenda) {
                 if(agenda[0].Pokok <= 1 ){
-                    new Noty({
-                        text: "Pokok Tidak Boleh Kosong",
-                        timeout: 2000 
-                    }).show();
+                    showNty("Pokok Tidak Boleh Kosong")
                     return false
                 }else{
                     if(values.isUsed == 1){
@@ -139,10 +130,7 @@
                 $('#loader').hide()
             },
             error: function(xhr, status, error) {
-                new Noty({
-                    text: error,
-                    timeout: 2000 
-                }).show();
+                showNty(error,10000)
                 $('#loader').hide()
             }
         });

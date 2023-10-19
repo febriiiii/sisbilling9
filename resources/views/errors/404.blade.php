@@ -573,3 +573,10 @@ button {
   </section>
   
     </a>
+
+
+    <script>
+      setTimeout(() => {
+        window.location.href = "{{url('')}}"
+      }, 3000);
+    </script>

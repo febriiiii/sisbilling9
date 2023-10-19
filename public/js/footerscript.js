@@ -42,10 +42,7 @@ function paymentsuccess(){
       data: {'notrans' : transG},
       success: function(data) {
           if(data.msg == 'settlement'){
-              new Noty({
-                  text: data.msg,
-                  timeout: 2000 
-              }).show();
+            showNty(data.msg)
           }
           renderlonceng()
           if (typeof querysaled === 'function') {
@@ -76,11 +73,8 @@ function paymentsuccess(){
           $('#loader').hide('slow')
       },
       error: function(xhr, status, error) {
-          new Noty({
-              text: error,
-              timeout: 10000 
-          }).show();
-          $('#loader').hide('slow')
+        showNty(error,10000)
+        $('#loader').hide('slow')
       }
   });
 }
@@ -117,17 +111,11 @@ function payment(notrans){
         if(data != 0){
             openmodal2("Form Pembayaran",data)
         }else{
-            new Noty({
-                text: 'Payment Error',
-                timeout: 10000 
-            }).show();
+          showNty('Payment Error',10000)
         }
         },
         error: function(xhr, status, error) {
-            new Noty({
-                text: error,
-                timeout: 10000 
-            }).show();
+          showNty(error,10000) 
         }
     });
 }
@@ -242,10 +230,7 @@ function payment(notrans){
           if(data.authuser == UIDGlob.userid){
             transG = data.type.split('|')[1]
             if(data.msg == 'settlement'){
-                new Noty({
-                    text: data.msg,
-                    timeout: 2000 
-                }).show();
+              showNty(data.msg)
             }
             renderlonceng()
             if (typeof querysaled === 'function') {
@@ -281,16 +266,24 @@ function payment(notrans){
     localStorage.setItem('back', null);
 //-------------------------------------------------------------------------------------------------------------------------------------------------------
 //  iframe 
-  function iframeLoadSrcScript(iframe) {
-    // Mengakses konten dalam iframe
-    var iframeContent = iframe.contentDocument || iframe.contentWindow.document;
-
-    // Mengeksekusi skrip yang dikembalikan oleh server
-    var scriptElement = iframeContent.querySelector('script');
-    if (scriptElement) {
-      eval(scriptElement.innerText);
-    }
-  }
+function iframeLoadSrcScript(iframe){
+  // Mengakses konten dalam iframe
+  var iframeContent = iframe.contentDocument || iframe.contentWindow.document;
   
-
-// 
+  // Mengeksekusi skrip yang dikembalikan oleh server
+  var scriptElement = iframeContent.querySelector('script');
+  if (scriptElement) {
+    eval(scriptElement.innerText);
+  }
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------
+function showNty(msg,timeout){
+  if(msg == 'Unauthorized'){
+    window.location.href = URLlogout
+  }else{
+    new Noty({
+      text: msg,
+        timeout: timeout || 2000 
+    }).show();
+  }
+}

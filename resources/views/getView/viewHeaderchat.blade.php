@@ -29,10 +29,7 @@
     function createChatHeader(){
         userid = $('#searchBox').dxSelectBox('option', 'value');
         if(userid == null){
-            new Noty({
-                  text: "Tolong Pilih User",
-                  timeout: 2000 
-              }).show();
+            showNty("Tolong Pilih User")
             return false
         }
         $.ajax({
@@ -44,10 +41,7 @@
             opnchat(chatid)
           },
           error: function(xhr, status, error) {
-              new Noty({
-                  text: error,
-                  timeout: 10000 
-              }).show();
+            showNty(error,10000)
           }
       });
     }

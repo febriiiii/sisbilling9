@@ -290,7 +290,7 @@ class AgendaController extends Controller
                                     tblagenda a
                                 JOIN
                                     tblmasterproduct p ON p.productCode = a.productCode AND p.companyid = a.companyid
-                                WHERE isBilling = 1;"),
+                                WHERE isBilling = 1 AND a.companyid = ".session('UIDGlob')->companyid.";"),
             'totalCount' => DB::select("SELECT COUNT(*) as aggregate FROM tblagenda")[0]->aggregate,
         ]);
     }

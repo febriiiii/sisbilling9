@@ -11,7 +11,7 @@
         <span class="badge" style="background-color: whitesmoke;color:black; position: absolute; margin-left:-10px; margin-top:-7px"><?php echo e($notif['count']); ?></span>
         <?php endif; ?>
     </a>
-    <ul class="dropdown-menu" style="position: absolute; left:-170px;">
+    <ul class="dropdown-menu" style="position: absolute; left:-170px; box-shadow:-3px 3px 6px rgb(221, 221, 221)">
         <?php $__currentLoopData = $notif['myAgendda']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <li onclick=""><a class="dropdown-item card mt-1" href="#"><?php echo e($i->text); ?> </a></li>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>

@@ -24,10 +24,7 @@
 <script>
     $('#d-block').fadeToggle('slow')
     $('#d-block').click(function(){
-        new Noty({
-            text: "Tekan Lanjutkan Untuk Melewati",
-            timeout: 2000,
-        }).show();
+        showNty('Tekan Lanjutkan Untuk Melewati')
     })
     var indexTutor = 1;
     var zIndexValue = 0;
@@ -89,6 +86,9 @@
                 type: 'GET',
                 cache: false,
                 url: '<?php echo e(url("/updateTutor")); ?>',
+                success:function(){
+                    window.location.href="<?php echo e(url('/')); ?>";
+                }
             });
         }
     }

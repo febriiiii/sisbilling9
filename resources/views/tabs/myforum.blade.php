@@ -104,10 +104,7 @@
               openmodal('Form Pengumuman',data)
           },
           error: function(xhr, status, error) {
-              new Noty({
-                  text: error,
-                  timeout: 10000 
-              }).show();
+            showNty(error,10000)
           }
       });
   }
@@ -126,10 +123,7 @@
             url: '{{url("/polling")}}',
             data: {pengumumanid,arraypolling,id},
             error: function(xhr, status, error) {
-              new Noty({
-                text: "Terjadi kesalahan server. Akan otomatis reload dalam waktu 4 detik.",
-                timeout: 4000,
-              }).show();
+              showNty("Terjadi kesalahan server. Akan otomatis reload dalam waktu 4 detik.",4000)
               setTimeout(function() {
                 location.reload();
               }, 4000);
@@ -158,10 +152,7 @@
               openmodal("Polling Informasi",data,pengumumanid)
           },
           error: function(xhr, status, error) {
-              new Noty({
-                  text: error,
-                  timeout: 10000 
-              }).show();
+            showNty(error,10000)
           }
       });
     }
@@ -305,20 +296,14 @@
             data: $(this).serialize(),
             success: function(userid) {
               if(userid == -1){
-                new Noty({
-                    text: "Tidak Bisa Membalas Pengumuman Anda Sendiri",
-                    timeout: 2000 
-                }).show();
+                showNty("Tidak Bisa Membalas Pengumuman Anda Sendiri")
                 return false;
               }
               openpengumuman(userid)
               $('.myforum_descmsg').val("")
             },
             error: function(xhr, status, error) {
-              new Noty({
-                  text: error,
-                  timeout: 10000 
-              }).show();
+              showNty(error,10000)
             }
         });
       })
@@ -331,19 +316,13 @@
             data: {userid},
             success: function(data) {
               if(data == 0){
-                new Noty({
-                    text: "Tidak Bisa Membuka Pengumuman Anda Sendiri",
-                    timeout: 2000 
-                }).show();
+                showNty("Tidak Bisa Membalas Pengumuman Anda Sendiri")
                 return false
               }
               opnchat(data.chatid)
             },
             error: function(xhr, status, error) {
-                new Noty({
-                    text: error,
-                    timeout: 10000 
-                }).show();
+              showNty(error,10000)
             }
         });
     }
@@ -356,10 +335,7 @@
               openmodal("",data,chatid)
           },
           error: function(xhr, status, error) {
-              new Noty({
-                  text: error,
-                  timeout: 10000 
-              }).show();
+            showNty(error,10000)
           }
       });
     }
@@ -372,10 +348,7 @@
                 openmodal("Pesan",data,"")
             },
             error: function(xhr, status, error) {
-                new Noty({
-                    text: error,
-                    timeout: 10000 
-                }).show();
+              showNty(error,10000)
             }
         });
     }

@@ -119,10 +119,7 @@
                 }
             },
             error: function(xhr, status, error) {
-                new Noty({
-                    text: error,
-                    timeout: 10000 
-                }).show();
+              showNty(error,10000)
             }
         });
     }

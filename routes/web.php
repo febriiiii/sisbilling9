@@ -53,7 +53,7 @@ Route::post('/updateDevice',[ChatController::class,'updateDevice'])->name('updat
 Route::get('nextAppointment', [TransactionController::class, 'nextAppointment'])->middleware('auth');
 
 Route::get('', [Controller::class, 'index'])->middleware('no-cache', 'auth');
-Route::get('/home', [Controller::class, 'index'])->middleware('auth');
+Route::get('/home', [Controller::class, 'index'])->middleware('no-cache','auth')->name('home');
 Route::get('/login', [Controller::class, 'login'])->name('login')->middleware('no-cache', 'guest');
 Route::post('/auuten', [Controller::class, 'auuten']);
 Route::get('/logout', [Controller::class, 'logout']);

@@ -30,10 +30,7 @@
             openmodal2(title,content,type)
         },
         error: function(xhr, status, error) {
-            new Noty({
-                text: error,
-                timeout: 10000 
-            }).show();
+          showNty(error,10000)
         }
     });
   }
@@ -156,17 +153,11 @@
                     if(data != 0){
                       openmodal2("Form Pembayaran",data)
                     }else{
-                      new Noty({
-                          text: 'Payment Error',
-                          timeout: 10000 
-                      }).show();
+                      showNty("Payment Error")
                     }
                   },
                   error: function(xhr, status, error) {
-                      new Noty({
-                          text: error,
-                          timeout: 10000 
-                      }).show();
+                    showNty(error,10000)
                   }
                 });
               });

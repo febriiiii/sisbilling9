@@ -11,7 +11,7 @@
         <span class="badge" style="background-color: whitesmoke;color:black; position: absolute; margin-left:-10px; margin-top:-7px">{{$notif['count']}}</span>
         @endif
     </a>
-    <ul class="dropdown-menu" style="position: absolute; left:-170px;">
+    <ul class="dropdown-menu" style="position: absolute; left:-170px; box-shadow:-3px 3px 6px rgb(221, 221, 221)">
         @foreach ($notif['myAgendda'] as $i)
             <li onclick=""><a class="dropdown-item card mt-1" href="#">{{$i->text}} </a></li>
         @endforeach

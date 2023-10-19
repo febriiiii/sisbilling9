@@ -110,10 +110,7 @@
           openmodal(judul,data,pengumumanid)
         },
         error: function(xhr, status, error) {
-            new Noty({
-                text: error,
-                timeout: 10000 
-            }).show();
+          showNty(error,10000)
         }
     });
   }
@@ -138,10 +135,7 @@
           dxsceduler()
         },
         error: function(xhr, status, error) {
-            new Noty({
-                text: "Color Status Error",
-                timeout: 10000 
-            }).show();
+          showNty('Color Status Error',10000)
         }
     });
   }
@@ -463,10 +457,7 @@
             }
 
             if (e.appointmentData.userid != undefined && e.appointmentData.userid !== "{{session('UIDGlob')->userid}}") {
-              new Noty({
-                text: "Tidak Diizinkan",
-                timeout: 2000 
-              }).show();
+              showNty("Tidak Diizinkan")
               e.cancel = true; // Prevent opening appointment form
             }
 
@@ -648,10 +639,6 @@
           //         // console.log(appointmentArray);
           //       },
           //       error: function(xhr, status, error) {
-          //           new Noty({
-          //               text: "Color Status Error",
-          //               timeout: 10000 
-          //           }).show();
           //       }
           //   });
           // },

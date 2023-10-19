@@ -143,9 +143,14 @@ class ViewtabController extends Controller
                                     AND d.statusid NOT IN (9,4) 
                                     GROUP BY d.userid");
         $notif['pengumuman'] = DB::select("SELECT judul,pengumumanid,isPengumumanCompany FROM tblpengumuman WHERE UserInsert != ".session('UIDGlob')->userid." 
-                                                AND companyid IN (".$cid.")  
-                                                AND ".session('UIDGlob')->userid." NOT IN (SELECT value FROM STRING_SPLIT(usersRead, ','))                                    
-                                                AND statusid NOT IN (4)");
+                                            AND UserInsert = 1
+                                            AND 2 NOT IN (SELECT value FROM STRING_SPLIT(usersRead, ','))                                    
+                                            AND statusid NOT IN (4)
+                                            UNION
+                                            SELECT judul,pengumumanid,isPengumumanCompany FROM tblpengumuman WHERE UserInsert != ".session('UIDGlob')->userid." 
+                                            AND companyid IN (".$cid.") AND companyid <> 1
+                                            AND ".session('UIDGlob')->userid." NOT IN (SELECT value FROM STRING_SPLIT(usersRead, ','))                                    
+                                            AND statusid NOT IN (4)");
         
         $notif['invoice'] = DB::select("SELECT t.*, a.Text FROM tbltrans t
                                         JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
@@ -204,7 +209,12 @@ class ViewtabController extends Controller
                                                             FROM STRING_SPLIT(c.userarray, ',')
                                                         )
                             WHERE c.statusid <> 4 
-                            AND PATINDEX('%[".session('UIDGlob')->userid."]%', userArray) > 0 
+                            AND (CASE 
+									WHEN CHARINDEX(',', REPLACE(REPLACE(userarray, '[', ''), ']', '')) > 0 THEN LEFT(REPLACE(REPLACE(userarray, '[', ''), ']', ''), CHARINDEX(',', REPLACE(REPLACE(userarray, '[', ''), ']', '')) - 1)
+								END = ".session('UIDGlob')->userid." 
+							OR CASE 
+									WHEN CHARINDEX(',', REPLACE(REPLACE(userarray, '[', ''), ']', '')) > 0 THEN RIGHT(REPLACE(REPLACE(userarray, '[', ''), ']', ''), LEN(REPLACE(REPLACE(userarray, '[', ''), ']', '')) - CHARINDEX(',', REPLACE(REPLACE(userarray, '[', ''), ']', '')))
+								END = ".session('UIDGlob')->userid." )
                             AND u.userid != ".session('UIDGlob')->userid."
                             AND c.companyid IN (".$cid.")");
 

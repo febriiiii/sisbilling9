@@ -72,10 +72,7 @@
             renderlonceng()
         },
         error: function(xhr, status, error) {
-            new Noty({
-                text: error,
-                timeout: 10000 
-            }).show();
+            showNty(error,10000)
         }
     });
     $('#msgkmtr-form').unbind()
@@ -101,10 +98,7 @@
                 $('#msgkmtr-input').val("")
             },
             error: function(xhr, status, error) {
-                new Noty({
-                    text: error,
-                    timeout: 10000 
-                }).show();
+                showNty(error,10000)
             }
         });
     })
