@@ -46,11 +46,12 @@ class AgendaController extends Controller
         if($AppointmentId == null){
             $AppointmentId = 0;
         }
-        $compid = session('UIDGlob')->companyid;
+        $controller = new Controller;
+        $PAT = $controller->PAT(session('UIDGlob')->companyid);
         return DB::select("SELECT nama, u.userid, email, CASE WHEN b.AppointmentId IS NULL THEN 0 ELSE 1 END AS isUsed
                             FROM tbluser u
                             LEFT JOIN (SELECT * FROM tblbilling WHERE AppointmentId = ".$AppointmentId.") b ON b.userid = u.userid
-                            WHERE PATINDEX('%[".$compid."]%', companyidArray) > 0");
+                            WHERE PATINDEX('%".$PAT."%', companyidArray) > 0");
     }
     public function getAgendaPinjam(Request $request){
         return DB::select("SELECT a.AppointmentId,Text,Pokok, CASE WHEN b.AppointmentId IS NULL THEN 0 ELSE 1 END AS isUsed
@@ -195,10 +196,20 @@ class AgendaController extends Controller
             } elseif ($freq === 'WEEKLY') {
                 $Lastdate->subWeek();
             } elseif ($freq === 'MONTHLY') {
-                $Lastdate->subMonth();
+                $Lastdate->sub(new DateInterval('P1M'));
             } elseif ($freq === 'YEARLY') {
                 $Lastdate->subYear();
-            }    
+            }   
+            $tempStartDate = Carbon::parse($tblagenda->StartDate);
+            if($freq == "MONTHLY"){
+                if($tempStartDate->isLastOfMonth()){
+                    if($tempStartDate->format('d') == '31'){
+                        $Lastdate->subMonth()->endOfMonth()->startOfDay();
+                    }else{
+                        $Lastdate->endOfMonth()->startOfDay();
+                    }
+                }
+            }
             $Ntrans->nextTransaction($apoinmentid,$userid,$Lastdate,session('UIDGlob')->companyid);
         }else{
             $Ntrans->nextTransaction($apoinmentid,$userid,null,session('UIDGlob')->companyid);

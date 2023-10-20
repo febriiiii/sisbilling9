@@ -32,15 +32,12 @@ class QueryController extends Controller
                     WHERE a.AppointmentId = ".$request->AppointmentId)[0];
     }
     public function chatHeader(){
-        $or = "";
-        if(session('UIDGlob')->companyidArray != null){
-            $or = "OR PATINDEX('%[".session('UIDGlob')->companyid."]%', companyidArray) > 0";
-        }
-        $compArray = substr(session('UIDGlob')->companyidArray, 0, -1);
-        if(session('UIDGlob')->userid == 1){
-            return DB::select("SELECT nama,userid FROM tbluser where userid <> 1"); 
-        }
-        return DB::select("SELECT nama,userid FROM tbluser where companyid in (".$compArray.") ".$or);
+        $query = "SELECT distinct sub1.nama, sub1.userid from tbluser sub
+                join (
+                SELECT * FROM tbluser
+                ) sub1 on PATINDEX('%[sub1.companyid]%', sub.companyidArray) > 0
+                where sub1.userid <> sub.userid and sub.userid=".session('UIDGlob')->userid;
+        return DB::select($query);
     }
     
     public function tblcomp(){

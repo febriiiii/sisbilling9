@@ -27,13 +27,14 @@ class TransactionController extends Controller
 {
     public function nextAppointment($startDate,$recurenceRule,$recurenceException,$lastDate){
         $startDate = Carbon::parse($startDate);
+        $tempStartDate = $startDate;
         $recurenceRule = explode(";",$recurenceRule);
         $recurenceException = explode(",",$recurenceException);
         foreach($recurenceRule as $val){
             $recurs = explode("=",$val);
             $Recurr[$recurs[0]] = $recurs[1];
         }
-        // $log = new Controller;
+        $log = new Controller;
         $INTERVAL = 1;
         if(isset($Recurr['INTERVAL'])){
             $INTERVAL = $Recurr['INTERVAL'];
@@ -77,7 +78,7 @@ class TransactionController extends Controller
                             $nextDate = $nextDate->addDay($INTERVAL);
                         }
                     }
-                    if (in_array(strtoupper(substr($nextDate->englishDayOfWeek, 0, 2)), $days)) {
+                    if (in_array(strtoupper(substr($nextDate->englishDayOfWeek, 0, 2)), $days)){
                         break;
                     }
                 }
@@ -92,6 +93,7 @@ class TransactionController extends Controller
         }else if($Recurr['FREQ'] == "MONTHLY"){
             if(isset($Recurr['COUNT'])){
                 $finishDate = $startDate->copy()->addMonth($Recurr['COUNT'] - 1);
+                $log->savelog("finishDate1".$finishDate);
             }
             $lD = Carbon::parse($lastDate)->addMonth($INTERVAL);
             $nextDate = $startDate->copy()->addMonth($INTERVAL);
@@ -115,12 +117,22 @@ class TransactionController extends Controller
         if(isset($Recurr['UNTIL'])){
             $finishDate = Carbon::parse($Recurr['UNTIL']);
         }
-
+        
+        // $log->savelog("next".$nextDate);
         if($nextDate->lessThan($lD)){
             $startDate = $nextDate;
             goto Loop;
         }
         if($finishDate->greaterThan($nextDate)){
+            if($Recurr['FREQ'] == "MONTHLY"){
+                if($tempStartDate->isLastOfMonth()){
+                    if($tempStartDate->format('d') == '31'){
+                        $nextDate->subMonth()->endOfMonth()->startOfDay();
+                    }else{
+                        $nextDate->endOfMonth()->startOfDay();
+                    }
+                }
+            }
             return $nextDate;
         }else{
             return false;
@@ -143,6 +155,13 @@ class TransactionController extends Controller
                 return $nextDate->copy()->sub(new DateInterval('P7D')); // Mengurangkan 1 minggu
                 break;
             case 'MONTHLY':
+                    if($nextDate->copy()->isLastOfMonth()){
+                        if($nextDate->copy()->format('d') == '31'){
+                            return $nextDate->copy()->subMonth()->endOfMonth()->startOfDay();
+                        }else{
+                            return $nextDate->copy()->endOfMonth()->startOfDay();
+                        }
+                    }
                 return $nextDate->copy()->sub(new DateInterval('P1M')); // Mengurangkan 1 bulan
                 break;
             case 'YEARLY':
@@ -179,6 +198,7 @@ class TransactionController extends Controller
         }else{
             $nextDate = $this->nextAppointment($tblagenda->StartDate,$tblagenda->RecurrenceRule,$tblagenda->RecurrenceException,$lastDate);
         }
+        // dd($nextDate);
         if($nextDate != false){
             $cekIssetTrans = tbltrans::where('jatuhTempoTagihan',$nextDate)
                                         ->where('companyid',$companyid)
@@ -266,7 +286,7 @@ class TransactionController extends Controller
             DB::beginTransaction();
             $chatcontroller = new ChatController;
             $tbltrans = tbltrans::find($request->notrans);
-            $user = tbluser::find($tbltrans->userid);
+            $user = tbluser::find(session('UIDGlob')->userid);
             $status = 1;
             if($tbltrans->statusid != 13){
                 if($tbltrans->statusid == 5 || $tbltrans->statusid == 11){
@@ -285,7 +305,8 @@ class TransactionController extends Controller
                             $exten = $file->getClientOriginalExtension();
                             $file->storeAs('public/user/'.$user->userid.'/notrans', $request->notrans.'.'.$exten);
                             $tbltrans->update(['statusid' => 6, 'isreject' => 0, 'paymentid' => $request->paymentid]);
-                            $chatcontroller->GlobalPush("notif",$tbltrans->UserInsert);
+                            $Up = tbluser::where('companyid',$tbltrans->companyid)->first();
+                            $chatcontroller->GlobalPush("notif",$Up->userid);
                         }else{
                             $status = 0;
                         }

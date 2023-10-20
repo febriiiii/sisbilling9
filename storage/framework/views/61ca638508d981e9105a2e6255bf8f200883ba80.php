@@ -66,10 +66,7 @@
   $('#formAgendaBill').submit(function(event){
     event.preventDefault();
     if($('#viewformbillingPK').val() == ''){
-      new Noty({
-          text: "Tolong Pilih Produk Pada Dafta Produk",
-          timeout: 2000 
-      }).show()
+      showNty("Tolong Pilih Produk Pada Dafta Produk")
       return false;
     }
       $('#viewformbillingPokok').val(formatAngkaTanpaKoma($('#viewformbillingPokok').val()))
@@ -83,25 +80,19 @@
           url: '<?php echo e(url("/updateagendabill")); ?>', 
           data: formData,
           success: function(response) {
-              new Noty({
-                  text: "Success Save",
-                  timeout: 2000 
-              }).show();
-              $('#viewformbillingPokok').val(formatAngkaDenganKoma($('#viewformbillingPokok').val()))
-              tblcustomer()
+            showNty("Success Save")
+            $('#viewformbillingPokok').val(formatAngkaDenganKoma($('#viewformbillingPokok').val()))
+            tblcustomer()
           },
           error: function(xhr, status, error) {
-              new Noty({
-                  text: error,
-                  timeout: 2000 
-              }).show();
+            showNty(error,10000)
           }
       });
   });
   var storeUserpinjam = DevExpress.data.AspNet.createStore({
                               key: 'AppointmentId',
-                              loadUrl: '<?php echo e(url("getAgendaPinjam")); ?>',
-                              updateUrl: '<?php echo e(url("putAgendaPinjam")); ?>',
+                              loadUrl: '<?php echo e(url("getAgendaPinjam")); ?>?stamp=' + new Date().getTime(),
+                              updateUrl: '<?php echo e(url("putAgendaPinjam")); ?>?stamp=' + new Date().getTime(),
                               onBeforeSend: function(method, ajaxOptions) {
                                   ajaxOptions.xhrFields = { withCredentials: true };
                                   ajaxOptions.headers = ajaxOptions.headers || {};
@@ -122,13 +113,10 @@
       cache: false,
       url: '<?php echo e(url("/getPokok?AppointmentId=")); ?>' + key, 
       success: function(agenda) {
-          $('#loader').hide()
           if(agenda[0].Pokok <= 1 ){
-              new Noty({
-                  text: "Pokok Tidak Boleh Kosong",
-                  timeout: 2000 
-              }).show();
-              return false
+            showNty("Pokok Tidak Boleh Kosong")
+          }else if(agenda[0].RecurrenceRule == ''){
+            showNty("Anda Belum Menentukan Jadwal Tagihan di Agenda")
           }else{
             if(values.isUsed == 1){
                 tempUserpinjam.push(key)
@@ -144,13 +132,11 @@
                 }]);
             });
           }
+          $('#loader').hide()
       },
       error: function(xhr, status, error) {
-          new Noty({
-              text: error,
-              timeout: 2000 
-          }).show();
-          $('#loader').hide()
+        showNty(error,10000)
+        $('#loader').hide()
       }
     });
   }

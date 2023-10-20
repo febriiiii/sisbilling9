@@ -78,25 +78,19 @@
             url: '<?php echo e(url("/updateagendabill")); ?>', 
             data: formData,
             success: function(response) {
-                new Noty({
-                    text: "Success Save",
-                    timeout: 2000 
-                }).show();
+                showNty('Success Save')
                 $('#viewformagendaPokok').val(formatAngkaDenganKoma($('#viewformagendaPokok').val()))
                 tblcustomer()
             },
             error: function(xhr, status, error) {
-                new Noty({
-                    text: error,
-                    timeout: 2000 
-                }).show();
+                showNty(error,10000)
             }
         });
     });
     var storeUserpinjam = DevExpress.data.AspNet.createStore({
                                 key: 'userid',
-                                loadUrl: '<?php echo e(url("getUserPinjam")); ?>',
-                                updateUrl: '<?php echo e(url("putUserPinjam")); ?>',
+                                loadUrl: '<?php echo e(url("getUserPinjam")); ?>?stamp=' + new Date().getTime(),
+                                updateUrl: '<?php echo e(url("putUserPinjam")); ?>?stamp=' + new Date().getTime(),
                                 onBeforeSend: function(method, ajaxOptions) {
                                     ajaxOptions.xhrFields = { withCredentials: true };
                                     ajaxOptions.headers = ajaxOptions.headers || {};
@@ -116,11 +110,9 @@
             url: '<?php echo e(url("/getPokok?AppointmentId=").$agenda->AppointmentId); ?>', 
             success: function(agenda) {
                 if(agenda[0].Pokok <= 1 ){
-                    new Noty({
-                        text: "Pokok Tidak Boleh Kosong",
-                        timeout: 2000 
-                    }).show();
-                    return false
+                    showNty("Pokok Tidak Boleh Kosong")
+                }else if(agenda[0].RecurrenceRule == ''){
+                    showNty("Anda Belum Menentukan Jadwal Tagihan di Agenda")
                 }else{
                     if(values.isUsed == 1){
                         tempUserpinjam.push(key)
@@ -139,10 +131,7 @@
                 $('#loader').hide()
             },
             error: function(xhr, status, error) {
-                new Noty({
-                    text: error,
-                    timeout: 2000 
-                }).show();
+                showNty(error,10000)
                 $('#loader').hide()
             }
         });

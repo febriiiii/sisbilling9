@@ -11,7 +11,7 @@
 }
 </style>
 <div class="row container">
-    <small class="col-12" style="text-align: justify;">{!!$tblpengumuman->pengumuman!!}</small>
+    <small class="col-12" style="text-align: justify;"><?php echo $tblpengumuman->pengumuman; ?></small>
     <hr class="mt-1">
 </div>
 <div id="komentar-wrapper" class="glasskomentar container" style="padding-bottom: 10vh;">
@@ -56,13 +56,13 @@
     $.ajax({
         type: 'POST',
         cache: false,
-        url: '{{url("/getkomentard")}}',
+        url: '<?php echo e(url("/getkomentard")); ?>',
         data: {pengumumanid},
         success: function(data) {
             contentkomentar.html("")
             data.forEach(e => {
                 var urli = 'public/storage/'+e.profileImg
-                var name = `<img src="{{asset('')}}`+urli+`" style="border-radius:100%; width:20px; height:20px; margin-right:10px;"><b>`+e.nama+`</b><small> `+new Date(e.InsertDT).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })+`</small><br>`
+                var name = `<img src="<?php echo e(asset('')); ?>`+urli+`" style="border-radius:100%; width:20px; height:20px; margin-right:10px;"><b>`+e.nama+`</b><small> `+new Date(e.InsertDT).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })+`</small><br>`
                 var komentar = "<li class='msgkmtr item'> " +
                                 name+"<p style='margin-left:30px;'>"+e.pesan+"</p>" +
                             "</li>"
@@ -89,7 +89,7 @@
         $.ajax({
             type: 'POST',
             cache: false,
-            url: '{{url("/sendkomentar")}}',
+            url: '<?php echo e(url("/sendkomentar")); ?>',
             data: {
                 pengumumanid,
                 description : $('#msgkmtr-input').val()
@@ -102,4 +102,4 @@
             }
         });
     })
-</script>
+</script><?php /**PATH C:\xampp\htdocs\sisbilling9\resources\views/getView/viewKomentarpengumuman.blade.php ENDPATH**/ ?>

@@ -123,7 +123,8 @@ class ViewtabController extends Controller
                 $midtrans = new CreateSnapTokenService($trans);
                 $snapToken = $midtrans->getSnapToken();
                 $us->update(['snap_token' => $snapToken]);
-            }   
+            }
+            $us->update(['isreject' => 0]);   
             return view('getView.viewPayment',compact('file','trans','paymentMethod','snapToken'))->render();
         }else{
             return 0;
@@ -132,14 +133,15 @@ class ViewtabController extends Controller
     public function viewlonceng(){
         $controller = new Controller;
         $cid = $controller->inCidNotSelf();
+        // $PAT = $controller->PAT(session('UIDGlob')->userid);
         $notif['myAgendda'] = DB::select("SELECT text FROM tblagenda WHERE userid = ".session('UIDGlob')->userid." AND isBilling = 0 AND CONVERT(VARCHAR, GETDATE(), 12) = CONVERT(VARCHAR, EndDate, 12)");
         $notif['chat'] = DB::select("SELECT count(d.userid) AS total,d.userid,max(u.nama) AS nama, max(h.chatid) AS chatid
                                     FROM tblchat h 
                                     JOIN tblchatd d ON h.chatid=d.chatid
                                     JOIN tbluser u ON u.userid=d.userid
-                                    WHERE PATINDEX('%[".session('UIDGlob')->userid."]%', userArray) > 0 
+                                    WHERE (SUBSTRING(REPLACE(REPLACE(userArray, ']', ''), '[', ''), 1, CHARINDEX(',', REPLACE(REPLACE(userArray, ']', ''), '[', '')) - 1) = ".session('UIDGlob')->userid."
+	                                OR SUBSTRING(REPLACE(REPLACE(userArray, ']', ''), '[', ''), CHARINDEX(',', REPLACE(REPLACE(userArray, ']', ''), '[', '')) + 1, LEN(REPLACE(REPLACE(userArray, ']', ''), '[', ''))) = ".session('UIDGlob')->userid.") 
                                     AND d.userid != ".session('UIDGlob')->userid." 
-                                    AND h.companyid IN (".$cid.") 
                                     AND d.statusid NOT IN (9,4) 
                                     GROUP BY d.userid");
         $notif['pengumuman'] = DB::select("SELECT judul,pengumumanid,isPengumumanCompany FROM tblpengumuman WHERE UserInsert != ".session('UIDGlob')->userid." 
@@ -182,42 +184,41 @@ class ViewtabController extends Controller
         }else{
             $cid = "'".session('UIDGlob')->companyid."'";
         }
-        $tblchat = DB::select("SELECT c.*, u.nama, u.companyid AS pengelola, u.profileImg, d1.description AS latestChat, d2.description AS firstChat, d1.InsertDT
-                            FROM tblchat c
-                            LEFT JOIN (
-                                SELECT chatid, description, InsertDT
-                                FROM tblchatd
-                                WHERE id IN (
-                                    SELECT MAX(id)
-                                    FROM tblchatd
-                                    GROUP BY chatid
-                                )
-                                AND statusid <> 4
-                            ) d1 ON c.chatid = d1.chatid
-                            LEFT JOIN (
-                                SELECT chatid, description
-                                FROM tblchatd
-                                WHERE id IN (
-                                    SELECT MIN(id)
-                                    FROM tblchatd
-                                    GROUP BY chatid
-                                )
-                                AND statusid <> 4
-                            ) d2 ON c.chatid = d2.chatid
-                            JOIN tbluser u ON u.userid IN (
-                                                            SELECT CAST(REPLACE(REPLACE(value, '[', ''), ']', '') AS INT)
-                                                            FROM STRING_SPLIT(c.userarray, ',')
-                                                        )
-                            WHERE c.statusid <> 4 
-                            AND (CASE 
-									WHEN CHARINDEX(',', REPLACE(REPLACE(userarray, '[', ''), ']', '')) > 0 THEN LEFT(REPLACE(REPLACE(userarray, '[', ''), ']', ''), CHARINDEX(',', REPLACE(REPLACE(userarray, '[', ''), ']', '')) - 1)
-								END = ".session('UIDGlob')->userid." 
-							OR CASE 
-									WHEN CHARINDEX(',', REPLACE(REPLACE(userarray, '[', ''), ']', '')) > 0 THEN RIGHT(REPLACE(REPLACE(userarray, '[', ''), ']', ''), LEN(REPLACE(REPLACE(userarray, '[', ''), ']', '')) - CHARINDEX(',', REPLACE(REPLACE(userarray, '[', ''), ']', '')))
-								END = ".session('UIDGlob')->userid." )
-                            AND u.userid != ".session('UIDGlob')->userid."
-                            AND c.companyid IN (".$cid.")");
-
+        $query = "SELECT c.*, u.nama, u.companyid AS pengelola, u.profileImg, d1.description AS latestChat, d2.description AS firstChat, d1.InsertDT
+                    FROM tblchat c
+                    LEFT JOIN (
+                        SELECT chatid, description, InsertDT
+                        FROM tblchatd
+                        WHERE id IN (
+                            SELECT MAX(id)
+                            FROM tblchatd
+                            GROUP BY chatid
+                        )
+                        AND statusid <> 4
+                    ) d1 ON c.chatid = d1.chatid
+                    LEFT JOIN (
+                        SELECT chatid, description
+                        FROM tblchatd
+                        WHERE id IN (
+                            SELECT MIN(id)
+                            FROM tblchatd
+                            GROUP BY chatid
+                        )
+                        AND statusid <> 4
+                    ) d2 ON c.chatid = d2.chatid
+                    JOIN tbluser u ON u.userid IN (
+                                                    SELECT CAST(REPLACE(REPLACE(value, '[', ''), ']', '') AS INT)
+                                                    FROM STRING_SPLIT(c.userarray, ',')
+                                                )
+                    WHERE c.statusid <> 4 
+                    AND (CASE 
+                            WHEN CHARINDEX(',', REPLACE(REPLACE(userarray, '[', ''), ']', '')) > 0 THEN LEFT(REPLACE(REPLACE(userarray, '[', ''), ']', ''), CHARINDEX(',', REPLACE(REPLACE(userarray, '[', ''), ']', '')) - 1)
+                        END = ".session('UIDGlob')->userid." 
+                    OR CASE 
+                            WHEN CHARINDEX(',', REPLACE(REPLACE(userarray, '[', ''), ']', '')) > 0 THEN RIGHT(REPLACE(REPLACE(userarray, '[', ''), ']', ''), LEN(REPLACE(REPLACE(userarray, '[', ''), ']', '')) - CHARINDEX(',', REPLACE(REPLACE(userarray, '[', ''), ']', '')))
+                        END = ".session('UIDGlob')->userid." )
+                    AND u.userid != ".session('UIDGlob')->userid;
+        $tblchat = DB::select($query);
         return view('getView.viewHeaderchat',compact('tblchat'))->render();
     }
     public function pusher(){

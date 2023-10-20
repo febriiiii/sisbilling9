@@ -159,7 +159,7 @@ Route::get('/eod', [TransactionController::class, 'eod']);
 Route::get('/voidtrans', [TransactionController::class, 'voidtrans']);
 Route::get('/getbill', [TransactionController::class, 'getbill']);
 Route::get('/gettransaction', [TransactionController::class, 'gettransaction']);
-Route::post('/confirmPembayaran', [TransactionController::class, 'confirmPembayaran'])->middleware('auth');
-Route::post('/confirmPembayaranMID', [TransactionController::class, 'confirmPembayaranMID'])->middleware('auth');
+Route::post('/confirmPembayaran', [TransactionController::class, 'confirmPembayaran']);
+Route::post('/confirmPembayaranMID', [TransactionController::class, 'confirmPembayaranMID']);
 
 Route::get('/pivot', [ReportController::class, 'pivot']);

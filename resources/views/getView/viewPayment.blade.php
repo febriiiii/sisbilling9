@@ -150,6 +150,7 @@
 </form>
 
 <script>
+    renderlonceng()
     transG = '{{$trans->notrans}}'
     var snapToken = '{{ $snapToken }}';
     $('#viewpayment-submit').submit(function(event){
@@ -166,9 +167,9 @@
         form.append('reject', $('button[name="reject"]:focus').val());
 
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', '{{url("/confirmPembayaran")}}', true);
-        xhr.setRequestHeader('Cache-Control', 'no-store'); // CACHE FALSE
-        xhr.setRequestHeader('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+        xhr.open('POST', '{{url("/confirmPembayaran")}}?stamp=' + new Date().getTime(), true);
+        // xhr.setRequestHeader('Cache-Control', 'no-store'); // CACHE FALSE
+        // xhr.setRequestHeader('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
         xhr.onload = function () {
             if (xhr.status === 200) {
                 var response = xhr.responseText;
@@ -192,6 +193,7 @@
         };
 
         xhr.send(form);
+        $('#loader').hide('slow')
     }) 
     
     function voidtrans(){

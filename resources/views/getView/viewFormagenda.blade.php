@@ -89,8 +89,8 @@
     });
     var storeUserpinjam = DevExpress.data.AspNet.createStore({
                                 key: 'userid',
-                                loadUrl: '{{url("getUserPinjam")}}',
-                                updateUrl: '{{url("putUserPinjam")}}',
+                                loadUrl: '{{url("getUserPinjam")}}?stamp=' + new Date().getTime(),
+                                updateUrl: '{{url("putUserPinjam")}}?stamp=' + new Date().getTime(),
                                 onBeforeSend: function(method, ajaxOptions) {
                                     ajaxOptions.xhrFields = { withCredentials: true };
                                     ajaxOptions.headers = ajaxOptions.headers || {};
@@ -111,7 +111,8 @@
             success: function(agenda) {
                 if(agenda[0].Pokok <= 1 ){
                     showNty("Pokok Tidak Boleh Kosong")
-                    return false
+                }else if(agenda[0].RecurrenceRule == ''){
+                    showNty("Anda Belum Menentukan Jadwal Tagihan di Agenda")
                 }else{
                     if(values.isUsed == 1){
                         tempUserpinjam.push(key)

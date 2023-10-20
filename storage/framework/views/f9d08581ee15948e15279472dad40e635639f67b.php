@@ -41,11 +41,8 @@ $('#myforum-formpengumuman').submit(function(h){
     var htmlEditor = $(".html-editor").dxHtmlEditor("instance");
     var editorContent = htmlEditor.option("value");
     if(editorContent == ""){
-        new Noty({
-            text: "Tolong Masukan Deskripsi",
-            timeout: 2000 
-        }).show();
-        return false
+      showNty("Tolong Masukan Deskripsi")
+      return false
     }
     $("#val-pengumuman").val(editorContent);
 
@@ -60,11 +57,8 @@ $('#myforum-formpengumuman').submit(function(h){
     var maxSize = 10240; // Batas maksimum ukuran data dalam byte
 
     if (dataSize > maxSize) {
-        new Noty({
-            text: "Ukuran data melebihi batas yang diizinkan",
-            timeout: 2000 
-        }).show();
-        return false;
+      showNty("Ukuran data melebihi batas yang diizinkan")
+      return false;
     }
     
     $.ajax({
@@ -74,16 +68,10 @@ $('#myforum-formpengumuman').submit(function(h){
         data: $(this).serialize(),
         success: function(d) {
             closemodal()
-            new Noty({
-                text: "Berhasil Mengirim",
-                timeout: 2000 
-            }).show();
+            showNty("Berhasil Mengirim")
         },
         error: function(xhr, status, error) {
-            new Noty({
-                text: error,
-                timeout: 10000 
-            }).show();
+          showNty(error,10000)
         }
     });
 })

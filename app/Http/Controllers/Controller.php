@@ -141,4 +141,12 @@ class Controller extends BaseController
         );
         return $pusher;
     }
+
+    public function PAT($string){
+        $PAT = '';
+        for ($i = 0; $i < strlen($string); $i++) {
+            $PAT .= '['.$string[$i].']';
+        }
+        return $PAT . '[,]';
+    }
 }

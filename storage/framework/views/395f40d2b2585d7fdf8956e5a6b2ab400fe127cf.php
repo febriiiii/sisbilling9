@@ -131,6 +131,7 @@
 </form>
 
 <script>
+    renderlonceng()
     transG = '<?php echo e($trans->notrans); ?>'
     var snapToken = '<?php echo e($snapToken); ?>';
     $('#viewpayment-submit').submit(function(event){
@@ -147,16 +148,13 @@
         form.append('reject', $('button[name="reject"]:focus').val());
 
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', '<?php echo e(url("/confirmPembayaran")); ?>', true);
-        xhr.setRequestHeader('Cache-Control', 'no-store'); // CACHE FALSE
-        xhr.setRequestHeader('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+        xhr.open('POST', '<?php echo e(url("/confirmPembayaran")); ?>?stamp=' + new Date().getTime(), true);
+        // xhr.setRequestHeader('Cache-Control', 'no-store'); // CACHE FALSE
+        // xhr.setRequestHeader('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
         xhr.onload = function () {
             if (xhr.status === 200) {
                 var response = xhr.responseText;
-                new Noty({
-                    text: response,
-                    timeout: 2000 
-                }).show();
+                showNty(response)
                 if(response == 'Success'){
                     renderlonceng()
                     closemodal2()
@@ -176,6 +174,7 @@
         };
 
         xhr.send(form);
+        $('#loader').hide('slow')
     }) 
     
     function voidtrans(){
@@ -195,10 +194,7 @@
                 loadbilling()
             },
             error: function(xhr, status, error) {
-                new Noty({
-                    text: error,
-                    timeout: 10000,
-                }).show();
+                showNty(error,10000)
             }
         });
     }
@@ -207,10 +203,7 @@
         event.preventDefault();
         if(snapToken == null || snapToken == ''){
             closemodal2()
-            new Noty({
-                text: 'Jaringan Bermasalah,Tolong Buka ulang Tagihan',
-                timeout: 5000,
-            }).show();
+            showNty('Jaringan Bermasalah,Tolong Buka ulang Tagihan',5000)
             return false
         }
         snap.pay(snapToken, {
@@ -253,10 +246,7 @@
                 loadbilling()
             },
             error: function(xhr, status, error) {
-                new Noty({
-                    text: error,
-                    timeout: 10000 
-                }).show();
+                showNty(error,10000)
                 $('#loader').hide('slow')
             }
         });
