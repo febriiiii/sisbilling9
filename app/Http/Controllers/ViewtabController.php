@@ -218,6 +218,7 @@ class ViewtabController extends Controller
                             WHEN CHARINDEX(',', REPLACE(REPLACE(userarray, '[', ''), ']', '')) > 0 THEN RIGHT(REPLACE(REPLACE(userarray, '[', ''), ']', ''), LEN(REPLACE(REPLACE(userarray, '[', ''), ']', '')) - CHARINDEX(',', REPLACE(REPLACE(userarray, '[', ''), ']', '')))
                         END = ".session('UIDGlob')->userid." )
                     AND u.userid != ".session('UIDGlob')->userid;
+                    // dd($query);
         $tblchat = DB::select($query);
         return view('getView.viewHeaderchat',compact('tblchat'))->render();
     }

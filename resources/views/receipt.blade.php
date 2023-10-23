@@ -163,15 +163,17 @@
 				</div><!--End InvoiceBot-->
   </div><!--End Invoice--> --}}
     <div id="invoice-POS" style="box-shadow: 0 0 1in -0.25in rgba(0, 0, 0, 0.5);padding: 2mm;margin: 0 auto;width: 70mm;background: #FFF;">
-    
-      <center id="top" style="border-bottom: 1px solid #EEE;">
-          <div>
-              {!! QrCode::size(30)->generate($trans->notrans) !!}
-          </div>
+      <center id="top">
         <div class="info" style="display: block;margin-left: 0;"> 
           <h2 style="font-size: 0.9em;">{{$trans->companyname}}</h2>
         </div><!--End Info-->
       </center><!--End InvoiceTop-->
+    
+      @if ($trans->statusid == 7)
+        <h6 style="border-bottom: 1px solid #EEE;">Bukti Bayar</h6>
+      @else
+        <h6 style="border-bottom: 1px solid #EEE;">Tagihan</h6>
+      @endif
       
       <div id="mid" style="border-bottom: 1px solid #EEE;min-height: 80px;">
         <div class="info" style="display: block;margin-left: 0;">
@@ -236,9 +238,9 @@
             </div><!--End Table-->
     
             <div id="legalcopy" style="margin-top: 5mm;">
+              {!! QrCode::size(30)->generate($trans->notrans) !!}
               <p class="legal" style="font-size: 0.7em;color: #666;line-height: 1.2em;"><strong>Terima kasih!</strong><br> atas kepercayaan Anda dalam menggunakan layanan kami. 
               </p>
-                          <center><strong style="font-size: .7em;">Graha Kreasi Solusindo</strong></center>
             </div>
     
           </div><!--End InvoiceBot-->

@@ -22,6 +22,7 @@
         popup.hide();
     }
 
+
     $(function() {
         var popup = $("#myModal").dxPopup({
             visible: false,
@@ -31,6 +32,15 @@
                 deviceType: "phone"
             }
         }).dxPopup("instance");
+
+        // Cek Jika PopUp Di Tutup
+        var popupInstance = $('#myModal').dxPopup('instance');
+        popupInstance.on('hidden', function () {
+            if(openChat){
+                openChat = false
+            }
+        });
+
 
         function updatePopupHeight() {
             if (DevExpress.devices.current().deviceType === "phone" || DevExpress.devices.current().deviceType === "tablet") {

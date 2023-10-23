@@ -70,6 +70,7 @@
 
 <script>
     // start open modal image
+    openChat = true;
     function openmodalImage(url){
         $('#modal-media-image').css('z-index','11100')
         UIkit.modal('#modal-media-image').show()

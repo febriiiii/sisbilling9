@@ -108,11 +108,11 @@ function payment(notrans){
         type: 'GET',
         data: {val},
         success: function(data) {
-        if(data != 0){
-            openmodal2("Form Pembayaran",data)
-        }else{
-          showNty('Payment Error',10000)
-        }
+          if(data != 0){
+              openmodal2("Form Pembayaran",data)
+          }else{
+            showNty('Payment Error',10000)
+          }
         },
         error: function(xhr, status, error) {
           showNty(error,10000) 
@@ -120,6 +120,8 @@ function payment(notrans){
     });
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------
+// pusher config on-login
+  var openChat = false;
 // pusher 
     const strcid = CID;
     const arrayCompany = strcid.split(',').map(item => parseInt(decodeURIComponent(item.trim().replace(/&#039;/g, ''))));
@@ -155,14 +157,16 @@ function payment(notrans){
               contentchat.append(chat)
               scrolltoBottomChat()
               if(data.authuser != UIDGlob.userid){
-                $.ajax({
-                    url: URLreadchat,
-                    type: 'GET',
-                    data: {chatid},
-                    success: function() {
-                      renderlonceng()
-                    },
-                });
+                if(openChat){
+                  $.ajax({
+                      url: URLreadchat,
+                      type: 'GET',
+                      data: {chatid},
+                      success: function() {
+                        renderlonceng()
+                      },
+                  });
+                }
               }
           }
         }if(data.type == 'komentarcompany'){
@@ -193,12 +197,12 @@ function payment(notrans){
             $('#contentpengumumancompany').prepend(content);
           }
         }else if(data.type == 'polling'){
-          $(`#${data.id.replace(/\s/g, "")}text`).text(parseInt($(`#${data.id.replace(/\s/g, "")}text`).text()) + 1)
-          $(`#${data.id.replace(/\s/g, "")}range`).val(parseInt($(`#${data.id.replace(/\s/g, "")}range`).val()) + 1)
+          $(`.${data.classmax}`).attr('max',data.countUser)
+          $(`#${data.id.replace(/\s/g, "")}range`).val(parseInt($(`#${data.id.replace(/\s/g, "")}range`).val()) + parseInt(1))
+          $(`#${data.id.replace(/\s/g, "")}text`).text(parseInt($(`#${data.id.replace(/\s/g, "")}text`).text()) + parseInt(1))
           if(data.idrmv != false){
-            $(`#${data.idrmv.replace(/\s/g, "")}text`).text(parseInt($(`#${data.idrmv.replace(/\s/g, "")}text`).text()) - 1)
-            $(`#${data.idrmv.replace(/\s/g, "")}range`).val(parseInt($(`#${data.idrmv.replace(/\s/g, "")}range`).val()) - 1)
-            $(`.${data.classmax}`).attr('max',data.countUser)
+            $(`#${data.idrmv.replace(/\s/g, "")}range`).val(parseInt($(`#${data.idrmv.replace(/\s/g, "")}range`).val()) - parseInt(1))
+            $(`#${data.idrmv.replace(/\s/g, "")}text`).text(parseInt($(`#${data.idrmv.replace(/\s/g, "")}text`).text()) - parseInt(1))
           }
         }else if(data.type == 'notif'){
           if(data.authuser == UIDGlob.userid){

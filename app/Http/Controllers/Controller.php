@@ -36,14 +36,14 @@ class Controller extends BaseController
         ];
         
         $cid = $this->inCidSelf();
-
+        $useridQ = session('UIDGlob')->userid;
         $dateExpression = Carbon::now(config("app.GMT"))->subMonth(1)->format('Y-m-d H:i:s');
         $query = "SELECT p.*, c.companyname, u.userid, u.nama, u.profileImg, CASE WHEN u.companyid IS NULL THEN 0 ELSE 1 END AS ispengelola 
                 FROM tblpengumuman p
                 JOIN tbluser u ON u.userid = p.UserInsert
                 JOIN tblcomp c ON c.companyid = p.companyid
                 WHERE p.statusid <> 4 
-                    AND p.UserInsert = 1
+                    AND p.UserInsert = '{$useridQ}'
                     AND p.InsertDT > '{$dateExpression}'
                 UNION
                 SELECT p.*, c.companyname, u.userid, u.nama, u.profileImg, CASE WHEN u.companyid IS NULL THEN 0 ELSE 1 END AS ispengelola 
@@ -55,7 +55,6 @@ class Controller extends BaseController
                     AND p.InsertDT > '{$dateExpression}'
                 ORDER BY InsertDT DESC";
         $tblpengumuman = DB::select($query);
-        
         // $countchat = DB::select("SELECT * FROM tblchat WHERE PATINDEX('%[".session('UIDGlob')->userid."]%', userArray) > 0");
         return view('layout/main',compact('tblproducttype','cid','tblcomp','tblpengumuman'));
     }

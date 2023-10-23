@@ -100,7 +100,7 @@
             <button type="submit" class="col-5 btn btn-success mt-4" name="reject" value="0">Bayar Tagihan</button>
             <div class="col-2"></div>
             <button id="gatewayClose" <?php if($trans->statusid == 11): ?> style="display: none;" <?php endif; ?> type="button" class="col-5 btn btn-primary mt-4" onclick="payGateway(event)" name="reject" value="0">Gunakan Payment Gateway</button>
-            <div id="gatewayOpen" class="col-5 mt-4" <?php if($trans->statusid != 11): ?> style="display: none;" <?php endif; ?>>
+            <div id="gatewayOpen" class="col-sm-5 mt-4" <?php if($trans->statusid != 11): ?> style="display: none;" <?php endif; ?>>
                 <div class="btn-group" style="width: 110%;">
                     <button type="button" onclick="payGateway(event)" class="btn btn-primary">Menungu Pembayaran</button>
                     <button type="button" onclick="payExpire()" class="btn btn-danger">Tutup Pembayaran</button>
