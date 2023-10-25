@@ -130,7 +130,7 @@
     <button class="btn btn-secondary mt-2 me-2" onclick="opnPaymentMethod()">Payment Method</button>
     <button class="btn btn-secondary mt-2 me-2" onclick="opnmdlcustomer()">Tambah Customer</button>
     @endif
-    <button class="btn btn-secondary mt-2 me-2" onclick="opnmdlpengelola()">Tambah Pengelola</button>
+    {{-- <button class="btn btn-secondary mt-2 me-2" onclick="opnmdlpengelola()">Tambah Pengelola</button> --}}
     
     <!-- Modal popup -->
     <div class="modal fade" id="myprofile_companySetting" tabindex="-1" aria-labelledby="myprofile_companySettingLabel" aria-hidden="true">

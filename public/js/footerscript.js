@@ -225,10 +225,19 @@ function payment(notrans){
             reloadDashboard()
           }
         }else if(data.type == 'renderGlobal'){
+          alert('renderGlobal');
           if(data.authuser == UIDGlob.userid){
+            alert('msk Global');
             reloadDashboard()
             loadbilling()
             tblcustomer()
+            renderlonceng()
+            if (typeof querysaled === 'function') {
+              querysaled()
+            }
+            if (typeof querysaledBil === 'function') {
+                querysaledBil()
+            }
           }
         }else if(data.type == 'midtransHook'){
           if(data.authuser == UIDGlob.userid){

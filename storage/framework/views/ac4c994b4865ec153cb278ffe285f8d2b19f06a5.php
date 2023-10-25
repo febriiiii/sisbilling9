@@ -77,8 +77,12 @@
                       }else if(e.statusid == 11){
                         color = "#08e7fb";
                       }
+                      var productName = e.productName;
+                      if (productName.length > 19) {
+                        productName = productName.substring(0, 17) + "...";
+                      }
                       var content = `<div class="card box" style="border-radius:15px; margin-top:0;margin-bottom:15px;">` +
-                                      `<div class="ribbon-2" style="background:`+color+`">`+e.productName+`</div>` +
+                                      `<div class="ribbon-2" style="background:`+color+`">`+productName+`</div>` +
                                       `<div class="row">` +
                                           `<div onclick="payment('`+e.notrans+`')" class="col-auto p-2 btn" style="border-radius:15px 0 0 15px; background-color: `+color+`">` +
                                               `<img style="height:40px;width:40px;" src="<?php echo e(asset('public/payment.png')); ?>">` +

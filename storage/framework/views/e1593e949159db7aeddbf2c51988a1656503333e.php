@@ -137,8 +137,11 @@
         });
     }
     function onAdd(a) {
-        var key = a.itemData.userid;
+        isAdding = true;
         var values = { isUsed: a.toData };
+        if(a.itemData.length == 0){
+            return false;
+        }
         if(values.isUsed == 0){
             Swal.fire({
                 title: 'Apakah Kamu Yakin?',
@@ -151,13 +154,20 @@
                 cancelButtonText: 'Tidak',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    switcheds(key,values)
+                    a.itemData.forEach(data => {
+                        switcheds(data.userid,values)
+                    });
                 }
             })
         }else{
-            switcheds(key,values)
+            a.itemData.forEach(data => {
+                setTimeout(() => {
+                    switcheds(data.userid,values)
+                }, 1000);
+            });
         }
     }
+    var isAdding = false;
     function getDataGridConfiguration(index) {
         return {
             height: 300,
@@ -171,8 +181,34 @@
             rowDragging: {
                 data: index,
                 group: 'tasksGroup',
+                onDragStart: function (e) {
+                    const selectedData = e.component.getSelectedRowsData().sort((a, b) => a.OrderIndex > b.OrderIndex ? 1 : -1);
+                    e.itemData = selectedData 
+                },
+                dragTemplate: function(dragData) {
+                    const itemsContainer = $("<table>").addClass("drag-container");
+                    dragData.itemData.forEach((rowData => {
+                        const itemContainer = $("<tr>");
+                        for (field in rowData) {
+                            if(field != 'userid' && field != 'isUsed'){
+                                itemContainer.append($("<td>").text(rowData[field]));
+                            }
+                        }
+                        itemsContainer.append(itemContainer);
+                    }));
+                    return $("<div>").append(itemsContainer);
+                },
+                onDragEnd: function(e) {
+                    isAdding = false;
+                    setTimeout(() => {
+                        if(isAdding){
+                            e.component.clearSelection();
+                        }
+                    }, 2000);
+                },
                 onAdd,
             },
+            selection: { mode: "multiple" },
             scrolling: {
                 mode: 'virtual',
             },

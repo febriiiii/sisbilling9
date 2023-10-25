@@ -1,16 +1,21 @@
-<div class="card mt-2 p-1">
-  <ul style="background-color: rgb(207, 164, 248);color:white; cursor: pointer;" onclick="$('#contentbill1').slideToggle()">My Billing</ul>
-  <div id="contentbill1" style="display: none;">
-    <div class="mt-3" id="tabeltransaction"  style="min-height: 300px; height:500px; resize: vertical; overflow: auto;"></div>
-  </div>    
-</div>
-@if (session('UIDGlob')->companyid != '')
-<div class="card mt-4 p-1">
-  <ul style="background-color: rgb(192, 218, 151);color:white; cursor: pointer;" onclick="$('#contentbill2').slideToggle()">My Customer Billing</ul>
-  <div id="contentbill2" style="display: nones;">
-    <div class="mt-3" id="tabeltransactionCus" style="min-height: 300px; height:500px; resize: vertical; overflow: auto;"></div>
+  <style>
+    .whitesmoke{
+      background-color: rgb(0, 0, 0);
+    }
+  </style>
+  <div class="card mt-2 p-1">
+    <ul style="background-color: rgb(207, 164, 248);color:black; font-weight:bold; border-radius:7px; cursor: pointer;" onclick="$('#contentbill1').slideToggle()">My Billing</ul>
+    <div id="contentbill1" style="display: none;">
+      <div class="mt-3" id="tabeltransaction"  style="min-height: 300px; height:500px; resize: vertical; overflow: auto;"></div>
+    </div>    
   </div>
-</div>
+  @if (session('UIDGlob')->companyid != '')
+  <div class="card mt-4 p-1">
+    <ul style="background-color: rgb(192, 218, 151);color:black; font-weight:bold; border-radius:7px; cursor: pointer;" onclick="$('#contentbill2').slideToggle()">My Customer Billing</ul>
+    <div id="contentbill2" style="display: nones;">
+      <div class="mt-3" id="tabeltransactionCus" style="min-height: 300px; height:500px; resize: vertical; overflow: auto;"></div>
+    </div>
+  </div>
 @endif
 {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.4/jspdf.min.js"></script> --}}
 <script>
@@ -21,6 +26,7 @@
         height: "100%",
         width: "100%",
     }).dxScrollView("instance");
+    
   function opnpivotmybilling(title,type){
     $.ajax({
         type: 'GET',

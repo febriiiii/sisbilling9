@@ -65,19 +65,29 @@ class AgendaController extends Controller
             if($values->isUsed == 1){
                 $this->createTrans($request->key,$request->AppointmentId);
             }else{
-                tblbilling::where('userid',$request->key)->where('AppointmentId',$request->AppointmentId)->delete();
-                $data = tbltrans::where('AppointmentId',$request->AppointmentId)->where('userid',$request->key)->where('statusid',5)->where('MIDstatus','<>',500)->get();
-                foreach ($data as $d) {
-                    $d->update(['statusid' => 4, 'UserUpdate' => session('UIDGlob')->userid, 'UpdateDT' => Carbon::now(config('app.GMT'))]);
-                }
+                $this->delBill($request->key,$request->AppointmentId);
             }
         }
-        $chatcontroller = new ChatController;
-        $chatcontroller->GlobalPush("renderMyBilling",$request->key);
         return true;
     }
     public function getpokok(Request $request){
         return DB::select("select top 1 a.*, (select productName from tblmasterproduct where productCode = a.productCode) as produk from tblagenda a where AppointmentId = ".$request->AppointmentId);
+    }
+    private function delBill($userid,$AppointmentId){
+        tblbilling::where('userid',$userid)->where('AppointmentId',$AppointmentId)->delete();
+        $data = tbltrans::where('AppointmentId', $AppointmentId)
+                        ->where('userid', $userid)
+                        ->where('statusid', 5)
+                        ->where(function ($query) {
+                            $query->where('MIDstatus', '<>', 500)
+                                ->orWhereNull('MIDstatus');
+                        })
+                        ->get();
+        foreach ($data as $d) {
+            $d->update(['statusid' => 4, 'UserUpdate' => session('UIDGlob')->userid, 'UpdateDT' => Carbon::now(config('app.GMT'))]);
+        }
+        $chatcontroller = new ChatController;
+        $chatcontroller->GlobalPush("renderGlobal",$userid);
     }
     public function putAgendaPinjam(Request $request){
         $values = json_decode($request->values);
@@ -85,15 +95,9 @@ class AgendaController extends Controller
             if($values->isUsed == 1){
                 $this->createTrans($request->userid,$request->key);
             }else{
-                tblbilling::where('userid',$request->userid)->where('AppointmentId',$request->key)->delete();
-                $data = tbltrans::where('AppointmentId',$request->key)->where('userid',$request->userid)->where('statusid',5)->where('MIDstatus','<>',500)->get();
-                foreach ($data as $d) {
-                    $d->update(['statusid' => 4, 'UserUpdate' => session('UIDGlob')->userid, 'UpdateDT' => Carbon::now(config('app.GMT'))]);
-                }
+                $this->delBill($request->userid,$request->key);
             }
         }
-        $chatcontroller = new ChatController;
-        $chatcontroller->GlobalPush("renderMyBilling",$request->key);
         return true;
     }
     public function updateagendabill(Request $request){
@@ -165,14 +169,13 @@ class AgendaController extends Controller
         $Ntrans = new TransactionController;
         $tblagenda = tblagenda::find($apoinmentid);
 
-        tblbilling::create([
+        $billingid = tblbilling::insertGetId([
             'userid' => $userid,
             'AppointmentId' => $apoinmentid,
             'statusid' => 1,
             'UserInsert' => session('UIDGlob')->userid,
             'InsertDT' => Carbon::now(config('app.GMT')),
         ]);
-
         if($tblagenda->RecurrenceRule != ""){
             $freq = explode("=",explode(";",$tblagenda->RecurrenceRule)[0])[1];
             $Lastdate = Carbon::parse($tblagenda->StartDate);
@@ -210,9 +213,15 @@ class AgendaController extends Controller
                     }
                 }
             }
-            $Ntrans->nextTransaction($apoinmentid,$userid,$Lastdate,session('UIDGlob')->companyid);
+            if(!$Ntrans->nextTransaction($apoinmentid,$userid,$Lastdate,session('UIDGlob')->companyid)){
+                tblbilling::find($billingid)->delete();
+                dd("Stoper");
+            }
         }else{
-            $Ntrans->nextTransaction($apoinmentid,$userid,null,session('UIDGlob')->companyid);
+            if($Ntrans->nextTransaction($apoinmentid,$userid,null,session('UIDGlob')->companyid)){
+                tblbilling::find($billingid)->delete();
+                dd("Stoper");
+            }
         }
     }
 

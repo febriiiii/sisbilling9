@@ -170,6 +170,11 @@ class TransactionController extends Controller
         }
     }
     public function nextTransaction($AppointmentId,$userid,$lastDate,$companyid){ 
+        //Loop Jika Notrans Duplikat
+        $attempts = 500; // Batas percobaan maksimum
+        $attemptCount = 0;
+        loopDuplikat:
+
         // note: jika lastdate tidak ada maka tidak ada recuren
         $tblcomp = tblcomp::find($companyid);
         $notransHeader = $companyid.strtoupper(substr($tblcomp->companyname, 0, 2)).Carbon::now(config('app.GMT'))->format('ymd');
@@ -198,7 +203,6 @@ class TransactionController extends Controller
         }else{
             $nextDate = $this->nextAppointment($tblagenda->StartDate,$tblagenda->RecurrenceRule,$tblagenda->RecurrenceException,$lastDate);
         }
-        // dd($nextDate);
         if($nextDate != false){
             $cekIssetTrans = tbltrans::where('jatuhTempoTagihan',$nextDate)
                                         ->where('companyid',$companyid)
@@ -215,27 +219,41 @@ class TransactionController extends Controller
             // $log->savelog(json_encode($cekIssetTrans));
             if(!isset($cekIssetTrans)){ //Jika sudah ada jangan buat transaksi tagihan
                 if (isset($cekIsUsingBilling)) {// Jika memiliki billing, buatkan transaksi
-                    tbltrans::create([
-                        'notrans' => $notrans,
-                        'AppointmentId' => $AppointmentId,
-                        'companyid' => $companyid,
-                        'userid' => $userid,
-                        'statusid' => 5,
-                        'SisaPok' => $tblagenda->Pokok,
-                        'Pokok' => $tblagenda->Pokok,
-                        'Bunga' => ($tblagenda->Pokok * $tblagenda->BungaPercent / 100),
-                        'LateFee' => ($tblagenda->Pokok * $tblagenda->lateFeePercent / 100),
-                        'JHT' => 0,
-                        'SPokok' => $tblagenda->Pokok,
-                        'SBunga' => ($tblagenda->Pokok * $tblagenda->BungaPercent / 100),
-                        'SLateFee' => 0,
-                        'transdate' => $this->transDate($tblagenda->RecurrenceRule,$nextDate),
-                        'jatuhTempoTagihan' => $nextDate,
-                        'UserInsert' => $userid,
-                        'InsertDT' => now(config('app.GMT')),
-                        'UserUpdate' => $userid,
-                        'UpdateDT' => now(config('app.GMT')),
-                    ]);
+                    try {
+                        tbltrans::create([
+                            'notrans' => $notrans,
+                            'AppointmentId' => $AppointmentId,
+                            'companyid' => $companyid,
+                            'userid' => $userid,
+                            'statusid' => 5,
+                            'SisaPok' => $tblagenda->Pokok,
+                            'Pokok' => $tblagenda->Pokok,
+                            'Bunga' => ($tblagenda->Pokok * $tblagenda->BungaPercent / 100),
+                            'LateFee' => ($tblagenda->Pokok * $tblagenda->lateFeePercent / 100),
+                            'JHT' => 0,
+                            'SPokok' => $tblagenda->Pokok,
+                            'SBunga' => ($tblagenda->Pokok * $tblagenda->BungaPercent / 100),
+                            'SLateFee' => 0,
+                            'transdate' => $this->transDate($tblagenda->RecurrenceRule,$nextDate),
+                            'jatuhTempoTagihan' => $nextDate,
+                            'UserInsert' => $userid,
+                            'InsertDT' => now(config('app.GMT')),
+                            'UserUpdate' => $userid,
+                            'UpdateDT' => now(config('app.GMT')),
+                        ]);
+                        $chtController = new ChatController;
+                        $chtController->GlobalPush("renderGlobal",$userid);
+                    } catch (\Throwable $th) {
+                        $attemptCount++;
+            
+                        if ($attemptCount >= $attempts) {
+                            // Batas percobaan maksimum tercapai
+                            //dd("Limit ". $attempts ." Tercapai.");
+                            return false;
+                        }
+            
+                        goto loopDuplikat;
+                    }
                 }
             }
         }
@@ -252,26 +270,23 @@ class TransactionController extends Controller
     }
     public function gettransaction(Request $request){
         if($request->type != 'c'){
-            $arr = explode(',', session('UIDGlob')->companyidArray);
-            array_pop($arr);
-            $cid = "'" . implode("','", $arr) . "'";
-            
             return DB::select("SELECT u.nama, t.notrans, t.transdate, CASE WHEN t.paymentid = 2 THEN MIDpaymenttype ELSE paymentName END AS paymentname, t.jatuhTempoTagihan,t.SPokok + t.SBunga + t.SLateFee AS Amount, s.deskripsi, p.productName
                 FROM tbltrans t
                 JOIN tblstatus s ON t.statusid=s.statusid
                 JOIN tbluser u ON u.userid=t.userid
                 JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
                 JOIN tblmasterproduct p ON p.productCode=a.productCode
-                JOIN tblpaymentmethod ON t.paymentid=tblpaymentmethod.paymentid
-                WHERE t.statusid != 4 AND t.companyid IN (".$cid.") AND t.userid = ".session('UIDGlob')->userid);
+                LEFT JOIN tblpaymentmethod ON t.paymentid=tblpaymentmethod.paymentid
+                WHERE t.statusid != 4 AND t.companyid IN (SELECT value FROM STRING_SPLIT(u.companyidArray, ',')) AND t.userid = ".session('UIDGlob')->userid);
         }else{
+            //My Customer Billing
             return DB::select("SELECT u.nama, t.notrans, t.transdate, CASE WHEN t.paymentid = 2 THEN MIDpaymenttype ELSE paymentName END AS paymentname, t.jatuhTempoTagihan,t.SPokok + t.SBunga + t.SLateFee AS Amount, s.deskripsi, p.productName
                 FROM tbltrans t
                 JOIN tblstatus s ON t.statusid=s.statusid
                 JOIN tbluser u ON u.userid=t.userid
                 JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
                 JOIN tblmasterproduct p ON p.productCode=a.productCode
-                join tblpaymentmethod on t.paymentid=tblpaymentmethod.paymentid
+                LEFT JOIN tblpaymentmethod on t.paymentid=tblpaymentmethod.paymentid
                 WHERE t.statusid != 4 AND t.companyid = ".session('UIDGlob')->companyid);
         }
     }
