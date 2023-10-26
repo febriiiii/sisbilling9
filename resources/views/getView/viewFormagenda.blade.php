@@ -161,9 +161,7 @@
             })
         }else{
             a.itemData.forEach(data => {
-                setTimeout(() => {
-                    switcheds(data.userid,values)
-                }, 1000);
+                switcheds(data.userid,values)
             });
         }
     }

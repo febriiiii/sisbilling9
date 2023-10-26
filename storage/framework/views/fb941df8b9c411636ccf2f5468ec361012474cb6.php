@@ -156,15 +156,14 @@
           timeZone: 'Asia/Jakarta',
           dataSource: DevExpress.data.AspNet.createStore({
             key: 'AppointmentId',
-            loadUrl: `${url}/getAgenda`,
-            insertUrl: `${url}/insertAgenda`,
-            updateUrl: `${url}/putAgenda`,
-            deleteUrl: `${url}/deleteAgenda`,
+            loadUrl: `${url}/getAgenda?stamp=` + new Date().getTime(),
+            insertUrl: `${url}/insertAgenda?stamp=` + new Date().getTime(),
+            updateUrl: `${url}/putAgenda?stamp=` + new Date().getTime(),
+            deleteUrl: `${url}/deleteAgenda?stamp=` + new Date().getTime(),
             onBeforeSend(method, ajaxOptions) {
               ajaxOptions.xhrFields = { withCredentials: true };
               ajaxOptions.headers = ajaxOptions.headers || {};
               ajaxOptions.headers['X-CSRF-Token'] = "<?php echo e(csrf_token()); ?>";
-              ajaxOptions.cache = false;
             },
           }),
           editing: {

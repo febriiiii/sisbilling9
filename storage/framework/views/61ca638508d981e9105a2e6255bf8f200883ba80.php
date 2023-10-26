@@ -141,7 +141,10 @@
     });
   }
   function onAdd(a) {
-    var key = a.itemData.AppointmentId;
+    isAdding = true;
+    if(a.itemData.length == 0){
+      return false;
+    }
     var values = { isUsed: a.toData };
     if(values.isUsed == 0){
       Swal.fire({
@@ -155,28 +158,59 @@
         cancelButtonText: 'Tidak',
       }).then((result) => {
         if (result.isConfirmed) {
-          switcheds(key,values)
+          a.itemData.forEach(data => {
+              switcheds(data.AppointmentId,values)
+          });
         }
       })
     }else{
-      switcheds(key,values)
+      a.itemData.forEach(data => {
+          switcheds(data.AppointmentId,values)
+      });
     }
   }
+  var isAdding = false;
   function getDataGridConfiguration(index) {
     var config = {
         height: 300,
         dataSource: {
-            store: storeUserpinjam,
-            reshapeOnPush: true,
+          store: storeUserpinjam,
+          reshapeOnPush: true,
         },
         searchPanel: { visible: true },
         showBorders: true,
         filterValue: ['isUsed', '=', index],
         rowDragging: {
-            data: index,
-            group: 'tasksGroup',
-            onAdd,
+          data: index,
+          group: 'tasksGroup',
+          onDragStart: function (e) {
+              const selectedData = e.component.getSelectedRowsData().sort((a, b) => a.OrderIndex > b.OrderIndex ? 1 : -1);
+              e.itemData = selectedData 
+          },
+          dragTemplate: function(dragData) {
+              const itemsContainer = $("<table>").addClass("drag-container");
+              dragData.itemData.forEach((rowData => {
+                  const itemContainer = $("<tr>");
+                  for (field in rowData) {
+                      if(field != 'AppointmentId' && field != 'isUsed'){
+                          itemContainer.append($("<td>").text(rowData[field]));
+                      }
+                  }
+                  itemsContainer.append(itemContainer);
+              }));
+              return $("<div>").append(itemsContainer);
+          },
+          onDragEnd: function(e) {
+              isAdding = false;
+              setTimeout(() => {
+                  if(isAdding){
+                      e.component.clearSelection();
+                  }
+              }, 2000);
+          },
+          onAdd,
         },
+        selection: { mode: "multiple" },
         scrolling: {
             mode: 'virtual',
         },
@@ -201,24 +235,27 @@
     // Tambahkan pengaturan seleksi ke konfigurasi jika diperlukan
     if (index === 0) {
         config.selection = {
-            mode: 'single',
+            mode: 'multiple',
         };
 
         config.onSelectionChanged = function(selectedItems) {
-            var selectedData = selectedItems.selectedRowsData[0].AppointmentId;
-            $.ajax({
-              type: 'GET',
-              cache: false,
-              url: '<?php echo e(url("/getPokok?AppointmentId=")); ?>' + selectedData, 
-              success: function(agenda) {
-                $('#viewformbillingKeterangan').val(agenda[0].description)
-                $('#viewformbillingPokok').val(formatAngkaDenganKoma(agenda[0].Pokok))
-                $('#viewformbillingBunga').val(agenda[0].BungaPercent)
-                $('#viewformbillingFee').val(agenda[0].lateFeePercent)
-                $('#viewformbillingProduk').val(agenda[0].description)
-                $('#viewformbillingPK').val(agenda[0].AppointmentId)
-              },
-            });
+          if(selectedItems.selectedRowsData[0] == undefined){
+            return false;
+          }
+          var selectedData = selectedItems.selectedRowsData[0].AppointmentId;
+          $.ajax({
+            type: 'GET',
+            cache: false,
+            url: '<?php echo e(url("/getPokok?AppointmentId=")); ?>' + selectedData, 
+            success: function(agenda) {
+              $('#viewformbillingKeterangan').val(agenda[0].description)
+              $('#viewformbillingPokok').val(formatAngkaDenganKoma(agenda[0].Pokok))
+              $('#viewformbillingBunga').val(agenda[0].BungaPercent)
+              $('#viewformbillingFee').val(agenda[0].lateFeePercent)
+              $('#viewformbillingProduk').val(agenda[0].description)
+              $('#viewformbillingPK').val(agenda[0].AppointmentId)
+            },
+          });
         };
     }
 
@@ -226,5 +263,4 @@
 }
 
 </script>
-
 <?php /**PATH C:\xampp\htdocs\sisbilling9\resources\views/getView/viewFormbilling.blade.php ENDPATH**/ ?>

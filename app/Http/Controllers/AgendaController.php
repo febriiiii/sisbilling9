@@ -27,6 +27,7 @@ class AgendaController extends Controller
                             ->from('tbltrans as t')
                             ->join('tblagenda as ag', 't.AppointmentId', '=', 'ag.AppointmentId')
                             ->where('t.userid', session('UIDGlob')->userid)
+                            ->where('t.statusid','<>','4')
                             ->groupBy('t.AppointmentId');
                     })
                     ->orWhere('userid', session('UIDGlob')->userid)
@@ -218,7 +219,7 @@ class AgendaController extends Controller
                 dd("Stoper");
             }
         }else{
-            if($Ntrans->nextTransaction($apoinmentid,$userid,null,session('UIDGlob')->companyid)){
+            if(!$Ntrans->nextTransaction($apoinmentid,$userid,null,session('UIDGlob')->companyid)){
                 tblbilling::find($billingid)->delete();
                 dd("Stoper");
             }
@@ -286,32 +287,92 @@ class AgendaController extends Controller
         $tblagenda->delete();
         return true;
     }
+    public function dataMyagenda(Request $request){
+        $selected = "AppointmentId,
+                        Text,
+                        StartDate,
+                        description,
+                        productName,
+                        pokok,
+                        CASE
+                            WHEN CHARINDEX('FREQ=', RecurrenceRule) > 0 AND CHARINDEX(';', RecurrenceRule, CHARINDEX('FREQ=', RecurrenceRule) + LEN('FREQ=')) - (CHARINDEX('FREQ=', RecurrenceRule) + LEN('FREQ=')) >= 0 THEN
+                                SUBSTRING(RecurrenceRule, CHARINDEX('FREQ=', RecurrenceRule) + LEN('FREQ='), CHARINDEX(';', RecurrenceRule, CHARINDEX('FREQ=', RecurrenceRule) + LEN('FREQ=')) - (CHARINDEX('FREQ=', RecurrenceRule) + LEN('FREQ=')))
+                            WHEN CHARINDEX('FREQ=', RecurrenceRule) > 0 AND CHARINDEX(';', RecurrenceRule, CHARINDEX('FREQ=', RecurrenceRule) + LEN('FREQ=')) - (CHARINDEX('FREQ=', RecurrenceRule) + LEN('FREQ=')) < 0 THEN 
+                                SUBSTRING('FREQ=DAILY', CHARINDEX('=', 'FREQ=DAILY') + 1, LEN('FREQ=DAILY'))
+                            ELSE
+                                ''
+                        END AS frequency";
+        $from = "tblagenda a";
+        $join = "JOIN tblmasterproduct p ON p.productCode = a.productCode AND p.companyid = a.companyid";
+        $where = "WHERE isBilling = 1 AND a.companyid = ".session('UIDGlob')->companyid;
+        // Set base query
+        $query = "SELECT ".$selected." FROM ".$from." ".$join." ".$where." ";
 
-    
-    public function dataMyagenda(Request $request)
-    {
+        // Apply filtering
+        $filter = json_decode($request->filter);
+        if (isset($filter)) {
+            $query = "SELECT ".$selected." FROM ".$from." ".$join." ".$where." AND ";
+            if (is_array($filter[0])) {
+                foreach ($filter as $f) {
+                    if ($f != "and" && $f != "or") {
+                        $column = $f[0];
+                        $operator = $f[1];
+                        $value = $f[2];
+                        $escaped_value = str_replace("'", "''", $value);
+                        $query = $this->operator($operator, $query,$column,$escaped_value);
+                    }else{
+                        $query .= " ".$f." ";
+                    }
+                }
+            } else {
+                $column = $filter[0];
+                $operator = $filter[1];
+                $value = $filter[2];
+                $escaped_value = str_replace("'", "''", $value);
+                $query = $this->operator($operator, $query,$column,$escaped_value);
+            }
+        }
+
+        $query = str_replace('AND  and','AND',$query);
+        if($query == "SELECT ".$selected." FROM ".$from." ".$where." AND "){
+            $query = "SELECT ".$selected." FROM ".$from."";
+        }
+
+        // Apply sorting
+        $sort = $request->sort;
+        if (isset($sort)) {
+            $sort = json_decode($sort);
+            $query .= " ORDER BY";
+            foreach ($sort as $s) {
+                $query .= " $s->selector " . ($s->desc ? "DESC" : "ASC") . ",";
+            }
+            $query = rtrim($query, ",");
+        }else{
+            // Jika tidak ada pengurutan, gunakan (SELECT 0) agar tidak error
+            $query .= " ORDER BY (SELECT 0)";
+        }
+
+        // Apply paging
+        $skip = $request->skip;
+        $take = $request->take;
+        if (isset($skip) && isset($take)) {
+            $query .= " OFFSET $skip ROWS FETCH NEXT $take ROWS ONLY";
+        }
+        // SELECT * FROM tbluser
+        // ORDER BY userid 
+        // OFFSET 0 ROWS
+        // FETCH NEXT 6 ROWS ONLY
+
+        // Execute query
+        $data = DB::select($query);
+
+        // Get total count
+        $totalCount = DB::select("SELECT COUNT(*) as aggregate FROM ".$from."")[0]->aggregate;
+
         return response()->json([
-            'data' => DB::select("SELECT
-                                    AppointmentId,
-                                    Text,
-                                    StartDate,
-                                    description,
-                                    productName,
-                                    pokok,
-                                    CASE
-                                        WHEN CHARINDEX('FREQ=', RecurrenceRule) > 0 AND CHARINDEX(';', RecurrenceRule, CHARINDEX('FREQ=', RecurrenceRule) + LEN('FREQ=')) - (CHARINDEX('FREQ=', RecurrenceRule) + LEN('FREQ=')) >= 0 THEN
-                                            SUBSTRING(RecurrenceRule, CHARINDEX('FREQ=', RecurrenceRule) + LEN('FREQ='), CHARINDEX(';', RecurrenceRule, CHARINDEX('FREQ=', RecurrenceRule) + LEN('FREQ=')) - (CHARINDEX('FREQ=', RecurrenceRule) + LEN('FREQ=')))
-                                        WHEN CHARINDEX('FREQ=', RecurrenceRule) > 0 AND CHARINDEX(';', RecurrenceRule, CHARINDEX('FREQ=', RecurrenceRule) + LEN('FREQ=')) - (CHARINDEX('FREQ=', RecurrenceRule) + LEN('FREQ=')) < 0 THEN 
-                                            SUBSTRING('FREQ=DAILY', CHARINDEX('=', 'FREQ=DAILY') + 1, LEN('FREQ=DAILY'))
-                                        ELSE
-                                            ''
-                                    END AS frequency
-                                FROM
-                                    tblagenda a
-                                JOIN
-                                    tblmasterproduct p ON p.productCode = a.productCode AND p.companyid = a.companyid
-                                WHERE isBilling = 1 AND a.companyid = ".session('UIDGlob')->companyid.";"),
-            'totalCount' => DB::select("SELECT COUNT(*) as aggregate FROM tblagenda")[0]->aggregate,
+            'data' => $data,
+            'totalCount' => $totalCount,
+            'query' => $query
         ]);
     }
 }
