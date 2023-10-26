@@ -123,6 +123,7 @@ Route::get('/viewpolling', [ViewtabController::class, 'viewpolling'])->middlewar
 Route::get('/viewkomentarpengumuman', [ViewtabController::class, 'viewkomentarpengumuman'])->middleware('auth');
 Route::get('/viewlonceng', [ViewtabController::class, 'viewlonceng'])->middleware('auth');
 Route::get('/pusher', [ViewtabController::class, 'pusher'])->middleware('auth');
+Route::get('/administrator', [ViewtabController::class, 'administrator'])->middleware('auth');
 
 Route::get('/readpengumuman', [ChatController::class, 'readpengumuman'])->middleware('auth');
 Route::get('/getchatLawan', [ChatController::class, 'getchatLawan'])->middleware('auth');
@@ -163,3 +164,4 @@ Route::post('/confirmPembayaran', [TransactionController::class, 'confirmPembaya
 Route::post('/confirmPembayaranMID', [TransactionController::class, 'confirmPembayaranMID']);
 
 Route::get('/pivot', [ReportController::class, 'pivot']);
+

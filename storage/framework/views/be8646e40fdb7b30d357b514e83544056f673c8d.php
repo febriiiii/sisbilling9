@@ -159,7 +159,7 @@ $(() => {
             lookup: {
               dataSource: DevExpress.data.AspNet.createStore({
                 key: 'producttypeid',
-                loadUrl: `<?php echo e(url('producttype')); ?>`,
+                loadUrl: `<?php echo e(url('producttype')); ?>?stamp=` + new Date().getTime(),
                 onBeforeSend(method, ajaxOptions) {
                   ajaxOptions.xhrFields = { withCredentials: true };
                 },

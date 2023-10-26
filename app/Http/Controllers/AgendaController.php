@@ -19,19 +19,35 @@ class AgendaController extends Controller
 {
     public function getAgenda(Request $request)
     {   
-        $array = explode(",", session('UIDGlob')->companyidArray);
-        array_pop($array);
-        $agendas = tblagenda::whereIn('companyid', $array)
-                    ->whereIn('AppointmentId', function ($query) {
-                        $query->select('t.AppointmentId')
-                            ->from('tbltrans as t')
-                            ->join('tblagenda as ag', 't.AppointmentId', '=', 'ag.AppointmentId')
-                            ->where('t.userid', session('UIDGlob')->userid)
-                            ->where('t.statusid','<>','4')
-                            ->groupBy('t.AppointmentId');
-                    })
-                    ->orWhere('userid', session('UIDGlob')->userid)
-                    ->get();
+        // $array = explode(",", session('UIDGlob')->companyidArray);
+        $userid = session('UIDGlob')->userid;
+        // array_pop($array);
+        // $agendas = tblagenda::whereIn('companyid', $array)
+        //             ->whereIn('AppointmentId', function ($query) {
+        //                 $query->select('t.AppointmentId')
+        //                     ->from('tbltrans as t')
+        //                     ->join('tblagenda as ag', 't.AppointmentId', '=', 'ag.AppointmentId')
+        //                     ->where('t.userid', session('UIDGlob')->userid)
+        //                     ->where('t.statusid','<>','4')
+        //                     ->groupBy('t.AppointmentId');
+        //             })
+        //             ->orWhere('userid', session('UIDGlob')->userid)
+        //             ->get();
+        $array = substr(session('UIDGlob')->companyidArray, 0, -1);
+        $query = "SELECT AppointmentId,Text,EndDate,description,all_day,RecurrenceRule,RecurrenceException,companyid,isBilling,productCode,Pokok,lateFeePercent,BungaPercent,userid,statusid,UserInsert,InsertDT,UserUpdate,UpdateDT,
+                    COALESCE((select MIN(jatuhTempoTagihan) from tbltrans where statusid <> 4 and userid = {$userid} and AppointmentId = a.AppointmentId),StartDate) as StartDate
+                    FROM tblagenda a
+                    WHERE companyid IN ({$array}) 
+                    AND AppointmentId IN (
+                        SELECT t.AppointmentId
+                        FROM tbltrans t
+                        JOIN tblagenda ag ON t.AppointmentId = ag.AppointmentId
+                        WHERE t.userid = {$userid}
+                        AND t.statusid <> 4
+                        GROUP BY t.AppointmentId
+                    ) 
+                    OR userid = {$userid}";
+        $agendas = DB::select($query);
         return $agendas;
     }
 

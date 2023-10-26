@@ -29,6 +29,7 @@ return new class extends Migration
             $table->string('alamatSingkat');
             $table->text('alamatLengkap');
             $table->boolean('isTutor')->default(1);
+            $table->boolean('isAktif')->default(1);
             $table->text('infoTambahan')->nullable();
             $table->text('TokenCompany')->nullable();
             $table->text('TokenOTP')->nullable();

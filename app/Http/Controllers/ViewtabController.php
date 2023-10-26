@@ -225,4 +225,11 @@ class ViewtabController extends Controller
     public function pusher(){
         return view('getView.pusher')->render();
     }
+    public function administrator(){
+        if(auth()->user()->superadmin == 1){
+            return view('admin.administrator');
+        }else{
+            return false;
+        }
+    }
 }
