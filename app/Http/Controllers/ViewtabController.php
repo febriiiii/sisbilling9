@@ -12,7 +12,8 @@ use App\Models\tbltrans;
 use App\Models\tbluser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Services\Midtrans\CreateSnapTokenService; 
+use App\Services\Midtrans\CreateSnapTokenService;
+use Illuminate\Auth\Events\Logout;
 
 class ViewtabController extends Controller
 {
@@ -225,11 +226,12 @@ class ViewtabController extends Controller
     public function pusher(){
         return view('getView.pusher')->render();
     }
-    public function administrator(){
+    public function adminindex(){
         if(auth()->user()->superadmin == 1){
-            return view('admin.administrator');
+            $data = [];
+            return view('admin.index',compact('data'))->render();
         }else{
-            return false;
+            return redirect()->route('logout');
         }
     }
 }

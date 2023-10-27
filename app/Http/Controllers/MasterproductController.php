@@ -36,7 +36,7 @@ class MasterproductController extends Controller
     }
     public function dataviewmaster(Request $request)
     {
-        $where = "WHERE tblmasterproduct.statusid<>4 AND tblmasterproduct.companyid='".session('UIDGlob')->companyid."'";
+        $where = "WHERE tblmasterproduct.statusid<>4 AND isSubscribe = 0 AND tblmasterproduct.companyid='".session('UIDGlob')->companyid."'";
         // $join = "JOIN tblproducttype ON tblproducttype.producttypeid=tblmasterproduct.producttypeid ";
         $join = " ";
         // Set base query

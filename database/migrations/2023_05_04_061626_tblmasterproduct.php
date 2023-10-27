@@ -25,6 +25,12 @@ return new class extends Migration
             $table->dateTime('InsertDT')->nullable();
             $table->string('UserUpdate')->nullable();
             $table->dateTime('UpdateDT')->nullable();
+
+            // Subscribe
+            $table->boolean('isSubscribe')->default(0);
+            $table->double('price');
+            $table->string('rangeDuration');
+            $table->string('duration');
         });
     }
 

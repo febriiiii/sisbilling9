@@ -17,7 +17,6 @@
     </div>
   </div>
 <?php endif; ?>
-
 <script>
   var popup = $('#myModal').dxPopup('instance');
   popup.option("fullScreen", true);

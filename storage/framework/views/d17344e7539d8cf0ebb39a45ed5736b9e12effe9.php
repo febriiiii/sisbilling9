@@ -1,6 +1,6 @@
 
 <!-- Font Awesome -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflareX.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
 <!-- Google Fonts -->
 <link href="<?php echo e(asset('public/mdb/font.google.css')); ?>" rel="stylesheet" />
 <!-- MDB -->

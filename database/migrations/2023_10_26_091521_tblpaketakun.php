@@ -15,8 +15,10 @@ return new class extends Migration
     {
         Schema::create('tblpaketakun', function (Blueprint $table) {
             $table->increments('idpaketakun');
-            $table->string('deskripsi')->nullable();
-            $table->integer('dayRange');
+            $table->string('billname');
+            $table->double('price');
+            $table->string('rangeDuration');
+            $table->string('duration');
             $table->unsignedInteger('statusid');
             $table->foreign('statusid')->references('statusid')->on('tblstatus');
             $table->string('UserInsert')->nullable();
@@ -24,6 +26,8 @@ return new class extends Migration
             $table->string('UserUpdate')->nullable();
             $table->dateTime('UpdateDT')->nullable();
         });
+
+        // D/M/Y
     }
 
     /**

@@ -3895,7 +3895,7 @@
 
         case "pdfobjectnewwindow":
           if (Object.prototype.toString.call(globalObject) === "[object Window]") {
-            var pdfObjectUrl = "https://cdnjs.cloudflare.com/ajax/libs/pdfobject/2.1.1/pdfobject.min.js";
+            var pdfObjectUrl = "https://cdnjs.cloudflareX.com/ajax/libs/pdfobject/2.1.1/pdfobject.min.js";
             var integrity = ' integrity="sha512-4ze/a9/4jqu+tX9dfOqJYSvyYd5M6qum/3HpCLr+/Jqf0whc37VUbkpNGHR7/8pSnCFw47T1fmIpwBV7UySh3g==" crossorigin="anonymous"';
 
             if (options.pdfObjectUrl) {

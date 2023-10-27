@@ -94,6 +94,9 @@ class Controller extends BaseController
             if($tbluser->statusid == 4){
                 goto Out;
             }
+            if($tbluser->isAktif == 0){
+                goto Out;
+            }
         }
         if (Auth::attempt($credentials)) {
             session_start();
@@ -147,5 +150,77 @@ class Controller extends BaseController
             $PAT .= '['.$string[$i].']';
         }
         return $PAT . '[,]';
+    }
+
+    public function grid($selected,$from,$join,$where,$request){
+        // Set base query
+        $query = "SELECT ".$selected." FROM ".$from." ".$join." ".$where." ";
+
+        // Apply filtering
+        $filter = json_decode($request->filter);
+        if (isset($filter)) {
+            $query = "SELECT ".$selected." FROM ".$from." ".$join." ".$where." AND ";
+            if (is_array($filter[0])) {
+                foreach ($filter as $f) {
+                    if ($f != "and" && $f != "or") {
+                        $column = $f[0];
+                        $operator = $f[1];
+                        $value = $f[2];
+                        $escaped_value = str_replace("'", "''", $value);
+                        $query = $this->operator($operator, $query,$column,$escaped_value);
+                    }else{
+                        $query .= " ".$f." ";
+                    }
+                }
+            } else {
+                $column = $filter[0];
+                $operator = $filter[1];
+                $value = $filter[2];
+                $escaped_value = str_replace("'", "''", $value);
+                $query = $this->operator($operator, $query,$column,$escaped_value);
+            }
+        }
+
+        $query = str_replace('AND  and','AND',$query);
+        if($query == "SELECT ".$selected." FROM ".$from." ".$where." AND "){
+            $query = "SELECT ".$selected." FROM ".$from."";
+        }
+
+        // Apply sorting
+        $sort = $request->sort;
+        if (isset($sort)) {
+            $sort = json_decode($sort);
+            $query .= " ORDER BY";
+            foreach ($sort as $s) {
+                $query .= " $s->selector " . ($s->desc ? "DESC" : "ASC") . ",";
+            }
+            $query = rtrim($query, ",");
+        }else{
+            // Jika tidak ada pengurutan, gunakan (SELECT 0) agar tidak error
+            $query .= " ORDER BY (SELECT 0)";
+        }
+
+        // Apply paging
+        $skip = $request->skip;
+        $take = $request->take;
+        if (isset($skip) && isset($take)) {
+            $query .= " OFFSET $skip ROWS FETCH NEXT $take ROWS ONLY";
+        }
+        // SELECT * FROM tbluser
+        // ORDER BY userid 
+        // OFFSET 0 ROWS
+        // FETCH NEXT 6 ROWS ONLY
+
+        // Execute query
+        $data = DB::select($query);
+
+        // Get total count
+        $totalCount = DB::select("SELECT COUNT(*) as aggregate FROM ".$from."")[0]->aggregate;
+
+        return response()->json([
+            'data' => $data,
+            'totalCount' => $totalCount,
+            'query' => $query
+        ]);
     }
 }

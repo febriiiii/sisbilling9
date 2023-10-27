@@ -28,6 +28,9 @@
         <?php echo $__env->make('modal.mainModal', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
         <?php echo $__env->make('modal.mainModal2', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
         <?php echo $__env->make('modal.mainModalSelect', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?> 
+        <?php if(auth()->user()->superadmin == 1): ?>
+        <?php echo $__env->make('admin.administrator', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+        <?php endif; ?>
         
         
         <div class="body" style="padding-bottom:20vh; padding-top:30px;">

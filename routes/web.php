@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\adminController;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\BillController;
 use App\Http\Controllers\ChatController;
@@ -123,7 +124,7 @@ Route::get('/viewpolling', [ViewtabController::class, 'viewpolling'])->middlewar
 Route::get('/viewkomentarpengumuman', [ViewtabController::class, 'viewkomentarpengumuman'])->middleware('auth');
 Route::get('/viewlonceng', [ViewtabController::class, 'viewlonceng'])->middleware('auth');
 Route::get('/pusher', [ViewtabController::class, 'pusher'])->middleware('auth');
-Route::get('/administrator', [ViewtabController::class, 'administrator'])->middleware('auth');
+Route::get('/adminindex', [ViewtabController::class, 'adminindex'])->middleware('auth');
 
 Route::get('/readpengumuman', [ChatController::class, 'readpengumuman'])->middleware('auth');
 Route::get('/getchatLawan', [ChatController::class, 'getchatLawan'])->middleware('auth');
@@ -164,4 +165,17 @@ Route::post('/confirmPembayaran', [TransactionController::class, 'confirmPembaya
 Route::post('/confirmPembayaranMID', [TransactionController::class, 'confirmPembayaranMID']);
 
 Route::get('/pivot', [ReportController::class, 'pivot']);
+Route::middleware(['superadmin'])->group(function () {
+    Route::get('/admin', [adminController::class, 'index'])->middleware('auth');
+    Route::get('/updateisAktif', [adminController::class, 'updateisAktif'])->middleware('auth');
+    Route::get('/adminlistpengelola', [adminController::class, 'adminlistpengelola'])->middleware('auth');
+    Route::get('/admintagihan', [adminController::class, 'admintagihan'])->middleware('auth');
+    Route::get('/adminpembayaran', [adminController::class, 'adminpembayaran'])->middleware('auth');
+    Route::get('/dataPengelola', [adminController::class, 'dataPengelola'])->middleware('auth');
+    Route::get('/dataTagihan', [adminController::class, 'dataTagihan'])->middleware('auth');
+    Route::post('/dataTagihanInsert', [adminController::class, 'dataTagihanInsert'])->middleware('auth');
+    Route::post('/dataTagihanUpdate', [adminController::class, 'dataTagihanUpdate'])->middleware('auth');
+    Route::post('/dataTagihanDelete', [adminController::class, 'dataTagihanDelete'])->middleware('auth');
+    Route::get('/dataPembayaran', [adminController::class, 'dataPembayaran'])->middleware('auth');
+});
 

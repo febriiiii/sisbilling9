@@ -17,7 +17,6 @@
     </div>
   </div>
 @endif
-{{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.4/jspdf.min.js"></script> --}}
 <script>
   var popup = $('#myModal').dxPopup('instance');
   popup.option("fullScreen", true);
