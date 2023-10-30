@@ -1,4 +1,5 @@
 <div id="gridPengelola"></div>
+
 <script>
     $(() => {
       const dataGrid = $('#gridPengelola').dxDataGrid({
@@ -137,7 +138,18 @@
                     editButton.css('color','blue');
                     editButton.on('click', function() {
                         var data = options.data;
-                        console.log(data);
+                        $.ajax({
+                            type: 'GET',
+                            cache: false,
+                            url: '{{url("/modalbill?userid=")}}'+data.userid,
+                            success: function(content) {
+                                GModal('Tagihan Pengelola',content)
+                            },
+                            error: function(xhr, status, error) {
+                            showNty(error,10000)
+                            }
+                        });
+                        
                     });
 
                     var deleteButton = $('<i class="las la-file-invoice-dollar"></i>');
@@ -156,5 +168,6 @@
         ],
       }).dxDataGrid('instance');
     });
+
     
     </script>

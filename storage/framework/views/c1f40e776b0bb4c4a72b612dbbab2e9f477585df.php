@@ -1,5 +1,5 @@
 <div id="myModal" class="dx-popup dx-popup-fullscreen" style="min-width: 500px;"></div>
-
+<div id="myCreateModal"></div>
 <script>
     function openmodal(title, content, val) {
         var popup = $('#myModal').dxPopup('instance');
@@ -60,4 +60,37 @@
         updatePopupHeight();
     });
 </script>
-<?php /**PATH C:\xampp\htdocs\sisbilling9\resources\views/modal/mainModal.blade.php ENDPATH**/ ?>
+
+
+
+
+<script>
+const myCreateModal = $('#myCreateModal').dxPopup({
+                            showCloseButton: true,
+                            visible: false,
+                            fullScreen: false,
+                            resizeEnabled: true,
+                            device: {
+                                deviceType: "phone"
+                            },
+                            contentTemplate(contentElement) {
+                            $('<div />')
+                                .addClass('myCreateModal').appendTo(contentElement);
+                            },
+                            onShowing() {
+                            // $('.myCreateModal').text("onShowing hello");
+                            },
+                            onShown() {
+                                // $('.myCreateModal').text("onShownhello");
+                            },
+                        }).dxPopup('instance');
+
+function GModal(title,content){
+    myCreateModal.option('title', title);
+    if (DevExpress.devices.current().deviceType === "phone" || DevExpress.devices.current().deviceType === "tablet") {
+        myCreateModal.option("fullScreen", true);
+    }
+    myCreateModal.option("contentTemplate", content);
+    myCreateModal.show();
+}
+</script><?php /**PATH C:\xampp\htdocs\sisbilling9\resources\views/modal/mainModal.blade.php ENDPATH**/ ?>

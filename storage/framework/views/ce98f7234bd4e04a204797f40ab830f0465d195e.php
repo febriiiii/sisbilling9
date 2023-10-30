@@ -113,6 +113,7 @@
                     lookup: {
                     dataSource: [
                         { duration: 'Hari', durationName: 'Hari' },
+                        { duration: 'Minggu', durationName: 'Minggu' },
                         { duration: 'Bulan', durationName: 'Bulan' },
                         { duration: 'Tahun', durationName: 'Tahun' },
                     ],

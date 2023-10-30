@@ -223,4 +223,30 @@ class Controller extends BaseController
             'query' => $query
         ]);
     }
+    public function getNoTrans($companyid){
+        // note: jika lastdate tidak ada maka tidak ada recuren
+        $tblcomp = tblcomp::find($companyid);
+        $notransHeader = $companyid.strtoupper(substr($tblcomp->companyname, 0, 2)).Carbon::now(config('app.GMT'))->format('ymd');
+        $lastTrans = DB::select("SELECT ISNULL(MAX(CAST(SUBSTRING(notrans, LEN('$notransHeader') + 1, LEN(notrans)) AS INT)) + 1, 1) AS maxNotrans
+                                    FROM tbltrans
+                                    WHERE notrans LIKE '".$notransHeader."%'");
+
+        $notrans = $notransHeader.sprintf("%05d", $lastTrans[0]->maxNotrans);
+        $TransactionController = new TransactionController;
+        while ($TransactionController->cekstatusMID($notrans)->status_code != 404) {
+            if($TransactionController->cekstatusMID($notrans)->status_code == 401){
+                dd(
+                    $TransactionController->cekstatusMID($notrans), 
+                    config('app.serverKey'), 
+                    "base64_encode : " . base64_encode(config('app.serverKey').':'), 
+                    config('app.URLmidv2'),
+                    "isProduction : ".config('app.isProduction')
+                ); // Stop Looping
+            }
+            $notrans = intval(substr($notrans, strlen($notransHeader))); // Mengambil angka dari nomor transaksi
+            $notrans++; // Increment nomor transaksi jika sudah dipakai di MIDTRANS
+            $notrans = $notransHeader.sprintf("%05d", $notrans); // Menggabungkan kembali nomor transaksi yang telah di-increment
+        }
+        return $notrans;
+    }
 }

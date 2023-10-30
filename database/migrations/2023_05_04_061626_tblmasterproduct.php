@@ -28,9 +28,9 @@ return new class extends Migration
 
             // Subscribe
             $table->boolean('isSubscribe')->default(0);
-            $table->double('price');
-            $table->string('rangeDuration');
-            $table->string('duration');
+            $table->double('price')->nullable();
+            $table->string('rangeDuration')->nullable();
+            $table->string('duration')->nullable();
         });
     }
 

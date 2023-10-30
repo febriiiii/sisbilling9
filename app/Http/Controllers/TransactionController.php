@@ -25,7 +25,7 @@ use Symfony\Component\Translation\Extractor\Visitor\TransMethodVisitor;
 
 class TransactionController extends Controller
 {
-    public function nextAppointment($startDate,$recurenceRule,$recurenceException,$lastDate){
+    public function nextAppointment($startDate,$recurenceRule,$recurenceException,$lastDate,$skip){
         $startDate = Carbon::parse($startDate);
         $tempStartDate = $startDate;
         $recurenceRule = explode(";",$recurenceRule);
@@ -123,7 +123,7 @@ class TransactionController extends Controller
             $startDate = $nextDate;
             goto Loop;
         }
-        if($finishDate->greaterThan($nextDate)){
+        if($finishDate->greaterThan($nextDate) || $skip){
             if($Recurr['FREQ'] == "MONTHLY"){
                 if($tempStartDate->isLastOfMonth()){
                     if($tempStartDate->format('d') == '31'){
@@ -174,34 +174,16 @@ class TransactionController extends Controller
         $attempts = 500; // Batas percobaan maksimum
         $attemptCount = 0;
         loopDuplikat:
-
+        
         // note: jika lastdate tidak ada maka tidak ada recuren
-        $tblcomp = tblcomp::find($companyid);
-        $notransHeader = $companyid.strtoupper(substr($tblcomp->companyname, 0, 2)).Carbon::now(config('app.GMT'))->format('ymd');
-        $lastTrans = DB::select("SELECT ISNULL(MAX(CAST(SUBSTRING(notrans, LEN('$notransHeader') + 1, LEN(notrans)) AS INT)) + 1, 1) AS maxNotrans
-                                    FROM tbltrans
-                                    WHERE notrans LIKE '".$notransHeader."%'");
+        $controller = new Controller;
+        $notrans = $controller->getNoTrans($companyid);
 
-        $notrans = $notransHeader.sprintf("%05d", $lastTrans[0]->maxNotrans);
-        while ($this->cekstatusMID($notrans)->status_code != 404) {
-            if($this->cekstatusMID($notrans)->status_code == 401){
-                dd(
-                    $this->cekstatusMID($notrans), 
-                    config('app.serverKey'), 
-                    "base64_encode : " . base64_encode(config('app.serverKey').':'), 
-                    config('app.URLmidv2'),
-                    "isProduction : ".config('app.isProduction')
-                ); // Stop Looping
-            }
-            $notrans = intval(substr($notrans, strlen($notransHeader))); // Mengambil angka dari nomor transaksi
-            $notrans++; // Increment nomor transaksi jika sudah dipakai di MIDTRANS
-            $notrans = $notransHeader.sprintf("%05d", $notrans); // Menggabungkan kembali nomor transaksi yang telah di-increment
-        }
         $tblagenda = tblagenda::find($AppointmentId);
         if($lastDate == null){
             $nextDate = Carbon::parse(tblagenda::find($AppointmentId)->StartDate);
         }else{
-            $nextDate = $this->nextAppointment($tblagenda->StartDate,$tblagenda->RecurrenceRule,$tblagenda->RecurrenceException,$lastDate);
+            $nextDate = $this->nextAppointment($tblagenda->StartDate,$tblagenda->RecurrenceRule,$tblagenda->RecurrenceException,$lastDate,false);
         }
         if($nextDate != false){
             $cekIssetTrans = tbltrans::where('jatuhTempoTagihan',$nextDate)
@@ -254,10 +236,11 @@ class TransactionController extends Controller
             
                         goto loopDuplikat;
                     }
+                    return true;
                 }
             }
         }
-        return true;
+        return false;
     }
     public function getbill(){
         $data = DB::select("SELECT t.statusid, t.notrans, t.jatuhTempoTagihan,t.SPokok + t.SBunga + t.SLateFee AS Amount, p.productName
@@ -741,7 +724,7 @@ class TransactionController extends Controller
         $transNew->update(['snap_token' => $trans->snapToken]);
         return $trans;
     }
-    private function cekstatusMID($notrans){
+    public function cekstatusMID($notrans){
         $url = config('app.URLmidv2').$notrans.'/status';
         $headers = array(
             'Accept: application/json',
@@ -835,7 +818,7 @@ class TransactionController extends Controller
                                             WHERE productCode IS NOT NULL and isBilling = 1
                                             AND a.statusid <> 4"));
             foreach ($tblagenda as $agenda) {
-                $nextDate = $this->nextAppointment($agenda->StartDate,$agenda->RecurrenceRule,$agenda->RecurrenceException,$agenda->transdate);
+                $nextDate = $this->nextAppointment($agenda->StartDate,$agenda->RecurrenceRule,$agenda->RecurrenceException,$agenda->transdate,false);
                 // $log = new Controller;
                 if( Carbon::parse($nextDate)->format('ymd') == Carbon::now(config('GMT'))->format('ymd') ){
                     // $log->savelog('create dari jatuhtempo ' . $agenda->jatuhTempoTagihan );

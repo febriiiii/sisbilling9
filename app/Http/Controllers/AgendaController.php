@@ -34,6 +34,9 @@ class AgendaController extends Controller
         //             ->orWhere('userid', session('UIDGlob')->userid)
         //             ->get();
         $array = substr(session('UIDGlob')->companyidArray, 0, -1);
+        if(auth()->user()->superadmin == 1){
+            $array = 1;
+        }
         $query = "SELECT AppointmentId,Text,EndDate,description,all_day,RecurrenceRule,RecurrenceException,companyid,isBilling,productCode,Pokok,lateFeePercent,BungaPercent,userid,statusid,UserInsert,InsertDT,UserUpdate,UpdateDT,
                     COALESCE((select MIN(jatuhTempoTagihan) from tbltrans where statusid <> 4 and userid = {$userid} and AppointmentId = a.AppointmentId),StartDate) as StartDate
                     FROM tblagenda a

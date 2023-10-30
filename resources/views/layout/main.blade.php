@@ -28,9 +28,6 @@
         @include('modal.mainModal')
         @include('modal.mainModal2')
         @include('modal.mainModalSelect') 
-        @if (auth()->user()->superadmin == 1)
-        @include('admin.administrator')
-        @endif
         
         {{-- HATI HATI MENGINCLUDE FILE, TES SUBMIT FORM APAKAH BEKERJA, CONTOH FORM PADA PENGATURAN->PERUSAHAAN --}}
         <div class="body" style="padding-bottom:20vh; padding-top:30px;">

@@ -124,7 +124,9 @@ Route::get('/viewpolling', [ViewtabController::class, 'viewpolling'])->middlewar
 Route::get('/viewkomentarpengumuman', [ViewtabController::class, 'viewkomentarpengumuman'])->middleware('auth');
 Route::get('/viewlonceng', [ViewtabController::class, 'viewlonceng'])->middleware('auth');
 Route::get('/pusher', [ViewtabController::class, 'pusher'])->middleware('auth');
+// administrator------------------------------------------------------------------------------------
 Route::get('/adminindex', [ViewtabController::class, 'adminindex'])->middleware('auth');
+Route::get('/modalbill', [ViewtabController::class, 'modalbill'])->middleware('auth');
 
 Route::get('/readpengumuman', [ChatController::class, 'readpengumuman'])->middleware('auth');
 Route::get('/getchatLawan', [ChatController::class, 'getchatLawan'])->middleware('auth');
@@ -167,6 +169,8 @@ Route::post('/confirmPembayaranMID', [TransactionController::class, 'confirmPemb
 Route::get('/pivot', [ReportController::class, 'pivot']);
 Route::middleware(['superadmin'])->group(function () {
     Route::get('/admin', [adminController::class, 'index'])->middleware('auth');
+    Route::post('/subscribe', [adminController::class, 'subscribe'])->middleware('auth');
+    Route::post('/unsubscribe', [adminController::class, 'unsubscribe'])->middleware('auth');
     Route::get('/updateisAktif', [adminController::class, 'updateisAktif'])->middleware('auth');
     Route::get('/adminlistpengelola', [adminController::class, 'adminlistpengelola'])->middleware('auth');
     Route::get('/admintagihan', [adminController::class, 'admintagihan'])->middleware('auth');

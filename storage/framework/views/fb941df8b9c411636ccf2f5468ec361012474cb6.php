@@ -1,5 +1,5 @@
 <?php echo $__env->make('loading', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-
+<?php echo $__env->make('tes', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 <div class="demo-container FirstShow">
   <div id="showscheduler"></div>
   <div class="scedulerket row p-2">

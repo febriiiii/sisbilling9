@@ -8,6 +8,7 @@ use App\Models\tblmasterproduct;
 use App\Models\tblpaymentmethod;
 use App\Models\tblpengumuman;
 use App\Models\tblproducttype;
+use App\Models\tblsyspara;
 use App\Models\tbltrans;
 use App\Models\tbluser;
 use Illuminate\Http\Request;
@@ -226,6 +227,8 @@ class ViewtabController extends Controller
     public function pusher(){
         return view('getView.pusher')->render();
     }
+
+    // ADMINISTRATOR --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     public function adminindex(){
         if(auth()->user()->superadmin == 1){
             $data = [];
@@ -233,5 +236,22 @@ class ViewtabController extends Controller
         }else{
             return redirect()->route('logout');
         }
+    }
+
+    public function modalbill(Request $request){
+
+        $data = DB::select("SELECT userid, u.email as emailU, u.nama as namaU, u.hp as hpU, u.alamatSingkat as alamatU, c.companyname, c.companyaddress, c.email as emailP, c.hp as hpP from tbluser u 
+                            join tblcomp c on c.companyid=u.companyid 
+                            WHERE u.userid = {$request->userid}")[0];
+        $produk = DB::select("SELECT productCode, productName from tblmasterproduct where isSubscribe = 1");
+        $tagihan = DB::select("SELECT t.AppointmentId, u.nama, t.notrans, t.transdate, a.description, CASE WHEN t.paymentid = 2 THEN MIDpaymenttype ELSE paymentName END AS paymentname, t.jatuhTempoTagihan,t.SPokok + t.SBunga + t.SLateFee AS Amount, s.deskripsi, p.productName
+                                FROM tbltrans t
+                                JOIN tblstatus s ON t.statusid=s.statusid
+                                JOIN tbluser u ON u.userid=t.userid
+                                JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
+                                JOIN tblmasterproduct p ON p.productCode=a.productCode
+                                LEFT JOIN tblpaymentmethod on t.paymentid=tblpaymentmethod.paymentid
+                                WHERE t.statusid != 4 AND p.isSubscribe = 1 AND t.userid={$request->userid}");
+        return view('admin.modal.addbillpengelola',compact('data','produk','tagihan'))->render();
     }
 }

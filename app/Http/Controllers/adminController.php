@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\tblagenda;
+use App\Models\tblbilling;
 use App\Models\tblmasterproduct;
 use App\Models\tblpaketakun;
+use App\Models\tbltrans;
 use App\Models\tbluser;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -11,6 +14,9 @@ use Illuminate\Support\Facades\DB;
 
 class adminController extends Controller
 {
+    public function index(){
+        return view('admin.index');
+    }
     public function adminlistpengelola() {
         return view('admin.listpengelola');
     }
@@ -101,5 +107,95 @@ class adminController extends Controller
                 JOIN tblmasterproduct p ON p.productCode=a.productCode
                 LEFT JOIN tblpaymentmethod on t.paymentid=tblpaymentmethod.paymentid
                 WHERE t.statusid != 4 AND u.companyid IS NOT NULL AND u.superadmin <> 1");
+    }
+    public function subscribe(Request $request){
+        $produk = tblmasterproduct::find($request->productCode);
+
+        $recur ='FREQ=DAILY;COUNT=1';
+        if($produk->duration == 'Minggu'){
+            $recur ='FREQ=WEEKLY;COUNT=1';
+        }else if($produk->duration == 'Bulan'){
+            $recur ='FREQ=MONTHLY;COUNT=1';
+        }else if($produk->duration == 'Tahun'){
+            $recur ='FREQ=YEARLY;COUNT=1';
+        }
+        $now = Carbon::now(config('app.GMT'));
+        $agenda = [
+            'Text' => $produk->productName,
+            'userid' => session('UIDGlob')->userid,
+            'UserInsert' => session('UIDGlob')->userid,
+            'UserUpdate' => session('UIDGlob')->userid,
+            'InsertDT' => $now,
+            'UpdateDT' => $now,
+            'statusid' => 1,
+            'isBilling' => 1,
+            'productCode' => $request->productCode,
+            'Pokok' => $produk->price,
+            'lateFeePercent' => 0,
+            'BungaPercent' => 0,
+            'companyid' => 1,
+            'StartDate' => $now->format('Y-m-d\TH:i:s\Z'),
+            'EndDate' => $now->format('Y-m-d\TH:i:s\Z'),
+            'description' => $request->Deskripsi,
+            'RecurrenceRule' => $recur,
+            'RecurrenceException' => '',
+            'all_day' => 1,
+        ];
+        $apoinmentid = tblagenda::insertGetId($agenda);
+
+        tblbilling::create([
+            'userid' => $request->userid,
+            'AppointmentId' => $apoinmentid,
+            'statusid' => 1,
+            'UserInsert' => session('UIDGlob')->userid,
+            'InsertDT' => $now,
+        ]);
+        $controller = new Controller;
+        $notrans = $controller->getNoTrans(1);
+        $transactionController = new TransactionController;
+        $nextDate = $transactionController->nextAppointment($agenda['StartDate'],$agenda['RecurrenceRule'],$agenda['RecurrenceException'],$now,true);
+        tbltrans::create([
+            'notrans' => $notrans,
+            'AppointmentId' => $apoinmentid,
+            'companyid' => 1,
+            'userid' => $request->userid,
+            'statusid' => 5,
+            'SisaPok' => $produk->price,
+            'Pokok' => $produk->price,
+            'Bunga' => 0,
+            'LateFee' => 0,
+            'JHT' => 0,
+            'SPokok' => $produk->price,
+            'SBunga' => 0,
+            'SLateFee' => 0,
+            'transdate' => $now,
+            'jatuhTempoTagihan' => $nextDate,
+            'UserInsert' => auth()->user()->userid,
+            'InsertDT' => now(config('app.GMT')),
+            'UserUpdate' => auth()->user()->userid,
+            'UpdateDT' => now(config('app.GMT')),
+        ]);
+        $chtController = new ChatController;
+        $chtController->GlobalPush("renderGlobal",$request->userid);
+
+        $tagihan = DB::select("SELECT TOP 1 t.AppointmentId, u.nama, t.notrans, t.transdate, a.description, CASE WHEN t.paymentid = 2 THEN MIDpaymenttype ELSE paymentName END AS paymentname, t.jatuhTempoTagihan,t.SPokok + t.SBunga + t.SLateFee AS Amount, s.deskripsi, p.productName
+                                FROM tbltrans t
+                                JOIN tblstatus s ON t.statusid=s.statusid
+                                JOIN tbluser u ON u.userid=t.userid
+                                JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
+                                JOIN tblmasterproduct p ON p.productCode=a.productCode
+                                LEFT JOIN tblpaymentmethod on t.paymentid=tblpaymentmethod.paymentid
+                                WHERE t.notrans='{$notrans}'");
+
+        return $tagihan;
+    }
+
+    public function unsubscribe(Request $request){
+        tblagenda::where('AppointmentId',$request->AppointmentId)->first()->update(['statusid' => 4]);
+        tblbilling::where('AppointmentId',$request->AppointmentId)->first()->update(['statusid' => 4]);
+        tbltrans::where('AppointmentId',$request->AppointmentId)->first()->update(['statusid' => 4]);
+        $chtController = new ChatController;
+        $chtController->GlobalPush("renderGlobal",$request->userid);
+        return true;
     }
 }

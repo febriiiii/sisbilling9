@@ -1,5 +1,5 @@
 @include('loading')
-{{-- @include('tes') --}}
+@include('tes')
 <div class="demo-container FirstShow">
   <div id="showscheduler"></div>
   <div class="scedulerket row p-2">
