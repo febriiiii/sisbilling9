@@ -46,7 +46,7 @@ class AgendaController extends Controller
                         FROM tbltrans t
                         JOIN tblagenda ag ON t.AppointmentId = ag.AppointmentId
                         WHERE t.userid = {$userid}
-                        AND t.statusid <> 4
+                        AND t.statusid NOT IN (4,13)
                         GROUP BY t.AppointmentId
                     ) 
                     OR userid = {$userid}";
@@ -76,8 +76,9 @@ class AgendaController extends Controller
     public function getAgendaPinjam(Request $request){
         return DB::select("SELECT a.AppointmentId,Text,Pokok, CASE WHEN b.AppointmentId IS NULL THEN 0 ELSE 1 END AS isUsed
                             FROM tblagenda a
+                            JOIN tblmasterproduct p on p.productcode=a.productcode 
                             LEFT JOIN (SELECT * FROM tblbilling WHERE userid = ".$request->userid.") b ON b.AppointmentId = a.AppointmentId
-                            WHERE isBilling = 1 AND companyid = ". session('UIDGlob')->companyid);
+                            WHERE isBilling = 1 AND p.isSubscribe <> 1 AND a.companyid = ". session('UIDGlob')->companyid);
     }
     public function putUserPinjam(Request $request){
         $values = json_decode($request->values);
@@ -323,7 +324,7 @@ class AgendaController extends Controller
                         END AS frequency";
         $from = "tblagenda a";
         $join = "JOIN tblmasterproduct p ON p.productCode = a.productCode AND p.companyid = a.companyid";
-        $where = "WHERE isBilling = 1 AND a.companyid = ".session('UIDGlob')->companyid;
+        $where = "WHERE isBilling = 1 AND p.isSubscribe <> 1 AND a.companyid = ".session('UIDGlob')->companyid;
         // Set base query
         $query = "SELECT ".$selected." FROM ".$from." ".$join." ".$where." ";
 

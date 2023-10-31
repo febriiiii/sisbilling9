@@ -57,7 +57,7 @@ Route::get('', [Controller::class, 'index'])->middleware('no-cache', 'auth');
 Route::get('/home', [Controller::class, 'index'])->middleware('no-cache','auth')->name('home');
 Route::get('/login', [Controller::class, 'login'])->name('login')->middleware('no-cache', 'guest');
 Route::post('/auuten', [Controller::class, 'auuten']);
-Route::get('/logout', [Controller::class, 'logout']);
+Route::get('/logout', [Controller::class, 'logout'])->name('logout');
 
 Route::get('/usertocomp', [UserController::class, 'usertocomp']);
 Route::get('/companytouser', [UserController::class, 'companytouser']);
@@ -167,6 +167,7 @@ Route::post('/confirmPembayaran', [TransactionController::class, 'confirmPembaya
 Route::post('/confirmPembayaranMID', [TransactionController::class, 'confirmPembayaranMID']);
 
 Route::get('/pivot', [ReportController::class, 'pivot']);
+
 Route::middleware(['superadmin'])->group(function () {
     Route::get('/admin', [adminController::class, 'index'])->middleware('auth');
     Route::post('/subscribe', [adminController::class, 'subscribe'])->middleware('auth');

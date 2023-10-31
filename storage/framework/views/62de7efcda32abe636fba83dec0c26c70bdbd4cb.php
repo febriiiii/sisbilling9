@@ -23,6 +23,8 @@
     <body style="overflow-y: scroll; height: auto;">
         
         <?php echo $__env->make('modal.mainModal', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+        <?php echo $__env->make('modal.mainModal2', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+        <?php echo $__env->make('modal.mainModalSelect', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?> 
 
         
             <!-- Navbar -->

@@ -131,7 +131,9 @@
 </form>
 
 <script>
-    renderlonceng()
+    if (typeof renderlonceng === 'function') {
+        renderlonceng()
+    }
     transG = '<?php echo e($trans->notrans); ?>'
     var snapToken = '<?php echo e($snapToken); ?>';
     $('#viewpayment-submit').submit(function(event){
@@ -176,7 +178,7 @@
         xhr.send(form);
         $('#loader').hide('slow')
     }) 
-    
+
     function voidtrans(){
         $.ajax({
             type: 'GET',
@@ -184,6 +186,7 @@
             url: '<?php echo e(url("/voidtrans")); ?>', //status = 13
             data: {transG},
             success: function(data) {
+                showNty(data)
                 if (typeof querysaled === 'function') {
                     querysaled()
                 }

@@ -7,11 +7,26 @@
             colors="primary:#ffffff"
             style="width:30px;height:30px">
         </lord-icon>
+        @php
+            if(session('UIDGlob')->companyid != '' && session('UIDGlob')->scrb < 1){
+                if(session('UIDGlob')->superadmin != 1){
+                    $notif['count'] = $notif['count'] + 1;
+                }
+            }
+        @endphp
         @if ($notif['count'] != 0)
-        <span class="badge" style="background-color: whitesmoke;color:black; position: absolute; margin-left:-10px; margin-top:-7px">{{$notif['count']}}</span>
+            <span class="badge" style="background-color: whitesmoke;color:black; position: absolute; margin-left:-10px; margin-top:-7px">{{$notif['count']}}</span>
         @endif
     </a>
     <ul class="dropdown-menu" style="position: absolute; left:-170px; box-shadow:-3px 3px 6px rgb(221, 221, 221)">
+        @if (session('UIDGlob')->companyid != '' && session('UIDGlob')->scrb < 1)
+            @if (session('UIDGlob')->superadmin != 1)
+                <div class="uk-alert-danger" uk-alert>
+                    <p>Akun Anda Telah Habis Masa Aktif, Tolong Lakukan Pembayaran</p>
+                    <p>Jika Butuh Bantuan Hubungi CS SisBilling.</p>
+                </div>
+            @endif
+        @endif
         @foreach ($notif['myAgendda'] as $i)
             <li onclick=""><a class="dropdown-item card mt-1" href="#">{{$i->text}} </a></li>
         @endforeach

@@ -28,14 +28,22 @@
         <?php echo $__env->make('modal.mainModal', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
         <?php echo $__env->make('modal.mainModal2', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
         <?php echo $__env->make('modal.mainModalSelect', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?> 
-        
+        <?php if($UIDGlob->companyid != '' && session('UIDGlob')->scrb < 1): ?>
+            <?php if(session('UIDGlob')->superadmin != 1): ?>
+                <div class="uk-alert-danger" uk-alert style="position: fixed; top:50px; right:5px;vw;z-index:99999">
+                    <a href class="uk-alert-close" uk-close></a>
+                    <p>Akun Anda Telah Habis Masa Aktif, Tolong Lakukan Pembayaran</p>
+                    <p>Jika Butuh Bantuan Hubungi CS SisBilling.</p>
+                </div>
+            <?php endif; ?>
+        <?php endif; ?>
         
         <div class="body" style="padding-bottom:20vh; padding-top:30px;">
             <div class="container">
                 <?php echo $__env->make('loader', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
                 <ul class="uk-switcher switcher-navbarCustom uk-margin">
                     <li><?php echo $__env->make('tabs.mydashboard', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?></li>
-                    <?php if($UIDGlob->companyid != ''): ?>
+                    <?php if(($UIDGlob->companyid != '' && session('UIDGlob')->scrb > 0) || session('UIDGlob')->superadmin == 1): ?>
                     <li><?php echo $__env->make('tabs.mycustomer', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?></li>
                     <?php endif; ?>
                     <li><?php echo $__env->make('tabs.mybilling', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?></li>

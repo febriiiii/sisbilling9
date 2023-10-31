@@ -23,6 +23,8 @@
     <body style="overflow-y: scroll; height: auto;">
         {{-- MASTER INCLUDE --}}
         @include('modal.mainModal')
+        @include('modal.mainModal2')
+        @include('modal.mainModalSelect') 
 
         
             <!-- Navbar -->

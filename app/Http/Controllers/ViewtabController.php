@@ -107,7 +107,9 @@ class ViewtabController extends Controller
         ->join('tbluser','tbluser.userid','=','tbltrans.userid')
         ->join('tblagenda','tblagenda.AppointmentId','=','tbltrans.AppointmentId')
         ->join('tblcomp','tblcomp.companyid','=','tblagenda.companyid')
-        ->where('notrans',$request->val)->first();
+        ->where('notrans',$request->val)
+        ->where(DB::raw('tbltrans.SPokok + tbltrans.SBunga + tbltrans.SLateFee'),'>',0)
+        ->first();
 
         if(isset($trans)){
             $file = '';
@@ -129,7 +131,7 @@ class ViewtabController extends Controller
             $us->update(['isreject' => 0]);   
             return view('getView.viewPayment',compact('file','trans','paymentMethod','snapToken'))->render();
         }else{
-            return 0;
+            return "<h1>Penagihan Tidak Berlaku / Tanpa Nominal</h1><script>setTimeout(() => { closemodal2() }, 3000);</script>";
         }
     }
     public function viewlonceng(){
@@ -154,15 +156,16 @@ class ViewtabController extends Controller
                                             SELECT judul,pengumumanid,isPengumumanCompany FROM tblpengumuman WHERE UserInsert != ".session('UIDGlob')->userid." 
                                             AND companyid IN (".$cid.") AND companyid <> 1
                                             AND ".session('UIDGlob')->userid." NOT IN (SELECT value FROM STRING_SPLIT(usersRead, ','))                                    
-                                            AND statusid NOT IN (4)");
+                                            AND statusid NOT IN (4,13)");
         
         $notif['invoice'] = DB::select("SELECT t.*, a.Text FROM tbltrans t
                                         JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
-                                        WHERE t.statusid NOT IN (7, 8, 9, 4) 
+                                        WHERE t.statusid NOT IN (7, 8, 9, 4, 13) 
                                         AND t.companyid IN (".$cid.") 
                                         AND t.userid = ".session('UIDGlob')->userid." 
-                                        AND DATEADD(DAY, -7, t.jatuhTempoTagihan) < '".now()->toDateTimeString()."'");
-        
+                                        AND t.SPokok + t.SBunga + t.SLateFee <> 0
+                                        AND DATEADD(DAY, -7, t.jatuhTempoTagihan) < '".now(config('app.GMT'))->toDateTimeString()."'");
+
         $notif['invoiceReject'] = DB::select("SELECT t.*, a.Text FROM tbltrans t
                                         JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
                                         WHERE t.statusid NOT IN (8, 9, 4) 
@@ -244,7 +247,26 @@ class ViewtabController extends Controller
                             join tblcomp c on c.companyid=u.companyid 
                             WHERE u.userid = {$request->userid}")[0];
         $produk = DB::select("SELECT productCode, productName from tblmasterproduct where isSubscribe = 1");
-        $tagihan = DB::select("SELECT t.AppointmentId, u.nama, t.notrans, t.transdate, a.description, CASE WHEN t.paymentid = 2 THEN MIDpaymenttype ELSE paymentName END AS paymentname, t.jatuhTempoTagihan,t.SPokok + t.SBunga + t.SLateFee AS Amount, s.deskripsi, p.productName
+        $tagihan = DB::select("SELECT t.AppointmentId, u.nama, t.notrans, t.transdate, a.description, CASE WHEN t.paymentid = 2 THEN MIDpaymenttype ELSE paymentName END AS paymentname, t.jatuhTempoTagihan,t.SPokok + t.SBunga + t.SLateFee AS Amount, s.deskripsi, p.productName,
+                                CASE 
+                                    WHEN p.duration = 'Hari' THEN DATEADD(DAY, CAST(p.rangeDuration AS INT), t.jatuhTempoTagihan)
+                                    WHEN p.duration = 'Minggu' THEN DATEADD(WEEK, CAST(p.rangeDuration AS INT), t.jatuhTempoTagihan)
+                                    WHEN p.duration = 'Bulan' THEN DATEADD(MONTH, CAST(p.rangeDuration AS INT), t.jatuhTempoTagihan)
+                                    WHEN p.duration = 'Tahun' THEN DATEADD(YEAR, CAST(p.rangeDuration AS INT), t.jatuhTempoTagihan)
+                                END AS FinishDate,
+                                CASE
+                                    WHEN GETDATE() BETWEEN t.jatuhTempoTagihan AND
+                                    (
+                                        SELECT
+                                            CASE
+                                                WHEN p.duration = 'Hari' THEN DATEADD(DAY, CAST(p.rangeDuration AS INT), t.jatuhTempoTagihan)
+                                                WHEN p.duration = 'Minggu' THEN DATEADD(WEEK, CAST(p.rangeDuration AS INT), t.jatuhTempoTagihan)
+                                                WHEN p.duration = 'Bulan' THEN DATEADD(MONTH, CAST(p.rangeDuration AS INT), t.jatuhTempoTagihan)
+                                                WHEN p.duration = 'Tahun' THEN DATEADD(YEAR, CAST(p.rangeDuration AS INT), t.jatuhTempoTagihan)
+                                            END
+                                    ) THEN 'Ya'
+                                    ELSE 'Tidak'
+                                END AS Aktif
                                 FROM tbltrans t
                                 JOIN tblstatus s ON t.statusid=s.statusid
                                 JOIN tbluser u ON u.userid=t.userid
@@ -253,5 +275,9 @@ class ViewtabController extends Controller
                                 LEFT JOIN tblpaymentmethod on t.paymentid=tblpaymentmethod.paymentid
                                 WHERE t.statusid != 4 AND p.isSubscribe = 1 AND t.userid={$request->userid}");
         return view('admin.modal.addbillpengelola',compact('data','produk','tagihan'))->render();
+    }
+
+    public function modalpembayaran(Request $request){
+        return view('admin.modal.pembayaranpengelola')->render();
     }
 }

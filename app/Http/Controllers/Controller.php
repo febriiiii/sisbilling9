@@ -56,6 +56,14 @@ class Controller extends BaseController
                 ORDER BY InsertDT DESC";
         $tblpengumuman = DB::select($query);
         // $countchat = DB::select("SELECT * FROM tblchat WHERE PATINDEX('%[".session('UIDGlob')->userid."]%', userArray) > 0");
+        session('UIDGlob')->scrb = count(DB::select("SELECT top 1 t.AppointmentId
+                                FROM tbltrans t
+                                JOIN tblstatus s ON t.statusid=s.statusid
+                                JOIN tbluser u ON u.userid=t.userid
+                                JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
+                                JOIN tblmasterproduct p ON p.productCode=a.productCode
+                                WHERE t.statusid != 4 AND p.isSubscribe = 1 AND t.userid={$useridQ}"));
+         
         return view('layout/main',compact('tblproducttype','cid','tblcomp','tblpengumuman'));
     }
     public function inCidSelf(){
@@ -68,13 +76,9 @@ class Controller extends BaseController
         }
     }
     public function inCidNotSelf(){
-        if(session('UIDGlob')->companyid == null){
-            $arr = explode(',', session('UIDGlob')->companyidArray);
-            array_pop($arr);
-            return "'" . implode("','", $arr) . "'";
-        }else{
-            return "'".session('UIDGlob')->companyid."'";
-        }
+        $arr = explode(',', session('UIDGlob')->companyidArray);
+        array_pop($arr);
+        return "'" . implode("','", $arr) . "'";
     }
 
     public function login(){
@@ -82,7 +86,6 @@ class Controller extends BaseController
         $eod->eod();
         return view('displayLogin');
     }
-    
     public function auuten(Request $request)
     {
         $credentials = $request->validate([
@@ -90,12 +93,15 @@ class Controller extends BaseController
             'password' => ['required'],
         ]);
         $tbluser = tbluser::where('email',$credentials['email'])->first();
+        
         if(isset($tbluser->statusid)){
             if($tbluser->statusid == 4){
                 goto Out;
             }
             if($tbluser->isAktif == 0){
-                goto Out;
+                return back()->withErrors([
+                    'email' => 'Akun Anda Telah Habis Masa Aktif, Tolong Hubungi CS SisBilling',
+                ])->onlyInput('email');
             }
         }
         if (Auth::attempt($credentials)) {

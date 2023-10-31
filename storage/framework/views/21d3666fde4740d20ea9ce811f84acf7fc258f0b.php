@@ -1,8 +1,9 @@
 <div id="gridPengelola"></div>
 
 <script>
-    $(() => {
-      const dataGrid = $('#gridPengelola').dxDataGrid({
+    loadlistpengelola()
+    function loadlistpengelola(){
+    $('#gridPengelola').dxDataGrid({
         dataSource: {
           store: new DevExpress.data.CustomStore({
             key: "userid",
@@ -71,7 +72,38 @@
             },
             {
                 dataField: 'billAktif',
-                dataType: "string" 
+                cellTemplate: function(container, options) {
+                    var bA = options.data.billAktif
+                    if(options.data.billAktif == null){
+                        bA = "Tidak Ada"
+                    }
+                    var editButton = $('<span class="badge badge-success rounded-pill d-inline">'+bA+'<span>');
+                    editButton.css('cursor','pointer');
+                    editButton.on('click', function() {
+                        var val = options.data.billAktif
+                        if(val == null){
+                            return false;
+                        }
+                        $.ajax({
+                        url: '<?php echo e(url("/viewpayment")); ?>',
+                        type: 'GET',
+                        cache: false,
+                        data: {val},
+                        success: function(data) {
+                            if(data != 0){
+                                openmodal2("Form Pembayaran",data)
+                            }else{
+                                showNty("Payment Error")
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            showNty(error,10000)
+                        }
+                        });
+                    });
+
+                    container.append(editButton);
+                } 
             },
             {
                 dataField: 'isAktif',
@@ -149,16 +181,24 @@
                             showNty(error,10000)
                             }
                         });
-                        
                     });
-
                     var deleteButton = $('<i class="las la-file-invoice-dollar"></i>');
                     deleteButton.css('font-size','1.5em');
                     deleteButton.css('cursor','pointer');
                     deleteButton.css('color','green');
                     deleteButton.on('click', function() {
                         var data = options.data;
-                        console.log(data);
+                        $.ajax({
+                            type: 'GET',
+                            cache: false,
+                            url: '<?php echo e(url("/adminpembayaran?userid=")); ?>'+data.userid,
+                            success: function(content) {
+                                GModal('Pembayaran Pengelola',content)
+                            },
+                            error: function(xhr, status, error) {
+                            showNty(error,10000)
+                            }
+                        });
                     });
 
                     container.append(editButton);
@@ -167,7 +207,7 @@
             }
         ],
       }).dxDataGrid('instance');
-    });
+    }
 
     
     </script><?php /**PATH C:\xampp\htdocs\sisbilling9\resources\views/admin/listpengelola.blade.php ENDPATH**/ ?>

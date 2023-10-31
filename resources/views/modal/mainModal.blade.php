@@ -85,6 +85,16 @@ const myCreateModal = $('#myCreateModal').dxPopup({
                             },
                         }).dxPopup('instance');
 
+                        // Cek Jika PopUp Di Tutup
+                        var popupInstance = $('#myCreateModal').dxPopup('instance');
+                        popupInstance.on('hidden', function () {
+                            if(openAddbillpengelola){
+                                loadlistpengelola()
+                                openAddbillpengelola = false
+                            }
+                        }); 
+
+
 function GModal(title,content){
     myCreateModal.option('title', title);
     if (DevExpress.devices.current().deviceType === "phone" || DevExpress.devices.current().deviceType === "tablet") {

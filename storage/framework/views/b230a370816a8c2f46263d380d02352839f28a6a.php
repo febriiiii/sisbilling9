@@ -20,7 +20,7 @@
         store: {
           type: 'odata',
           cache: false,
-          url: "<?php echo e(url('')); ?>/dataPembayaran?stamp=" + new Date().getTime(),
+          url: "<?php echo e(url('')); ?>/dataPembayaran?userid=<?php echo e($userid); ?>&stamp=" + new Date().getTime(),
           key: 'notrans',
           beforeSend(request) {
             request.params.SaleNo = $('#formsaleh-primary').val();

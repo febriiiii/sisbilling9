@@ -81,6 +81,14 @@
                       if (productName.length > 19) {
                         productName = productName.substring(0, 17) + "...";
                       }
+                      selisihH = "";
+                      if(parseInt(e.selisih) == 0){
+                        selisihH = `<i style="color: red; font-size:.7em;">* Jatuh Tempo Hari Ini</i>`;
+                      }else if(parseInt(e.selisih) > 0){
+                        selisihH = `<i style="color: red; font-size:.7em;">* (Tunggak) Telat `+parseInt(e.selisih) + ` Hari</i>`;
+                      }else if(parseInt(e.selisih) >= -7){
+                        selisihH = `<i style="color: red; font-size:.7em;">* Jatuh Tempo `+(parseInt(e.selisih) * -1 ) + ` Hari Lagi</i>`;
+                      }
                       var content = `<div class="card box" style="border-radius:15px; margin-top:0;margin-bottom:15px;">` +
                                       `<div class="ribbon-2" style="background:`+color+`">`+productName+`</div>` +
                                       `<div class="row">` +
@@ -102,7 +110,7 @@
                                                       `<span class="icon col-auto" style="margin-right:0px;">` +
                                                           `<img width="20" height="20" src="{{asset('public/checklist.png')}}" alt="checkmark--v1"/>` +
                                                       `</span>` +
-                                                      `<div class="col"><strong style="display: inline-block;">Amount:</strong><span style="padding-left: 1em;">`+formater.format(e.Amount)+`</span></div>` +
+                                                      `<div class="col"><strong style="display: inline-block;">Amount:</strong><span style="padding-left: 1em;">`+formater.format(e.Amount)+`</span></div>` + selisihH +
                                                   `</li>` +
                                               `</ul>` +
                                           `</div>` +

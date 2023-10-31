@@ -7,11 +7,26 @@
             colors="primary:#ffffff"
             style="width:30px;height:30px">
         </lord-icon>
+        <?php
+            if(session('UIDGlob')->companyid != '' && session('UIDGlob')->scrb < 1){
+                if(session('UIDGlob')->superadmin != 1){
+                    $notif['count'] = $notif['count'] + 1;
+                }
+            }
+        ?>
         <?php if($notif['count'] != 0): ?>
-        <span class="badge" style="background-color: whitesmoke;color:black; position: absolute; margin-left:-10px; margin-top:-7px"><?php echo e($notif['count']); ?></span>
+            <span class="badge" style="background-color: whitesmoke;color:black; position: absolute; margin-left:-10px; margin-top:-7px"><?php echo e($notif['count']); ?></span>
         <?php endif; ?>
     </a>
     <ul class="dropdown-menu" style="position: absolute; left:-170px; box-shadow:-3px 3px 6px rgb(221, 221, 221)">
+        <?php if(session('UIDGlob')->companyid != '' && session('UIDGlob')->scrb < 1): ?>
+            <?php if(session('UIDGlob')->superadmin != 1): ?>
+                <div class="uk-alert-danger" uk-alert>
+                    <p>Akun Anda Telah Habis Masa Aktif, Tolong Lakukan Pembayaran</p>
+                    <p>Jika Butuh Bantuan Hubungi CS SisBilling.</p>
+                </div>
+            <?php endif; ?>
+        <?php endif; ?>
         <?php $__currentLoopData = $notif['myAgendda']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <li onclick=""><a class="dropdown-item card mt-1" href="#"><?php echo e($i->text); ?> </a></li>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>

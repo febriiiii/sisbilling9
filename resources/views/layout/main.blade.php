@@ -28,14 +28,22 @@
         @include('modal.mainModal')
         @include('modal.mainModal2')
         @include('modal.mainModalSelect') 
-        
+        @if ($UIDGlob->companyid != '' && session('UIDGlob')->scrb < 1)
+            @if (session('UIDGlob')->superadmin != 1)
+                <div class="uk-alert-danger" uk-alert style="position: fixed; top:50px; right:5px;vw;z-index:99999">
+                    <a href class="uk-alert-close" uk-close></a>
+                    <p>Akun Anda Telah Habis Masa Aktif, Tolong Lakukan Pembayaran</p>
+                    <p>Jika Butuh Bantuan Hubungi CS SisBilling.</p>
+                </div>
+            @endif
+        @endif
         {{-- HATI HATI MENGINCLUDE FILE, TES SUBMIT FORM APAKAH BEKERJA, CONTOH FORM PADA PENGATURAN->PERUSAHAAN --}}
         <div class="body" style="padding-bottom:20vh; padding-top:30px;">
             <div class="container">
                 @include('loader')
                 <ul class="uk-switcher switcher-navbarCustom uk-margin">
                     <li>@include('tabs.mydashboard')</li>
-                    @if ($UIDGlob->companyid != '')
+                    @if (($UIDGlob->companyid != '' && session('UIDGlob')->scrb > 0) || session('UIDGlob')->superadmin == 1)
                     <li>@include('tabs.mycustomer')</li>
                     @endif
                     <li>@include('tabs.mybilling')</li>

@@ -223,8 +223,6 @@ class TransactionController extends Controller
                             'UserUpdate' => $userid,
                             'UpdateDT' => now(config('app.GMT')),
                         ]);
-                        $chtController = new ChatController;
-                        $chtController->GlobalPush("renderGlobal",$userid);
                     } catch (\Throwable $th) {
                         $attemptCount++;
             
@@ -236,18 +234,22 @@ class TransactionController extends Controller
             
                         goto loopDuplikat;
                     }
+                    $chtController = new ChatController;
+                    $chtController->GlobalPush("renderGlobal",$userid);
                     return true;
                 }
             }
         }
+        $chtController = new ChatController;
+        $chtController->GlobalPush("renderGlobal",$userid);
         return false;
     }
     public function getbill(){
-        $data = DB::select("SELECT t.statusid, t.notrans, t.jatuhTempoTagihan,t.SPokok + t.SBunga + t.SLateFee AS Amount, p.productName
+        $data = DB::select("SELECT t.statusid, t.notrans, t.jatuhTempoTagihan,t.SPokok + t.SBunga + t.SLateFee AS Amount, p.productName, DATEDIFF(DAY, t.jatuhTempoTagihan, GETDATE()) as selisih
                             FROM tbltrans t
                             JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
                             JOIN tblmasterproduct p ON p.productCode=a.productCode
-                            WHERE t.statusid IN (5,6,11) AND t.userid = '".session('UIDGlob')->userid."'
+                            WHERE t.SPokok + t.SBunga + t.SLateFee <> 0 AND t.statusid IN (5,6,11) AND t.userid = '".session('UIDGlob')->userid."'
                             ORDER BY text, t.jatuhTempoTagihan ASC");
         return $data;
     }
@@ -772,19 +774,19 @@ class TransactionController extends Controller
         }
     }
     public function voidtrans(Request $request){
-        $tbltrans = tbltrans::find($request->notrans);
+        $tbltrans = tbltrans::find($request->transG);
         $user = tbluser::find($tbltrans->userid);
-        if($tbltrans->companyid != $user->companyid){
+        if($tbltrans->companyid != session('UIDGlob')->companyid){
             return "tidak bisa akses!";
         }
         $tbltrans->update([
             'statusid' => 13,
-            'UserUpdate' => $user->userid,
+            'UserUpdate' => session('UIDGlob')->userid,
             'UpdateDT' => Carbon::now(config('app.GMT')),
         ]);
-        $this->cancleMID($request->notrans);
+        $this->cancleMID($request->transG);
         $this->nextTransaction($tbltrans->AppointmentId,$tbltrans->userid,$tbltrans->jatuhTempoTagihan,$user->companyid);
-        return true;
+        return "success";
     }
     private function sendMailPayment($array){
         $data = [

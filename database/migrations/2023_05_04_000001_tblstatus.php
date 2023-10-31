@@ -26,12 +26,12 @@ return new class extends Migration
             ['deskripsi' => 'park'],
             ['deskripsi' => 'Canled'],
             ['deskripsi' => 'Delete'],
-            ['deskripsi' => 'Belum Diproses'],
+            ['deskripsi' => 'Belum Bayar'], //5
             ['deskripsi' => 'Sedang Diproses Manual'],
             ['deskripsi' => 'Paid'],
             ['deskripsi' => 'Ditolak'],
             ['deskripsi' => 'read'],
-            ['deskripsi' => 'Expired'],
+            ['deskripsi' => 'Expired'], //10
             ['deskripsi' => 'Pending Midtrans'],
             ['deskripsi' => 'Transaction Rollback'],
             ['deskripsi' => 'Void Transaksi'],

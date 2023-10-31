@@ -143,7 +143,7 @@
               </lord-icon>
             </div>
           </li>
-          <?php if(session('UIDGlob')->companyid != ''): ?>
+          <?php if((session('UIDGlob')->companyid != '' && session('UIDGlob')->scrb > 0) || session('UIDGlob')->superadmin == 1): ?>
           <li class="menu__item" style="--bgColorItem: rgb(169, 209, 90);">
             <div class="navbarCustomIconX" title="Customer">
               <lord-icon

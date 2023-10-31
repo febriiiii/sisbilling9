@@ -1,4 +1,3 @@
-
     <div id="invoice-POS" style="box-shadow: 0 0 1in -0.25in rgba(0, 0, 0, 0.5);padding: 2mm;margin: 0 auto;width: 70mm;background: #FFF;">
       <center id="top">
         <div class="info" style="display: block;margin-left: 0;"> 

@@ -122,6 +122,7 @@ function payment(notrans){
 //-------------------------------------------------------------------------------------------------------------------------------------------------------
 // pusher config on-login
   var openChat = false;
+  var openAddbillpengelola = false;
 // pusher 
     const strcid = CID;
     const arrayCompany = strcid.split(',').map(item => parseInt(decodeURIComponent(item.trim().replace(/&#039;/g, ''))));

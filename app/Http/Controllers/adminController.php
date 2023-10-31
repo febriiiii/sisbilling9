@@ -23,8 +23,9 @@ class adminController extends Controller
     public function admintagihan() {
         return view('admin.tagihan');
     }
-    public function adminpembayaran() {
-        return view('admin.pembayaran');
+    public function adminpembayaran(Request $request) {
+        $userid = $request->userid;
+        return view('admin.pembayaran',compact('userid'));
     }
     public function updateisAktif(Request $request){
         tbluser::find($request->userid)->update(['isAktif' => $request->val]);
@@ -37,8 +38,14 @@ class adminController extends Controller
                     tbluser.alamatLengkap as alamatU, 
                     tblcomp.companyname, 
                     tblcomp.email as emailP, 
-                    tblcomp.companyaddress as alamatP, 
-                    'Un Link' as billAktif,
+                    tblcomp.companyaddress as alamatP,
+                    (SELECT top 1 t.notrans
+                        FROM tbltrans t
+                        JOIN tblstatus s ON t.statusid=s.statusid
+                        JOIN tbluser u ON u.userid=t.userid
+                        JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
+                        JOIN tblmasterproduct p ON p.productCode=a.productCode
+                        WHERE t.statusid != 4 AND p.isSubscribe = 1 AND t.userid=tbluser.userid) as billAktif,
                     isAktif";
         $from = "tbluser";
         $join = "JOIN tblcomp ON tblcomp.companyid=tbluser.companyid";
@@ -98,7 +105,11 @@ class adminController extends Controller
         ]);
         return true;
     }
-    public function dataPembayaran(){
+    public function dataPembayaran(Request $request){
+        $where = "";
+        if($request->userid != ''){
+            $where = " AND t.userid=".$request->userid." ";
+        }
         return DB::select("SELECT u.nama, t.notrans, t.transdate, CASE WHEN t.paymentid = 2 THEN MIDpaymenttype ELSE paymentName END AS paymentname, t.jatuhTempoTagihan,t.SPokok + t.SBunga + t.SLateFee AS Amount, s.deskripsi, p.productName
                 FROM tbltrans t
                 JOIN tblstatus s ON t.statusid=s.statusid
@@ -106,10 +117,30 @@ class adminController extends Controller
                 JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
                 JOIN tblmasterproduct p ON p.productCode=a.productCode
                 LEFT JOIN tblpaymentmethod on t.paymentid=tblpaymentmethod.paymentid
-                WHERE t.statusid != 4 AND u.companyid IS NOT NULL AND u.superadmin <> 1");
+                WHERE t.statusid != 4 AND u.companyid IS NOT NULL AND u.superadmin <> 1 {$where}");
     }
     public function subscribe(Request $request){
         $produk = tblmasterproduct::find($request->productCode);
+        $now = Carbon::now(config('app.GMT'));
+        $finishDt = DB::select("SELECT MAX(
+                                CASE 
+                                    WHEN p.duration = 'Hari' THEN DATEADD(DAY, CAST(p.rangeDuration AS INT), t.jatuhTempoTagihan)
+                                    WHEN p.duration = 'Minggu' THEN DATEADD(WEEK, CAST(p.rangeDuration AS INT), t.jatuhTempoTagihan)
+                                    WHEN p.duration = 'Bulan' THEN DATEADD(MONTH, CAST(p.rangeDuration AS INT), t.jatuhTempoTagihan)
+                                    WHEN p.duration = 'Tahun' THEN DATEADD(YEAR, CAST(p.rangeDuration AS INT), t.jatuhTempoTagihan)
+                                END ) AS FinishDate
+                                FROM tbltrans t
+                                JOIN tblstatus s ON t.statusid=s.statusid
+                                JOIN tbluser u ON u.userid=t.userid
+                                JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
+                                JOIN tblmasterproduct p ON p.productCode=a.productCode
+                                LEFT JOIN tblpaymentmethod on t.paymentid=tblpaymentmethod.paymentid
+                                WHERE t.statusid != 4 AND p.isSubscribe = 1 AND t.userid = {$request->userid}");
+        if($finishDt[0]->FinishDate != null){
+            $finishDt = Carbon::parse($finishDt[0]->FinishDate)->setTime(0, 0, 0);
+        }else{
+            $finishDt = $now;
+        }
 
         $recur ='FREQ=DAILY;COUNT=1';
         if($produk->duration == 'Minggu'){
@@ -119,7 +150,6 @@ class adminController extends Controller
         }else if($produk->duration == 'Tahun'){
             $recur ='FREQ=YEARLY;COUNT=1';
         }
-        $now = Carbon::now(config('app.GMT'));
         $agenda = [
             'Text' => $produk->productName,
             'userid' => session('UIDGlob')->userid,
@@ -134,8 +164,8 @@ class adminController extends Controller
             'lateFeePercent' => 0,
             'BungaPercent' => 0,
             'companyid' => 1,
-            'StartDate' => $now->format('Y-m-d\TH:i:s\Z'),
-            'EndDate' => $now->format('Y-m-d\TH:i:s\Z'),
+            'StartDate' => $finishDt->format('Y-m-d\TH:i:s\Z'),
+            'EndDate' => $finishDt->format('Y-m-d\TH:i:s\Z'),
             'description' => $request->Deskripsi,
             'RecurrenceRule' => $recur,
             'RecurrenceException' => '',
@@ -153,7 +183,7 @@ class adminController extends Controller
         $controller = new Controller;
         $notrans = $controller->getNoTrans(1);
         $transactionController = new TransactionController;
-        $nextDate = $transactionController->nextAppointment($agenda['StartDate'],$agenda['RecurrenceRule'],$agenda['RecurrenceException'],$now,true);
+        $nextDate = $transactionController->nextAppointment($agenda['StartDate'],$agenda['RecurrenceRule'],$agenda['RecurrenceException'],$finishDt,true);
         tbltrans::create([
             'notrans' => $notrans,
             'AppointmentId' => $apoinmentid,
@@ -168,8 +198,8 @@ class adminController extends Controller
             'SPokok' => $produk->price,
             'SBunga' => 0,
             'SLateFee' => 0,
-            'transdate' => $now,
-            'jatuhTempoTagihan' => $nextDate,
+            'transdate' => $finishDt,
+            'jatuhTempoTagihan' => $finishDt,
             'UserInsert' => auth()->user()->userid,
             'InsertDT' => now(config('app.GMT')),
             'UserUpdate' => auth()->user()->userid,
@@ -178,7 +208,26 @@ class adminController extends Controller
         $chtController = new ChatController;
         $chtController->GlobalPush("renderGlobal",$request->userid);
 
-        $tagihan = DB::select("SELECT TOP 1 t.AppointmentId, u.nama, t.notrans, t.transdate, a.description, CASE WHEN t.paymentid = 2 THEN MIDpaymenttype ELSE paymentName END AS paymentname, t.jatuhTempoTagihan,t.SPokok + t.SBunga + t.SLateFee AS Amount, s.deskripsi, p.productName
+        $tagihan = DB::select("SELECT TOP 1 t.AppointmentId, u.nama, t.notrans, t.transdate, a.description, CASE WHEN t.paymentid = 2 THEN MIDpaymenttype ELSE paymentName END AS paymentname, t.jatuhTempoTagihan,t.SPokok + t.SBunga + t.SLateFee AS Amount, s.deskripsi, p.productName,
+                                CASE 
+                                    WHEN p.duration = 'Hari' THEN DATEADD(DAY, CAST(p.rangeDuration AS INT), t.jatuhTempoTagihan)
+                                    WHEN p.duration = 'Minggu' THEN DATEADD(WEEK, CAST(p.rangeDuration AS INT), t.jatuhTempoTagihan)
+                                    WHEN p.duration = 'Bulan' THEN DATEADD(MONTH, CAST(p.rangeDuration AS INT), t.jatuhTempoTagihan)
+                                    WHEN p.duration = 'Tahun' THEN DATEADD(YEAR, CAST(p.rangeDuration AS INT), t.jatuhTempoTagihan)
+                                END AS FinishDate,
+                                CASE
+                                    WHEN GETDATE() BETWEEN t.jatuhTempoTagihan AND
+                                    (
+                                        SELECT
+                                            CASE
+                                                WHEN p.duration = 'Hari' THEN DATEADD(DAY, CAST(p.rangeDuration AS INT), t.jatuhTempoTagihan)
+                                                WHEN p.duration = 'Minggu' THEN DATEADD(WEEK, CAST(p.rangeDuration AS INT), t.jatuhTempoTagihan)
+                                                WHEN p.duration = 'Bulan' THEN DATEADD(MONTH, CAST(p.rangeDuration AS INT), t.jatuhTempoTagihan)
+                                                WHEN p.duration = 'Tahun' THEN DATEADD(YEAR, CAST(p.rangeDuration AS INT), t.jatuhTempoTagihan)
+                                            END
+                                    ) THEN 'Ya'
+                                    ELSE 'Tidak'
+                                END AS Aktif
                                 FROM tbltrans t
                                 JOIN tblstatus s ON t.statusid=s.statusid
                                 JOIN tbluser u ON u.userid=t.userid

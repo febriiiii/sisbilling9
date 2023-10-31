@@ -30,6 +30,12 @@
             }
         }).dxPopup("instance");
 
+        // Cek Jika PopUp Di Tutup
+        var popupInstance = $('#myModal2').dxPopup('instance');
+        popupInstance.on('hidden', function () {
+            // ..... 
+        });
+
         function updatePopupHeight() {
             if (DevExpress.devices.current().deviceType === "phone" || DevExpress.devices.current().deviceType === "tablet") {
                 var viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);

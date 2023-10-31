@@ -20,7 +20,7 @@
         store: {
           type: 'odata',
           cache: false,
-          url: "{{url('')}}/dataPembayaran?stamp=" + new Date().getTime(),
+          url: "{{url('')}}/dataPembayaran?userid={{$userid}}&stamp=" + new Date().getTime(),
           key: 'notrans',
           beforeSend(request) {
             request.params.SaleNo = $('#formsaleh-primary').val();
