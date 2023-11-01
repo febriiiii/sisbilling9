@@ -13,7 +13,19 @@ return new class extends Migration
      */
     public function up()
     {
-        //
+        Schema::create('tblnotif', function (Blueprint $table) {
+            $table->increments('idnotif');
+            $table->unsignedInteger('userid');
+            $table->foreign('userid')->references('userid')->on('tbluser');
+            $table->text('deskripsi')->nullable();
+            $table->text('uniqCode')->nullable();
+            $table->unsignedInteger('statusid');
+            $table->foreign('statusid')->references('statusid')->on('tblstatus');
+            $table->string('UserInsert')->nullable();
+            $table->dateTime('InsertDT')->nullable();
+            $table->string('UserUpdate')->nullable();
+            $table->dateTime('UpdateDT')->nullable();
+        });
     }
 
     /**
@@ -23,6 +35,6 @@ return new class extends Migration
      */
     public function down()
     {
-        //
+        Schema::dropIfExists('tblnotif');
     }
 };

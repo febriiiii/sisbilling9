@@ -126,6 +126,8 @@
                 </a>
             </div>
         </div>
-    
+      <center><br>
+          <a style="font-size: 1.5em; font-weight:bold;" href="{{url('/')}}">Sis Billing</a>
+      </center>
 </body>
 </html>

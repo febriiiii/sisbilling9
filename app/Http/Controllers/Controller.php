@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\tblchatd;
 use App\Models\tblcomp;
+use App\Models\tblnotif;
 use App\Models\tblpengumuman;
 use App\Models\tblproducttype;
 use App\Models\tbluser;
@@ -254,5 +255,37 @@ class Controller extends BaseController
             $notrans = $notransHeader.sprintf("%05d", $notrans); // Menggabungkan kembali nomor transaksi yang telah di-increment
         }
         return $notrans;
+    }
+
+    public function notifInsert($userid,$desc,$uniqCode){
+        $chatcontroller = new ChatController;
+        $now = Carbon::now(config('app.GMT'));
+        tblnotif::create([
+            'userid' => $userid,
+            'deskripsi' => $desc,
+            'uniqCode' => $uniqCode,
+            'statusid' => 1,
+            'UserInsert' => session('UIDGlob')->userid,
+            'InsertDT' => $now,
+            'UserUpdate' => session('UIDGlob')->userid,
+            'UpdateDT' => $now,
+        ]);
+        $chatcontroller->GlobalPush("notif",$userid);
+        return true;
+    }
+    public function notifUpdate($userid,$desc,$uniqCode){
+        $chatcontroller = new ChatController;
+        $now = Carbon::now(config('app.GMT'));
+        $ntf = tblnotif::where('uniqCode',$uniqCode)->where('statusid','!=',4)->first();
+        if(isset($ntf)){
+            $ntf->update([
+                'deskripsi' => $desc,
+                'statusid' => 1,
+                'UserUpdate' => session('UIDGlob')->userid,
+                'UpdateDT' => $now,
+            ]);
+        }
+        $chatcontroller->GlobalPush("notif",$userid);
+        return true;
     }
 }

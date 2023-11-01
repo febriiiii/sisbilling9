@@ -1,6 +1,5 @@
 <div class="dropdown headericonX">
     <a href="#" class="notification" data-mdb-toggle="dropdown">
-        
         <lord-icon
             src="https://cdn.lordicon.com/psnhyobz.json"
             trigger="click"
@@ -29,6 +28,9 @@
         <?php endif; ?>
         <?php $__currentLoopData = $notif['myAgendda']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <li onclick=""><a class="dropdown-item card mt-1" href="#"><?php echo e($i->text); ?> </a></li>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        <?php $__currentLoopData = $notif['tblnotif']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <li onclick=""><a class="dropdown-item card mt-1" href="#"><?php echo e($i->deskripsi); ?> </a></li>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         <?php $__currentLoopData = $notif['pengumuman']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <?php

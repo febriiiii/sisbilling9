@@ -139,6 +139,7 @@ class ViewtabController extends Controller
         $cid = $controller->inCidNotSelf();
         // $PAT = $controller->PAT(session('UIDGlob')->userid);
         $notif['myAgendda'] = DB::select("SELECT text FROM tblagenda WHERE userid = ".session('UIDGlob')->userid." AND isBilling = 0 AND CONVERT(VARCHAR, GETDATE(), 12) = CONVERT(VARCHAR, EndDate, 12)");
+        $notif['tblnotif'] = DB::select("SELECT * FROM tblnotif WHERE statusid NOT IN (4,9) AND userid=".session('UIDGlob')->userid);
         $notif['chat'] = DB::select("SELECT count(d.userid) AS total,d.userid,max(u.nama) AS nama, max(h.chatid) AS chatid
                                     FROM tblchat h 
                                     JOIN tblchatd d ON h.chatid=d.chatid
@@ -178,7 +179,7 @@ class ViewtabController extends Controller
                                             JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
                                             WHERE t.statusid = 6 AND t.companyid = " . $mycompanyid);
         
-        $notif['count'] = count($notif['myAgendda'])+count($notif['chat'])+count($notif['pengumuman'])+count($notif['invoice'])+count($notif['invoiceReject'])+count($notif['invoiceWaiting']);
+        $notif['count'] = count($notif['tblnotif'])+count($notif['myAgendda'])+count($notif['chat'])+count($notif['pengumuman'])+count($notif['invoice'])+count($notif['invoiceReject'])+count($notif['invoiceWaiting']);
         return view('getView.viewLonceng',compact('notif'))->render();
     }
     public function viewHeaderchat(){

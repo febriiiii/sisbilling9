@@ -1,6 +1,5 @@
 <div class="dropdown headericonX">
     <a href="#" class="notification" data-mdb-toggle="dropdown">
-        {{-- <span><img src="{{asset('public/bell-ring.png')}}" width="30" height="30"></span> --}}
         <lord-icon
             src="https://cdn.lordicon.com/psnhyobz.json"
             trigger="click"
@@ -29,6 +28,9 @@
         @endif
         @foreach ($notif['myAgendda'] as $i)
             <li onclick=""><a class="dropdown-item card mt-1" href="#">{{$i->text}} </a></li>
+        @endforeach
+        @foreach ($notif['tblnotif'] as $i)
+            <li onclick=""><a class="dropdown-item card mt-1" href="#">{{$i->deskripsi}} </a></li>
         @endforeach
         @foreach ($notif['pengumuman'] as $p)
             @php

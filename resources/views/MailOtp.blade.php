@@ -55,6 +55,10 @@
         </div>
         <div class="footer">
             <strong>Email ini dikirimkan secara otomatis. Jangan membalas email ini.</strong>
+            
+            <center><br>
+                <a style="font-size: 1.5em; font-weight:bold;" href="{{url('/')}}">Sis Billing</a>
+            </center>
         </div>
     </div>
 </body>

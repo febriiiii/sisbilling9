@@ -56,29 +56,6 @@
         @if ($UIDGlob->isTutor == 1)
             @include('tutor')
         @endif
-        {{-- <script>
-                const mobileMediaQuery = window.matchMedia("(max-width: 767px)");
-                var name = "navbarMobile"
-                if (mobileMediaQuery.matches) {
-                    name = "navbarMobile"
-                }
-                $.ajax({
-                    type: 'GET',
-                    url: '{{url("/Getnavbar")}}',
-                    data:{name},
-                    success: function(data) {
-                        $('#navbarSwitches').html(data)
-                    },
-                    error: function(xhr, status, error) {
-                        
-                    }
-                });
-        </script>
-        <div id="navbarSwitches">
-            
-        </div> --}}
-
-        {{-- @include('layout.navbar') --}}
         
         @include('layout.navbarMobile')
         @include('layout.footer')

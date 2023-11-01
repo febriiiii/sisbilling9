@@ -171,6 +171,7 @@ class TransactionController extends Controller
     }
     public function nextTransaction($AppointmentId,$userid,$lastDate,$companyid){ 
         //Loop Jika Notrans Duplikat
+        $controller = new Controller;
         $attempts = 500; // Batas percobaan maksimum
         $attemptCount = 0;
         loopDuplikat:
@@ -285,6 +286,7 @@ class TransactionController extends Controller
         // try {
             DB::beginTransaction();
             $chatcontroller = new ChatController;
+            $controller = new Controller;
             $tbltrans = tbltrans::find($request->notrans);
             $user = tbluser::find(session('UIDGlob')->userid);
             $status = 1;
@@ -306,7 +308,22 @@ class TransactionController extends Controller
                             $file->storeAs('public/user/'.$user->userid.'/notrans', $request->notrans.'.'.$exten);
                             $tbltrans->update(['statusid' => 6, 'isreject' => 0, 'paymentid' => $request->paymentid]);
                             $Up = tbluser::where('companyid',$tbltrans->companyid)->first();
-                            $chatcontroller->GlobalPush("notif",$Up->userid);
+                            
+                            $controller->notifInsert($tbltrans->userid,"Pembayaran Menunggu Persetujuan ".$tbltrans->notrans,$tbltrans->notrans);
+                            $chatcontroller->GlobalPush("renderGlobal",$Up->userid);
+                            $transMail = tbltrans::select('notrans','tblcomp.companyname','tblagenda.text','tbluser.userid','tbluser.nama','tbluser.email','tbluser.hp','tbluser.alamatSingkat','tbltrans.companyid','tbltrans.statusid','jatuhTempoTagihan','tbltrans.Pokok',DB::raw('tbltrans.SPokok + tbltrans.SBunga + tbltrans.SLateFee as Amount'),DB::raw('CONCAT(tblagenda.productCode, tblagenda.companyid) as kodebarang'))
+                                                    ->addSelect(DB::raw('(SELECT COUNT(notrans) + 1 FROM tbltrans s WHERE AppointmentId = tbltrans.AppointmentId AND userid = tbltrans.userid AND jatuhTempoTagihan <= tbltrans.jatuhTempoTagihan) as angsuran'))
+                                                    ->addSelect(DB::raw('CASE WHEN tbltrans.paymentid = 2 THEN MIDpaymenttype ELSE paymentName END AS paymentname'))
+                                                    ->join('tbluser','tbluser.userid','=','tbltrans.userid')
+                                                    ->join('tblagenda','tblagenda.AppointmentId','=','tbltrans.AppointmentId')
+                                                    ->join('tblcomp','tblcomp.companyid','=','tblagenda.companyid')
+                                                    ->join('tblpaymentmethod','tblpaymentmethod.paymentid','=','tbltrans.paymentid')
+                                                    ->where('notrans',$tbltrans->notrans)->first();
+                            $arrayMail2 = [
+                                'email' => DB::select('SELECT TOP 1 email FROM tbluser WHERE companyid = '.$tbltrans->companyid)[0]->email,
+                                'trans' => $transMail,
+                            ];
+                            $this->sendMailPayment($arrayMail2,'mailaprovepayment');
                         }else{
                             $status = 0;
                         }
@@ -323,8 +340,20 @@ class TransactionController extends Controller
                                 'UserUpdate' => $user->userid,
                                 'UpdateDT' => Carbon::now(config('app.GMT')),
                             ]);
-                            $chatcontroller->GlobalPush("notif",$tbltrans->userid);
-                            $chatcontroller->GlobalPush("renderMyBilling",$tbltrans->userid);
+                            $chatcontroller->GlobalPush("renderGlobal",$tbltrans->userid);
+                            $transMail = tbltrans::select('notrans','tblcomp.companyname','tblagenda.text','tbluser.userid','tbluser.nama','tbluser.email','tbluser.hp','tbluser.alamatSingkat','tbltrans.companyid','tbltrans.statusid','jatuhTempoTagihan','tbltrans.Pokok',DB::raw('tbltrans.SPokok + tbltrans.SBunga + tbltrans.SLateFee as Amount'),DB::raw('CONCAT(tblagenda.productCode, tblagenda.companyid) as kodebarang'))
+                                                    ->addSelect(DB::raw('(SELECT COUNT(notrans) + 1 FROM tbltrans s WHERE AppointmentId = tbltrans.AppointmentId AND userid = tbltrans.userid AND jatuhTempoTagihan <= tbltrans.jatuhTempoTagihan) as angsuran'))
+                                                    ->addSelect(DB::raw('CASE WHEN tbltrans.paymentid = 2 THEN MIDpaymenttype ELSE paymentName END AS paymentname'))
+                                                    ->join('tbluser','tbluser.userid','=','tbltrans.userid')
+                                                    ->join('tblagenda','tblagenda.AppointmentId','=','tbltrans.AppointmentId')
+                                                    ->join('tblcomp','tblcomp.companyid','=','tblagenda.companyid')
+                                                    ->join('tblpaymentmethod','tblpaymentmethod.paymentid','=','tbltrans.paymentid')
+                                                    ->where('notrans',$tbltrans->notrans)->first();
+                            $arrayMail2 = [
+                                'email' => DB::select('SELECT TOP 1 email FROM tbluser WHERE userid = '.$tbltrans->userid)[0]->email,
+                                'trans' => $transMail,
+                            ];
+                            $this->sendMailPayment($arrayMail2,'mailarejectpayment');
                         }else{
                             //KONFIRMASI PEMBAYARAN
                             $tbltrans->update(['statusid' => 7]);
@@ -343,8 +372,9 @@ class TransactionController extends Controller
                                 'UserUpdate' => $user->userid,
                                 'UpdateDT' => Carbon::now(config('app.GMT')),
                             ]);
+                            $controller->notifUpdate($tbltrans->userid,"Pembayaran Berhasil ".$tbltrans->notrans,$tbltrans->notrans);
+                            $controller->notifInsert($user->userid,"Pembayaran Berhasil ".$tbltrans->notrans,$tbltrans->notrans);
                             $this->nextTransaction($tbltrans->AppointmentId,$tbltrans->userid,$tbltrans->jatuhTempoTagihan,$user->companyid);
-                            $chatcontroller->GlobalPush("renderMyBilling",$tbltrans->userid);
                             $transMail = tbltrans::select('notrans','tblcomp.companyname','tblagenda.text','tbluser.userid','tbluser.nama','tbluser.email','tbluser.hp','tbluser.alamatSingkat','tbltrans.companyid','tbltrans.statusid','jatuhTempoTagihan','tbltrans.Pokok',DB::raw('tbltrans.SPokok + tbltrans.SBunga + tbltrans.SLateFee as Amount'),DB::raw('CONCAT(tblagenda.productCode, tblagenda.companyid) as kodebarang'))
                                                     ->addSelect(DB::raw('(SELECT COUNT(notrans) + 1 FROM tbltrans s WHERE AppointmentId = tbltrans.AppointmentId AND userid = tbltrans.userid AND jatuhTempoTagihan <= tbltrans.jatuhTempoTagihan) as angsuran'))
                                                     ->addSelect(DB::raw('CASE WHEN tbltrans.paymentid = 2 THEN MIDpaymenttype ELSE paymentName END AS paymentname'))
@@ -358,12 +388,12 @@ class TransactionController extends Controller
                                 'email' => DB::select('SELECT TOP 1 email FROM tbluser WHERE userid = '.$tbltrans->userid)[0]->email,
                                 'trans' => $transMail,
                             ];
-                            $this->sendMailPayment($arrayMail);
+                            $this->sendMailPayment($arrayMail,'mailpayment');
                             $arrayMail2 = [
                                 'email' => DB::select('SELECT TOP 1 email FROM tbluser WHERE companyid = '.$tbltrans->companyid)[0]->email,
                                 'trans' => $transMail,
                             ];
-                            // $this->sendMailPayment($arrayMail2);
+                            $this->sendMailPayment($arrayMail2,'mailpayment');
                         }
                     }else{
                         $status = 3;
@@ -538,6 +568,7 @@ class TransactionController extends Controller
         }
     }
     public function confirmPembayaranMID(Request $request){
+        $controller = new Controller;
         $transG = null;
         $snapToken = null;
         // try {
@@ -572,6 +603,8 @@ class TransactionController extends Controller
                 if (in_array($tbltrans->companyid, $cid) && $MID->status_code == '200' && $MID->transaction_status == 'settlement') {
                     //KONFIRMASI PEMBAYARAN SUCCESS
                     $this->MIDsuccess($tbltrans,$MID->payment_type,$user);
+                    $controller->notifUpdate($tbltrans->userid,"Pembayaran Berhasil ".$tbltrans->notrans,$tbltrans->notrans);
+                    $controller->notifInsert($user->userid,"Pembayaran Berhasil ".$tbltrans->notrans,$tbltrans->notrans);
                 }
                 if($MID->status_code == '201'){
                     $statusTrans = 11 ; // Pending Midtrans
@@ -673,12 +706,12 @@ class TransactionController extends Controller
             'email' => DB::select('SELECT TOP 1 email FROM tbluser WHERE userid = '.$tbltrans->userid)[0]->email,
             'trans' => $transMail,
         ];
-        $this->sendMailPayment($arrayMail);
+        $this->sendMailPayment($arrayMail,'mailpayment');
         $arrayMail2 = [
             'email' => DB::select('SELECT TOP 1 email FROM tbluser WHERE companyid = '.$tbltrans->companyid)[0]->email,
             'trans' => $transMail,
         ];
-        $this->sendMailPayment($arrayMail2);
+        $this->sendMailPayment($arrayMail2,'mailpayment');
     }
     private function MIDexpire($tbltrans,$user){
         $tblcomp = tblcomp::find($tbltrans->companyid);
@@ -788,9 +821,9 @@ class TransactionController extends Controller
         $this->nextTransaction($tbltrans->AppointmentId,$tbltrans->userid,$tbltrans->jatuhTempoTagihan,$user->companyid);
         return "success";
     }
-    private function sendMailPayment($array){
+    private function sendMailPayment($array,$type){
         $data = [
-            'type' => 'mailpayment',
+            'type' => $type,
             'trans' => $array['trans'],
         ];
         Mail::to($array['email'])->send(new SendMail($data));

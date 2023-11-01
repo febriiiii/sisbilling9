@@ -37,6 +37,14 @@ class SendMail extends Mailable
             return new Envelope(
                 subject: 'Pembayaran SisBilling',
             );
+        }else if($this->data['type'] == 'mailaprovepayment'){
+            return new Envelope(
+                subject: 'Pembayaran Menunggu Persetujuan',
+            );
+        }else if($this->data['type'] == 'mailarejectpayment'){
+            return new Envelope(
+                subject: 'Pembayaran Di Tolak Pengelola',
+            );
         }
     }
 
@@ -58,6 +66,16 @@ class SendMail extends Mailable
         }else if($this->data['type'] == 'mailpayment'){
             return new Content(
                 view: 'receipt',
+                with: $this->data,
+            );
+        }else if($this->data['type'] == 'mailaprovepayment'){
+            return new Content(
+                view: 'MailPaymentaprove',
+                with: $this->data,
+            );
+        }else if($this->data['type'] == 'mailarejectpayment'){
+            return new Content(
+                view: 'MailPaymentreject',
                 with: $this->data,
             );
         }
