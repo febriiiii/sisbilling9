@@ -1,1 +1,0 @@
-<?php /**PATH C:\xampp\htdocs\sisbilling9\resources\views/layout/footer.blade.php ENDPATH**/ ?>

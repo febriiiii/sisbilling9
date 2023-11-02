@@ -63,7 +63,8 @@ class Controller extends BaseController
                                 JOIN tbluser u ON u.userid=t.userid
                                 JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
                                 JOIN tblmasterproduct p ON p.productCode=a.productCode
-                                WHERE t.statusid != 4 AND p.isSubscribe = 1 AND t.userid={$useridQ}"));
+                                WHERE (t.statusid IN (7) OR (t.SPokok + t.SBunga + t.SLateFee < 1 AND t.statusid IN (5)))
+                                AND p.isSubscribe = 1 AND t.userid={$useridQ}"));
          
         return view('layout/main',compact('tblproducttype','cid','tblcomp','tblpengumuman'));
     }

@@ -18,7 +18,37 @@ class UserController extends Controller
     public function registerView(){
         return view('displayRegister');
     }
+    public function encrypt($text) {
+        $iv = random_bytes(16); // Generate initial vector
+        $cipherText = openssl_encrypt($text, 'AES-256-CFB', "as4s%2s&7", 0, $iv);
+        return base64_encode($iv . $cipherText); // Encode IV + ciphertext as base64
+    }
+    
+    public function decrypt($text) {
+        $data = base64_decode($text);
+        $iv = substr($data, 0, 16); // Extract IV
+        $cipherText = substr($data, 16);
+        return openssl_decrypt($cipherText, 'AES-256-CFB', "as4s%2s&7", 0, $iv);
+    }
+    public function otpSET(Request $request){
+        $otp = random_int(100000, 999999);
+        session(['otp' => $this->encrypt($otp)]); 
+        $data = [
+            'type' => 'otp',
+            'name' => $request->nama,
+            'otp' => $otp,
+        ];
+        Mail::to($request->email)->send(new SendMail($data));
+        return session('otp');
+    }
     public function register(Request $request){
+        if(session('otp') == null){
+            return redirect()->back()->withInput();
+        }
+        $decryptedOTP = $this->decrypt(session('otp'));
+        if ($request->otp != $decryptedOTP) {
+            return redirect()->back()->withErrors(['otp' => 'OTP tidak sama'])->withInput();
+        }
         $request->validate(
         [    
             'email' => 'required|email|unique:tbluser,email',
@@ -74,7 +104,7 @@ class UserController extends Controller
             session(['UIDGlob' => auth()->user()]);
             return redirect()->intended('/');
         }
-        return redirect()->back();
+        return redirect()->back()->withInput();
     }
 
     public function forgot(){

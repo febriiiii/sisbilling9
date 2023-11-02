@@ -65,6 +65,7 @@ Route::get('/registerView', [UserController::class, 'registerView'])->middleware
 Route::get('/forgot', [UserController::class, 'forgot'])->middleware('guest');
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/otp', [UserController::class, 'otp']);
+Route::get('/otpSET', [UserController::class, 'otpSET']);
 Route::post('/confirmotp', [UserController::class, 'confirmotp']);
 Route::post('/uploadimageprofile', [UserController::class, 'uploadimageprofile'])->middleware('auth');
 Route::post('/updateUser', [UserController::class, 'updateUser'])->middleware('auth');

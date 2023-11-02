@@ -1,6 +1,6 @@
 @extends('layout.blank')
 @section('content')
-<button onclick="window.history.back()" class="btn btn-primary m-3" style="padding:5px 10px 5px 5px; border-radius:100%;"><i class="las la-backspace" style="font-size: 40px;"></i></button>
+<button onclick="window.location.href='{{url('/')}}'" class="btn btn-primary m-3" style="padding:5px 10px 5px 5px; border-radius:100%;"><i class="las la-backspace" style="font-size: 40px;"></i></button>
 <div class="container" style="padding-bottom: 15vh;"> 
     <div class="container" style="margin-top:15vh; z-index:3;">
         @csrf
