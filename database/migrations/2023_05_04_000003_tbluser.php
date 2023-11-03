@@ -42,21 +42,20 @@ return new class extends Migration
         });
         
         DB::statement("ALTER TABLE tbluser ADD DEFAULT (NEWID()) FOR tokenid");
-        
 
         DB::table('tbluser')->insert([
             'statusid' => 1,
             'superadmin' => 1,
-            'email' => 'pointad21@gmail.com',
-            'nama' => 'Suport Center',
-            'hp' => '6281234567890',
-            'alamatSingkat' => 'Jl. Merdeka No. 10',
-            'alamatLengkap' => 'Jl. Merdeka No. 10, Kota Jakarta, DKI Jakarta',
+            'email' => env('MAIL_FROM_ADDRESS'),
+            'nama' => str_replace("_", " ", env('NAMA')),
+            'hp' => env('HP'),
+            'alamatSingkat' => str_replace("_", " ", env('ALAMAT_SINGKAT')),
+            'alamatLengkap' => str_replace("_", " ", env('ALAMAT_SINGKAT')),
             'isTutor' => '0',
-            'infoTambahan' => 'Suka memasak',
+            'infoTambahan' => str_replace("_", " ", env('INFO_TAMBAHAN')),
             'companyid' => 1,
             'profileImg' => 'user/avatarHalloProfile.png',
-            'password' => Hash::make('admadm'),
+            'password' => Hash::make(env('PASLOGIN')),
             'UserInsert' => 'system',
             'InsertDT' => now(),
             'UserUpdate' => 'system',

@@ -31,16 +31,8 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-Route::put('/dd', function (Request $request) {
-    
-    return true;
-});
-Route::get('/otpC', function () {
-    $data = [
-        'name' => 'febri risnandi',
-        'otp' => '123456'
-    ];
-    return view('otp', $data);
+Route::get('/dd', function (Request $request) {
+    return view('MailTagihan');
 });
 // MAIL
 Route::get('/aprovalfile', [MailController::class, 'aprovalfile'])->name('aprovalfile');

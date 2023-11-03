@@ -58,6 +58,7 @@ class AgendaController extends Controller
             $product = tblmasterproduct::select('productCode','productName')
                         ->where('statusid','!=', 4)
                         ->where('companyid', session('UIDGlob')->companyid)
+                        ->where('isSubscribe',0)
                         ->get();
         return $product;
     }

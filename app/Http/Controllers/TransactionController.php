@@ -840,17 +840,24 @@ class TransactionController extends Controller
             SLateFee = LateFee * IIF(DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP) > 0, DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP),0),
             SPokok = Pokok WHERE statusid = 5");
             
-            $tbltranss = tbltrans::where('onEOD',1)->where('statusid',4)->get();
+            $tbltranss = tbltrans::select('tbltrans.userid','tbltrans.notrans')
+            ->join('tblagenda','tblagenda.AppointmentId','=','tbltrans.AppointmentId')
+            ->join('tblmasterproduct','tblmasterproduct.productCode','=','tblagenda.productCode')
+            ->where('tbltrans.onEOD',1)->where('tbltrans.statusid',4)->where('tblmasterproduct.isSubscribe','<>',1)
+            ->get();
             foreach ($tbltranss as $tbltrans) {
-                $user = tbltrans::find($tbltrans->userid);
-                $this->MIDexpire($tbltrans,$user);
+                $user = tbluser::find($tbltrans->userid);
+                $MID = $this->cekstatusMID($tbltrans->notrans);
+                if($MID->status_code == 407){// Expire midtrans
+                    $this->MIDexpire($tbltrans,$user);
+                }
             }
             DB::update("UPDATE tbltrans SET onEOD = 0");
             $tblagenda = collect(DB::select("SELECT a.AppointmentId, t.companyid, t.userid, t.notrans,t.transdate,t.jatuhTempoTagihan,a.StartDate,a.RecurrenceRule,a.RecurrenceException FROM tblagenda a
                                             JOIN (SELECT AppointmentId, userid, companyid, MAX(notrans) AS notrans,MAX(transdate) AS transdate, max(jatuhTempoTagihan) as jatuhTempoTagihan FROM tbltrans
                                                     WHERE statusid <> 4
                                                     GROUP BY companyid, userid, AppointmentId) AS t ON a.AppointmentId=t.AppointmentId
-                                            WHERE productCode IS NOT NULL and isBilling = 1
+                                            WHERE productCode IS NOT NULL AND isBilling = 1
                                             AND a.statusid <> 4"));
             foreach ($tblagenda as $agenda) {
                 $nextDate = $this->nextAppointment($agenda->StartDate,$agenda->RecurrenceRule,$agenda->RecurrenceException,$agenda->transdate,false);
@@ -861,6 +868,24 @@ class TransactionController extends Controller
                 }
             }
             tblsyspara::first()->update(['sysDate' => Carbon::now(config('app.GMT'))]);
+            $sendTagihan = DB::select("SELECT u.email,u.nama, FORMAT(CONVERT(DATETIME, jatuhTempoTagihan), 'dd MMM yyyy') AS jatuhTempoTagihan, SPokok+SBunga+SLateFee AS Amount, p.productName
+                                        FROM tbltrans t
+                                        JOIN tbluser u ON u.userid=t.userid
+                                        JOIN tblagenda a ON a.AppointmentId=t.AppointmentId 
+                                        JOIN tblmasterproduct p ON a.productCode=p.productCode
+                                        WHERE t.statusid <> 4
+                                        AND (
+                                            CONVERT(DATE, DATEADD(day, -7, GETDATE())) = CONVERT(DATE, jatuhTempoTagihan) 
+                                            OR CONVERT(DATE, DATEADD(day, -1, GETDATE())) = CONVERT(DATE, jatuhTempoTagihan) 
+                                            OR CONVERT(DATE, GETDATE()) = CONVERT(DATE, jatuhTempoTagihan) 
+                                            )");
+            foreach ($sendTagihan as $st) {
+                $arrayMail2 = [
+                    'email' => $st->email,
+                    'trans' => $st,
+                ];
+                $this->sendMailPayment($arrayMail2,'reminderTagihan');
+            }
             return true;
         }
     }
