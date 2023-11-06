@@ -1,4 +1,8 @@
 
+
+
+<script src="<?php echo e(env('linkHeader')); ?>" data-client-key="<?php echo e($clientKey); ?>"></script>
+
 <style>
     #dropzone-external {
   width: fit-content;
@@ -99,6 +103,7 @@
         <div class="onpay row">
             <button type="submit" class="col-5 btn btn-success mt-4" name="reject" value="0">Bayar Tagihan</button>
             <div class="col-2"></div>
+            <?php if($isMID == 1): ?>
             <button id="gatewayClose" <?php if($trans->statusid == 11): ?> style="display: none;" <?php endif; ?> type="button" class="col-5 btn btn-primary mt-4" onclick="payGateway(event)" name="reject" value="0">Gunakan Payment Gateway</button>
             <div id="gatewayOpen" class="col-sm-5 mt-4" <?php if($trans->statusid != 11): ?> style="display: none;" <?php endif; ?>>
                 <div class="btn-group" style="width: 110%;">
@@ -106,6 +111,7 @@
                     <button type="button" onclick="payExpire()" class="btn btn-danger">Tutup Pembayaran</button>
                 </div>
             </div>
+            <?php endif; ?>
         </div>
         <?php else: ?>
         <div class="onpay">

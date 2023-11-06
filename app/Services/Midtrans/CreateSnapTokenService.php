@@ -8,9 +8,9 @@ class CreateSnapTokenService extends Midtrans
 {
     protected $order;
 
-    public function __construct($order)
+    public function __construct($order,$conf)
     {
-        parent::__construct();
+        parent::__construct($conf);
 
         $this->order = $order;
     }

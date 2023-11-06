@@ -1,3 +1,7 @@
+{{-- MIDTRANS --}}
+{{-- <script src="https://app.midtrans.com/snap/snap.js" data-client-key="{{ $clientKey }}"></script> --}}
+
+<script src="{{env('linkHeader')}}" data-client-key="{{ $clientKey }}"></script>
 
 <style>
     #dropzone-external {
@@ -118,6 +122,7 @@
         <div class="onpay row">
             <button type="submit" class="col-5 btn btn-success mt-4" name="reject" value="0">Bayar Tagihan</button>
             <div class="col-2"></div>
+            @if ($isMID == 1)
             <button id="gatewayClose" @if ($trans->statusid == 11) style="display: none;" @endif type="button" class="col-5 btn btn-primary mt-4" onclick="payGateway(event)" name="reject" value="0">Gunakan Payment Gateway</button>
             <div id="gatewayOpen" class="col-sm-5 mt-4" @if ($trans->statusid != 11) style="display: none;" @endif>
                 <div class="btn-group" style="width: 110%;">
@@ -125,6 +130,7 @@
                     <button type="button" onclick="payExpire()" class="btn btn-danger">Tutup Pembayaran</button>
                 </div>
             </div>
+            @endif
         </div>
         @else
         <div class="onpay">

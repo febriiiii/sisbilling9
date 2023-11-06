@@ -120,6 +120,25 @@
             </div>
             <button id="myprofile_savepass" type="button" class="btn btn-primary mt-2" style="right:0;" disabled>Konfirmasi Password</button>
         </div>
+        @if (session('UIDGlob')->companyid != '')
+        <div style="max-width: 500px">
+            <hr>
+            <h4>Midtrans (Gateway)</h4>
+            <div class="form-outline mt-3">
+                <input type="password" id="clientKey" class="form-control seemid" value="{{$tblcomp['Client_Key']}}" readonly/>
+                <label class="form-label" for="clientKey">Client Key</label>
+            </div>
+            <div class="form-outline mt-3">
+                <input type="password" id="ServerKey" class="form-control seemid" value="{{$tblcomp['Server_Key']}}" readonly/>
+                <label class="form-label" for="ServerKey">Server Key</label>
+            </div>
+            <div class="form-outline mt-3">
+                <input type="password" id="IDMerchat" class="form-control seemid" value="{{$tblcomp['Merchant_ID']}}" readonly/>
+                <label class="form-label" for="IDMerchat">Merchant ID</label>
+            </div>
+            <button onclick="toggleSeeMID()" class="btn btn-info mt-2" id="seemid">Lihat</button> <!-- Tombol untuk mengganti tipe input -->
+        </div>
+        @endif
     </center>
     <hr>
     <h4>Pengaturan</h4>
@@ -142,6 +161,16 @@
                     <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    @if (session('UIDGlob')->companyid == '')
+                    <div class='mt-3'>
+                        <label class='form-label' for='myprofile_companynameP'>Subsribe</label>
+                        <select name="subscribe" id="myprofile_subscribe" class="form-select" style="background-color: red;color:white;font-weight:bold;">
+                            @foreach ($paket as $p)
+                                <option value="{{$p->productCode}}">{{$p->productName}} {{number_format($p->price,2)}}  disc {{$p->disc}}% ({{number_format($p->price - ($p->price * $p->disc / 100),2)}})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @endif
                     <div class='mt-3'>
                         <label class='form-label' for='myprofile_companynameP'>Nama Perusahaan</label>
                         <input type='text' id='myprofile_companynameP' class='form-control' name='companyname' value="{{$tblcomp['companyname']}}" required/>
@@ -181,7 +210,7 @@
                     <button type="submit" class="btn btn-primary">Simpan</button>
                     @else
                     <button type="submit" class="col-12 btn btn-danger" name="subscribe" value="1">Subscribe</button>
-                    <a href="https://api.whatsapp.com/send?phone={{App\Models\tbluser::find(1)->hp}}" target="_blank" class="col-12 btn btn-outline-secondary">
+                    <a href="https://api.whatsapp.com/send?phone={{App\Models\tbluser::find(1)->hp}}" target="_blank" class="col-12 btn btn-outline-secondary" style="height: 35px;">
                         <i class="fab fa-whatsapp"></i> Follow Up? <span style="color:red; font-size:0.8em;">*Menunggu Persetujuan Admin Sis Billing</span>
                     </a>
                     @endif
@@ -191,6 +220,18 @@
     </div>  
 </div>
 <script>
+    function toggleSeeMID() {
+        var inputs = document.querySelectorAll('.seemid');
+        inputs.forEach(function(input) {
+            if (input.type === 'password') {
+                input.type = 'text'; // Ganti ke tipe teks
+                $('#seemid').text("Sembunyikan")
+            } else {
+                input.type = 'password'; // Ganti ke tipe sandi (password)
+                $('#seemid').text("Lihat")
+            }
+        });
+    }
     function opnmdlcustomer(){
         $.ajax({
             type: 'GET',
@@ -304,8 +345,11 @@
                 xhr.setRequestHeader('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
             },
             success: function(data) {
-                showNty(data)
+                showNty(data,10000)
                 $('#loader').hide('slow')
+                setTimeout(() => {
+                    window.location.href = '{{url("/")}}'
+                }, 10000);
             },
             error: function(xhr, status, error) {
                 showNty(error,10000)

@@ -29,11 +29,11 @@
 <link href="<?php echo e(asset('public/noty/lib/noty.css')); ?>" rel="stylesheet">
 <script src="<?php echo e(asset('public/noty/lib/noty.js')); ?>" type="text/javascript"></script>
 
-<script src="<?php echo e(env('linkHeader')); ?>" data-client-key="<?php echo e(config('app.clientKey')); ?>"></script>
 
 
 
 <script src="<?php echo e(asset('public/js/headerscript.js')); ?>" type="text/javascript"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 <?php /**PATH C:\xampp\htdocs\sisbilling9\resources\views/layout/headerlink.blade.php ENDPATH**/ ?>

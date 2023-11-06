@@ -28,11 +28,11 @@
 {{-- noty --}}
 <link href="{{asset('public/noty/lib/noty.css')}}" rel="stylesheet">
 <script src="{{asset('public/noty/lib/noty.js')}}" type="text/javascript"></script>
-{{-- MIDTRANS --}}
-<script src="{{env('linkHeader')}}" data-client-key="{{ config('app.clientKey') }}"></script>
+
 {{-- PWA --}}
 {{-- <link rel="manifest" href="{{url('/manifest.json')}}"> --}}
 {{-- headerscript --}}
 <script src="{{asset('public/js/headerscript.js')}}" type="text/javascript"></script>
 {{-- HTML2CANVAS --}}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+

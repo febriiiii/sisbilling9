@@ -24,6 +24,8 @@ class MailController extends Controller
                 'UpdateDT' => Carbon::now(config('app.GMT')),
             ]);
             tbluser::find($request->userid)->update(['companyid' => $tblcomp]);
+            $adminController = new adminController;
+            $adminController->createSubscribe($request->subscribe,$request->userid);
             return view('success');
         }
         return "<h1>EMAIL ".$request->email." TELAH DIGUNAKAN<h1>";

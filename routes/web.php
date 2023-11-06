@@ -34,6 +34,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/dd', function (Request $request) {
     return view('MailTagihan');
 });
+Route::get('/encriipie', function (Request $request) {
+    $iv = random_bytes(16); // Generate initial vector
+    $cipherText = openssl_encrypt($request->text, 'AES-256-CFB', "as4s%2s&7", 0, $iv);
+    return base64_encode($iv . $cipherText); // Encode IV + ciphertext as base64
+});
 // MAIL
 Route::get('/aprovalfile', [MailController::class, 'aprovalfile'])->name('aprovalfile');
 

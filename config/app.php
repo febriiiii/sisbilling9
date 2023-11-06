@@ -220,6 +220,7 @@ return [
     'PUSHER_APP_CLUSTER' => 'ap1',
     'GMT' => '+7',
 
+    'merchanKey' => env('Merchant_ID'),
     'serverKey' => env('Server_Key'),
     'clientKey' => env('Client_Key'),
     'isProduction' => env('isProduction'),

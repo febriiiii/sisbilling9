@@ -120,7 +120,10 @@ class adminController extends Controller
                 WHERE t.statusid != 4 AND u.companyid IS NOT NULL AND u.superadmin <> 1 {$where}");
     }
     public function subscribe(Request $request){
-        $produk = tblmasterproduct::find($request->productCode);
+        $this->createSubscribe($request->productCode,$request->userid);
+    }
+    public function createSubscribe($productCode,$userid){
+        $produk = tblmasterproduct::find($productCode);
         $now = Carbon::now(config('app.GMT'));
         $finishDt = DB::select("SELECT MAX(
                                 CASE 
@@ -135,7 +138,7 @@ class adminController extends Controller
                                 JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
                                 JOIN tblmasterproduct p ON p.productCode=a.productCode
                                 LEFT JOIN tblpaymentmethod on t.paymentid=tblpaymentmethod.paymentid
-                                WHERE t.statusid != 4 AND p.isSubscribe = 1 AND t.userid = {$request->userid}");
+                                WHERE t.statusid != 4 AND p.isSubscribe = 1 AND t.userid = {$userid}");
         if($finishDt[0]->FinishDate != null){
             $finishDt = Carbon::parse($finishDt[0]->FinishDate)->setTime(0, 0, 0);
         }else{
@@ -152,21 +155,21 @@ class adminController extends Controller
         }
         $agenda = [
             'Text' => $produk->productName,
-            'userid' => session('UIDGlob')->userid,
-            'UserInsert' => session('UIDGlob')->userid,
-            'UserUpdate' => session('UIDGlob')->userid,
+            'userid' => 1,
+            'UserInsert' => 1,
+            'UserUpdate' => 1,
             'InsertDT' => $now,
             'UpdateDT' => $now,
             'statusid' => 1,
             'isBilling' => 1,
-            'productCode' => $request->productCode,
+            'productCode' => $productCode,
             'Pokok' => $produk->price,
             'lateFeePercent' => 0,
             'BungaPercent' => 0,
             'companyid' => 1,
             'StartDate' => $finishDt->format('Y-m-d\TH:i:s\Z'),
             'EndDate' => $finishDt->format('Y-m-d\TH:i:s\Z'),
-            'description' => $request->Deskripsi,
+            'description' => $produk->productName,
             'RecurrenceRule' => $recur,
             'RecurrenceException' => '',
             'all_day' => 1,
@@ -174,21 +177,19 @@ class adminController extends Controller
         $apoinmentid = tblagenda::insertGetId($agenda);
 
         tblbilling::create([
-            'userid' => $request->userid,
+            'userid' => $userid,
             'AppointmentId' => $apoinmentid,
             'statusid' => 1,
-            'UserInsert' => session('UIDGlob')->userid,
+            'UserInsert' => 1,
             'InsertDT' => $now,
         ]);
         $controller = new Controller;
         $notrans = $controller->getNoTrans(1);
-        $transactionController = new TransactionController;
-        $nextDate = $transactionController->nextAppointment($agenda['StartDate'],$agenda['RecurrenceRule'],$agenda['RecurrenceException'],$finishDt,true);
         tbltrans::create([
             'notrans' => $notrans,
             'AppointmentId' => $apoinmentid,
             'companyid' => 1,
-            'userid' => $request->userid,
+            'userid' => $userid,
             'statusid' => 5,
             'SisaPok' => $produk->price,
             'Pokok' => $produk->price,
@@ -200,13 +201,13 @@ class adminController extends Controller
             'SLateFee' => 0,
             'transdate' => $finishDt,
             'jatuhTempoTagihan' => $finishDt,
-            'UserInsert' => auth()->user()->userid,
+            'UserInsert' => 1,
             'InsertDT' => now(config('app.GMT')),
-            'UserUpdate' => auth()->user()->userid,
+            'UserUpdate' => 1,
             'UpdateDT' => now(config('app.GMT')),
         ]);
         $chtController = new ChatController;
-        $chtController->GlobalPush("renderGlobal",$request->userid);
+        $chtController->GlobalPush("renderGlobal",$userid);
 
         $tagihan = DB::select("SELECT TOP 1 t.AppointmentId, u.nama, t.notrans, t.transdate, a.description, CASE WHEN t.paymentid = 2 THEN MIDpaymenttype ELSE paymentName END AS paymentname, t.jatuhTempoTagihan,t.SPokok + t.SBunga + t.SLateFee AS Amount, s.deskripsi, p.productName,
                                 CASE 

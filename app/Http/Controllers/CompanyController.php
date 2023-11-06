@@ -19,15 +19,39 @@ class CompanyController extends Controller
             }
         }
         if($request->companyid == ""){
-            $request['userid'] = session('UIDGlob')->userid;
-            $request['companyid'] = "Pending Approval";
-            $data = [
-                'type' => 'subscribe',
-                'request' => json_encode($request->all()),
-                'url' => url('') . '/aprovalfile?' . http_build_query($request->all()),
-            ];
-            $masterUser = tbluser::find(1);
-            Mail::to($masterUser->email)->send(new SendMail($data));
+            //BY APROVE
+            // $request['userid'] = session('UIDGlob')->userid;
+            // $request['companyid'] = "Pending Approval";
+            // $data = [
+            //     'type' => 'subscribe',
+            //     'request' => json_encode($request->all()),
+            //     'url' => url('') . '/aprovalfile?' . http_build_query($request->all()),
+            // ];
+            // $masterUser = tbluser::find(1);
+            // Mail::to($masterUser->email)->send(new SendMail($data));
+
+            //LANGSUNG BAYAR
+            if(null == tblcomp::where('email',$request->email)->first()){
+                $tblcomp = tblcomp::insertGetId([
+                    'statusid' => 1,
+                    'companyname' => $request->companyname,
+                    'companyaddress' => $request->companyaddress,
+                    'email' => $request->email,
+                    'hp' => $request->hp,
+                    'producttypeArray' => json_encode($request->producttypeArray),
+                    'UserInsert' => auth()->user()->userid,
+                    'UserUpdate' => auth()->user()->userid,
+                    'InsertDT' => Carbon::now(config('app.GMT')),
+                    'UpdateDT' => Carbon::now(config('app.GMT')),
+                ]);
+                tbluser::find(auth()->user()->userid)->update(['companyid' => $tblcomp]);
+                $adminController = new adminController;
+                $adminController->createSubscribe($request->subscribe,auth()->user()->userid);
+
+                session(['UIDGlob' => tbluser::find(auth()->user()->userid)]);
+                return view('success');
+            }
+
             $msg="Success";
             
         }else{

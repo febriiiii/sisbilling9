@@ -61,5 +61,8 @@
         <?php echo $__env->make('layout.footer', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
         <?php echo $__env->make('layout.footerlink', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
     </body>
+    <script>
+        alert('jika issucbscribe load ulang')
+    </script>
 </html>
 <?php /**PATH C:\xampp\htdocs\sisbilling9\resources\views/layout/main.blade.php ENDPATH**/ ?>

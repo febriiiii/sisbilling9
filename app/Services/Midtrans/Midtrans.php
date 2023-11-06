@@ -10,12 +10,12 @@ class Midtrans {
     protected $isSanitized;
     protected $is3ds;
 
-    public function __construct()
+    public function __construct($conf)
     {
-        $this->serverKey = config('app.serverKey');
-        $this->isProduction = config('app.isProduction');
-        $this->isSanitized = config('app.isSanitized');
-        $this->is3ds = config('app.is3ds');
+        $this->serverKey = $conf['serverKey'];
+        $this->isProduction = $conf['isProduction'];
+        $this->isSanitized = $conf['isSanitized'];
+        $this->is3ds = $conf['is3ds'];
 
         $this->_configureMidtrans();
     }

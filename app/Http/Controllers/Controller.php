@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\tblchatd;
 use App\Models\tblcomp;
+use App\Models\tblmasterproduct;
 use App\Models\tblnotif;
 use App\Models\tblpengumuman;
 use App\Models\tblproducttype;
 use App\Models\tbluser;
+use App\Services\Midtrans\CreateSnapTokenService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -24,6 +26,7 @@ class Controller extends BaseController
     use AuthorizesRequests, ValidatesRequests;
 
     public function index(){
+        $controller = new Controller;
         $tblproducttype = tblproducttype::where('statusid','!=',4)->where('companyid',1)->get();
         $tblcomp = tblcomp::where('companyid',session('UIDGlob')->companyid)->first();
         $tblcomp = [
@@ -34,6 +37,9 @@ class Controller extends BaseController
             'hp' => isset($tblcomp->hp)? $tblcomp->hp : '',
             'companyaddress' => isset($tblcomp->companyaddress)? $tblcomp->companyaddress : '',
             'producttypeArray' => isset($tblcomp->producttypeArray)? $tblcomp->producttypeArray : '',
+            'Server_Key' => isset($tblcomp->Server_Key)? $this->decrypt($tblcomp->Server_Key) : 'Hub CS Sisbilling untuk Mengisi ini',
+            'Client_Key' => isset($tblcomp->Client_Key)? $this->decrypt($tblcomp->Client_Key) : 'Hub CS Sisbilling untuk Mengisi ini',
+            'Merchant_ID' => isset($tblcomp->Merchant_ID)? $this->decrypt($tblcomp->Merchant_ID) : 'Hub CS Sisbilling untuk Mengisi ini',
         ];
         
         $cid = $this->inCidSelf();
@@ -65,8 +71,8 @@ class Controller extends BaseController
                                 JOIN tblmasterproduct p ON p.productCode=a.productCode
                                 WHERE (t.statusid IN (7) OR (t.SPokok + t.SBunga + t.SLateFee < 1 AND t.statusid IN (5)))
                                 AND p.isSubscribe = 1 AND t.userid={$useridQ}"));
-         
-        return view('layout/main',compact('tblproducttype','cid','tblcomp','tblpengumuman'));
+        $paket = tblmasterproduct::where('isSubscribe',1)->where('price','>',1)->get();
+        return view('layout/main',compact('tblproducttype','cid','tblcomp','tblpengumuman','paket'));
     }
     public function inCidSelf(){
         $arr = explode(',', session('UIDGlob')->companyidArray);
@@ -241,10 +247,10 @@ class Controller extends BaseController
 
         $notrans = $notransHeader.sprintf("%05d", $lastTrans[0]->maxNotrans);
         $TransactionController = new TransactionController;
-        while ($TransactionController->cekstatusMID($notrans)->status_code != 404) {
-            if($TransactionController->cekstatusMID($notrans)->status_code == 401){
+        while ($TransactionController->cekstatusMID($notrans,$companyid)->status_code != 404) {
+            if($TransactionController->cekstatusMID($notrans,$companyid)->status_code == 401){
                 dd(
-                    $TransactionController->cekstatusMID($notrans), 
+                    $TransactionController->cekstatusMID($notrans,$companyid), 
                     config('app.serverKey'), 
                     "base64_encode : " . base64_encode(config('app.serverKey').':'), 
                     config('app.URLmidv2'),
@@ -288,5 +294,28 @@ class Controller extends BaseController
         }
         $chatcontroller->GlobalPush("notif",$userid);
         return true;
+    }
+    public function encrypt($text) {
+        $iv = random_bytes(16); // Generate initial vector
+        $cipherText = openssl_encrypt($text, 'AES-256-CFB', "as4s%2s&7", 0, $iv);
+        return base64_encode($iv . $cipherText); // Encode IV + ciphertext as base64
+    }
+    
+    public function decrypt($text) {
+        $data = base64_decode($text);
+        $iv = substr($data, 0, 16); // Extract IV
+        $cipherText = substr($data, 16);
+        return openssl_decrypt($cipherText, 'AES-256-CFB', "as4s%2s&7", 0, $iv);
+    }
+    public function MIDConf($trans,$companyid){
+        $comp = tblcomp::find($companyid);
+        $conf['serverKey'] = $this->decrypt($comp->Server_Key);
+        $conf['isProduction'] = config('app.isProduction');
+        $conf['isSanitized'] = config('app.isSanitized');
+        if($companyid == 1){
+            $conf['isProduction'] = true;
+        }
+        $conf['is3ds'] = config('app.is3ds');
+        return new CreateSnapTokenService($trans,$conf);
     }
 }

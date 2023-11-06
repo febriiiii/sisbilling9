@@ -51,7 +51,7 @@ endif;
 unset($__errorArgs, $__bag); ?>
                       <div class="row" style="margin:0;">
                           <div class="form-outline col mt-3">
-                              <input name="otp" type="text" id="displayRegister_otp" class="form-control" />
+                              <input name="otp" type="text" id="displayRegister_otp" class="form-control" autocomplete="off"/>
                               <label class="form-label" for="displayRegister_otp">Email OTP</label>
                           </div>
                           <div style="width: 5px;"></div>

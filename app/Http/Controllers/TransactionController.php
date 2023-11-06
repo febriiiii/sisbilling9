@@ -7,12 +7,9 @@ use App\Models\tblcomp;
 use App\Models\tblpaymentmethod;
 use App\Models\tblpaymenttrans;
 use App\Models\tbltrans;
-use App\Services\Midtrans\CreateSnapTokenService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendMail;
@@ -21,7 +18,6 @@ use App\Models\tblsyspara;
 use App\Models\tbluser;
 use DateInterval;
 use GuzzleHttp\Client;
-use Symfony\Component\Translation\Extractor\Visitor\TransMethodVisitor;
 
 class TransactionController extends Controller
 {
@@ -481,7 +477,7 @@ class TransactionController extends Controller
             if(isset($request->type)){
                 $this->expirePayment($request->order_id,$user);
             }
-            $MID = $this->cekstatusMID($request->order_id);
+            $MID = $this->cekstatusMID($request->order_id,$tbltrans->companyid);
             if($MID->status_code == 404){// 404 TRANSAKSI TIDAK DITEMUKAN
                 $trans = tbltrans::select('notrans','tblcomp.companyname','tblagenda.text','tbluser.userid','tbluser.nama','tbluser.email','tbluser.hp','tbluser.alamatSingkat','tbltrans.companyid','tbltrans.statusid','jatuhTempoTagihan','tbltrans.Pokok',DB::raw('tbltrans.SPokok + tbltrans.SBunga + tbltrans.SLateFee as Amount'),DB::raw('CONCAT(tblagenda.productCode, tblagenda.companyid) as kodebarang'))
                                 ->addSelect(DB::raw('(SELECT COUNT(notrans) FROM tbltrans s WHERE AppointmentId = tbltrans.AppointmentId AND userid = tbltrans.userid AND jatuhTempoTagihan <= tbltrans.jatuhTempoTagihan) as angsuran'))
@@ -489,7 +485,8 @@ class TransactionController extends Controller
                                 ->join('tblagenda','tblagenda.AppointmentId','=','tbltrans.AppointmentId')
                                 ->join('tblcomp','tblcomp.companyid','=','tblagenda.companyid')
                                 ->where('notrans',$request->order_id)->first();
-                $midtrans = new CreateSnapTokenService($trans);
+                $confMID = new Controller;
+                $midtrans = $confMID->MIDConf($trans,$trans->companyid);
                 $snapToken = $midtrans->getSnapToken();
                 $tbltrans->update(['snap_token' => $snapToken]);
                 $data['type'] = "midtransHook";
@@ -518,7 +515,7 @@ class TransactionController extends Controller
                 }
                 if($MID->status_code == 407){// Expire midtrans
                     $trans = $this->MIDexpire($tbltrans,$user);
-                    $MID = $this->cekstatusMID($request->order_id);
+                    $MID = $this->cekstatusMID($request->order_id,$tbltrans->companyid);
                     $transG = $trans->notrans;
                     $snapToken = $trans->snapToken;
                     $statusTrans = 4;
@@ -579,7 +576,7 @@ class TransactionController extends Controller
             if(isset($request->type)){
                 $this->expirePayment($request->notrans,$user);
             }
-            $MID = $this->cekstatusMID($request->notrans);
+            $MID = $this->cekstatusMID($request->notrans,$tbltrans->companyid);
             if($MID->status_code == 404){// 404 TRANSAKSI TIDAK DITEMUKAN
                 $trans = tbltrans::select('notrans','tblcomp.companyname','tblagenda.text','tbluser.userid','tbluser.nama','tbluser.email','tbluser.hp','tbluser.alamatSingkat','tbltrans.companyid','tbltrans.statusid','jatuhTempoTagihan','tbltrans.Pokok',DB::raw('tbltrans.SPokok + tbltrans.SBunga + tbltrans.SLateFee as Amount'),DB::raw('CONCAT(tblagenda.productCode, tblagenda.companyid) as kodebarang'))
                                 ->addSelect(DB::raw('(SELECT COUNT(notrans) FROM tbltrans s WHERE AppointmentId = tbltrans.AppointmentId AND userid = tbltrans.userid AND jatuhTempoTagihan <= tbltrans.jatuhTempoTagihan) as angsuran'))
@@ -587,7 +584,8 @@ class TransactionController extends Controller
                                 ->join('tblagenda','tblagenda.AppointmentId','=','tbltrans.AppointmentId')
                                 ->join('tblcomp','tblcomp.companyid','=','tblagenda.companyid')
                                 ->where('notrans',$request->notrans)->first();
-                $midtrans = new CreateSnapTokenService($trans);
+                $confMID = new Controller;
+                $midtrans = $confMID->MIDConf($trans,$trans->companyid);
                 $snapToken = $midtrans->getSnapToken();
                 tbltrans::find($request->notrans)->update(['snap_token' => $snapToken]);
                 return [
@@ -613,7 +611,7 @@ class TransactionController extends Controller
                 }
                 if($MID->status_code == 407){// Expire midtrans
                     $trans = $this->MIDexpire($tbltrans,$user);
-                    $MID = $this->cekstatusMID($request->notrans);
+                    $MID = $this->cekstatusMID($request->notrans,$tbltrans->companyid);
                     $transG = $trans->notrans;
                     $snapToken = $trans->snapToken;
                     $statusTrans = 4;
@@ -653,11 +651,13 @@ class TransactionController extends Controller
     }
     private function expirePayment($notrans,$user)
     {
+        $controller = new Controller;
         try {
             $client = new Client(); 
             $url = config('app.URLmidv2').$notrans."/expire";
+            $srvK = tblcomp::find(tbltrans::find($notrans)->companyid)->Server_Key;
             $headers = [
-                'Authorization' => 'Basic ' . base64_encode(config('app.serverKey') . ':'),
+                'Authorization' => 'Basic ' . base64_encode($controller->decrypt($srvK) . ':'),
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
             ];
@@ -720,7 +720,7 @@ class TransactionController extends Controller
                                     FROM tbltrans
                                     WHERE notrans LIKE '".$notransHeader."%'");
         $notrans = $notransHeader.sprintf("%05d", $lastTrans[0]->maxNotrans);
-        while ($this->cekstatusMID($notrans)->status_code != 404) {
+        while ($this->cekstatusMID($notrans,$tbltrans->companyid)->status_code != 404) {
             $notrans = intval(substr($notrans, strlen($notransHeader))); // Mengambil angka dari nomor transaksi
             $notrans++; // Increment nomor transaksi jika sudah dipakai di MIDTRANS
             $notrans = $notransHeader.sprintf("%05d", $notrans); // Menggabungkan kembali nomor transaksi yang telah di-increment
@@ -754,17 +754,20 @@ class TransactionController extends Controller
         ->join('tblcomp','tblcomp.companyid','=','tblagenda.companyid')
         ->where('notrans',$notrans)->first();
 
-        $midtrans = new CreateSnapTokenService($trans);
+        $confMID = new Controller;
+        $midtrans = $confMID->MIDConf($trans,$trans->companyid);
         $trans->snapToken = $midtrans->getSnapToken();
         $transNew->update(['snap_token' => $trans->snapToken]);
         return $trans;
     }
-    public function cekstatusMID($notrans){
+    public function cekstatusMID($notrans,$companyid){
+        $controller = new Controller;
         $url = config('app.URLmidv2').$notrans.'/status';
+        $srvK = tblcomp::find($companyid)->Server_Key;
         $headers = array(
             'Accept: application/json',
             // 'Authorization: Basic U0ItTWlkLXNlcnZlci03STQ3NGV6QUE4QXZiejlzT0VHTW81bnc6'
-            'Authorization: Basic ' . base64_encode(config('app.serverKey') . ':')
+            'Authorization: Basic ' . base64_encode($controller->decrypt($srvK) . ':')
         );
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
@@ -781,12 +784,13 @@ class TransactionController extends Controller
         }
     }
     public function cancleMID($notrans){
+        $controller = new Controller;
         $endpoint = config('app.URLmidv2').$notrans.'/cancel';
-
+        $srvK = tblcomp::find(tbltrans::find($notrans)->companyid)->Server_Key;
         $headers = array(
             'Accept: application/json',
             // 'Authorization: Basic U0ItTWlkLXNlcnZlci03STQ3NGV6QUE4QXZiejlzT0VHTW81bnc6'
-            'Authorization: Basic ' . base64_encode(config('app.serverKey') . ':')
+            'Authorization: Basic ' . base64_encode($controller->decrypt($srvK) . ':')
         );
 
         $curl = curl_init();
@@ -830,11 +834,41 @@ class TransactionController extends Controller
     }
 
     public function eod(){
+        $log = new Controller;
         $sysDT = (tblsyspara::first()->sysDate != null) ? Carbon::parse(tblsyspara::first()->sysDate) : Carbon::parse('2022-01-01');
         $currentDate = Carbon::now(config('app.GMT'));
         if($sysDT->format('y-m-d') != $currentDate->format('y-m-d')){
+            // buat tagihan baru
+            $tblagenda = collect(DB::select("SELECT a.AppointmentId, t.companyid, t.userid, t.notrans,t.transdate,t.jatuhTempoTagihan,a.StartDate,a.RecurrenceRule,a.RecurrenceException FROM tblagenda a
+                                            JOIN (SELECT AppointmentId, userid, companyid, MAX(notrans) AS notrans,MAX(transdate) AS transdate, max(jatuhTempoTagihan) as jatuhTempoTagihan FROM tbltrans
+                                                    WHERE statusid <> 4
+                                                    GROUP BY companyid, userid, AppointmentId) AS t ON a.AppointmentId=t.AppointmentId
+                                            WHERE productCode IS NOT NULL AND isBilling = 1
+                                            AND a.statusid <> 4"));
+            foreach ($tblagenda as $agenda) {
+                $LD = $agenda->transdate;
+                while (true) {
+                    $nextDate = $this->nextAppointment($agenda->StartDate,$agenda->RecurrenceRule,$agenda->RecurrenceException,$LD,false);
+                    // $log->savelog('next: '.$nextDate );
+                    $LD = $nextDate;
+                    if($nextDate != false){
+                        // transaksi selanjutnya
+                        if( Carbon::parse($nextDate)->format('ymd') <= Carbon::now(config('GMT'))->format('ymd') ){
+                            $log->savelog('create dari jatuhtempo ' . $nextDate );
+                            $this->nextTransaction($agenda->AppointmentId,$agenda->userid,$nextDate,$agenda->companyid);
+                        }else{
+                            break;
+                            // $log->savelog('break ats');
+                        }
+                    }else{
+                        break;
+                        // $log->savelog('break bwh');
+                    }
+                }
+            }
+            // update JHT
             DB::update("UPDATE tbltrans SET 
-            statusid = IIF(jht <> IIF(DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP) > 0, DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP),0),4,statusid),
+            -- statusid = IIF(jht <> IIF(DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP) > 0, DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP),0),4,statusid),
             onEOD = IIF(jht <> IIF(DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP) > 0, DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP),0),1,0),
             jht = IIF(DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP) > 0, DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP),0), 
             SLateFee = LateFee * IIF(DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP) > 0, DATEDIFF(DAY, jatuhTempoTagihan, CURRENT_TIMESTAMP),0),
@@ -845,28 +879,18 @@ class TransactionController extends Controller
             ->join('tblmasterproduct','tblmasterproduct.productCode','=','tblagenda.productCode')
             ->where('tbltrans.onEOD',1)->where('tbltrans.statusid',4)->where('tblmasterproduct.isSubscribe','<>',1)
             ->get();
-            foreach ($tbltranss as $tbltrans) {
+            foreach ($tbltranss as $tbltrans) { //pembaruan trans next day
                 $user = tbluser::find($tbltrans->userid);
-                $MID = $this->cekstatusMID($tbltrans->notrans);
+                $MID = $this->cekstatusMID($tbltrans->notrans,$tbltrans->companyid);
                 if($MID->status_code == 407){// Expire midtrans
+                    $oldT = tbltrans::where('notrans',$tbltrans->notrans)->first();
+                    $oldT->update(['statusid' => 4]);
                     $this->MIDexpire($tbltrans,$user);
                 }
             }
             DB::update("UPDATE tbltrans SET onEOD = 0");
-            $tblagenda = collect(DB::select("SELECT a.AppointmentId, t.companyid, t.userid, t.notrans,t.transdate,t.jatuhTempoTagihan,a.StartDate,a.RecurrenceRule,a.RecurrenceException FROM tblagenda a
-                                            JOIN (SELECT AppointmentId, userid, companyid, MAX(notrans) AS notrans,MAX(transdate) AS transdate, max(jatuhTempoTagihan) as jatuhTempoTagihan FROM tbltrans
-                                                    WHERE statusid <> 4
-                                                    GROUP BY companyid, userid, AppointmentId) AS t ON a.AppointmentId=t.AppointmentId
-                                            WHERE productCode IS NOT NULL AND isBilling = 1
-                                            AND a.statusid <> 4"));
-            foreach ($tblagenda as $agenda) {
-                $nextDate = $this->nextAppointment($agenda->StartDate,$agenda->RecurrenceRule,$agenda->RecurrenceException,$agenda->transdate,false);
-                // $log = new Controller;
-                if( Carbon::parse($nextDate)->format('ymd') == Carbon::now(config('GMT'))->format('ymd') ){
-                    // $log->savelog('create dari jatuhtempo ' . $agenda->jatuhTempoTagihan );
-                    $this->nextTransaction($agenda->AppointmentId,$agenda->userid,$agenda->jatuhTempoTagihan,$agenda->companyid);
-                }
-            }
+            
+
             tblsyspara::first()->update(['sysDate' => Carbon::now(config('app.GMT'))]);
             $sendTagihan = DB::select("SELECT u.email,u.nama, FORMAT(CONVERT(DATETIME, jatuhTempoTagihan), 'dd MMM yyyy') AS jatuhTempoTagihan, SPokok+SBunga+SLateFee AS Amount, p.productName
                                         FROM tbltrans t

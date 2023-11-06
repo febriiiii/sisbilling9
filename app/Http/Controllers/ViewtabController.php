@@ -7,14 +7,10 @@ use App\Models\tblcomp;
 use App\Models\tblmasterproduct;
 use App\Models\tblpaymentmethod;
 use App\Models\tblpengumuman;
-use App\Models\tblproducttype;
-use App\Models\tblsyspara;
 use App\Models\tbltrans;
 use App\Models\tbluser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Services\Midtrans\CreateSnapTokenService;
-use Illuminate\Auth\Events\Logout;
 
 class ViewtabController extends Controller
 {
@@ -110,7 +106,8 @@ class ViewtabController extends Controller
         ->where('notrans',$request->val)
         ->where(DB::raw('tbltrans.SPokok + tbltrans.SBunga + tbltrans.SLateFee'),'>',0)
         ->first();
-
+        $transactioController = new TransactionController;
+        $MID = $transactioController->cekstatusMID($trans->notrans);
         if(isset($trans)){
             $file = '';
             $path = storage_path('app/public/user/'.$trans->userid.'/notrans/'.$trans->notrans.'.*');
@@ -121,15 +118,23 @@ class ViewtabController extends Controller
             }
             $paymentMethod = tblpaymentmethod::select('paymentid','paymentName','RekTujuan','AtasNama')->where('statusid','!=',4)->whereIn('companyid',[$trans->companyid,1])->get();
             $us = tbltrans::find($trans->notrans);
-            if($us->snap_token != null){
+            if($us->snap_token != null && $MID->status_code != 404){
                 $snapToken = $us->snap_token;
             }else{
-                $midtrans = new CreateSnapTokenService($trans);
-                $snapToken = $midtrans->getSnapToken();
-                $us->update(['snap_token' => $snapToken]);
-            }
+                if($MID->status_code != 401){//status auth not found
+                    $confMID = new Controller;
+                    $midtrans = $confMID->MIDConf($trans,$trans->companyid);
+                    $snapToken = $midtrans->getSnapToken();
+                    $us->update(['snap_token' => $snapToken]);
+                }
+            }//jika expire req ulang
             $us->update(['isreject' => 0]);   
-            return view('getView.viewPayment',compact('file','trans','paymentMethod','snapToken'))->render();
+            $clientKey = tblcomp::find($trans->companyid)->Client_Key;
+            $isMID = 1;
+            if($MID->status_code == 401){
+                $isMID = 0;
+            }
+            return view('getView.viewPayment',compact('file','trans','paymentMethod','snapToken','clientKey','isMID'))->render();
         }else{
             return "<h1>Penagihan Tidak Berlaku / Tanpa Nominal</h1><script>setTimeout(() => { closemodal2() }, 3000);</script>";
         }

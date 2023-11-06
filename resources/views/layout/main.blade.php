@@ -61,4 +61,7 @@
         @include('layout.footer')
         @include('layout.footerlink')
     </body>
+    <script>
+        alert('jika issucbscribe load ulang')
+    </script>
 </html>
