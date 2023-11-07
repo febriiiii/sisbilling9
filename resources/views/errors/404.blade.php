@@ -577,6 +577,6 @@ button {
 
     <script>
       setTimeout(() => {
-        window.location.href = "{{url('')}}"
+        window.location.href = "{{url('/')}}"
       }, 3000);
     </script>

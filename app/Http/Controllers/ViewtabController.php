@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\tblagenda;
 use App\Models\tblcomp;
 use App\Models\tblmasterproduct;
+use App\Models\tblnotif;
 use App\Models\tblpaymentmethod;
 use App\Models\tblpengumuman;
 use App\Models\tbltrans;
@@ -98,6 +99,10 @@ class ViewtabController extends Controller
         return view('getView.viewformagenda',compact('agenda','produk'))->render();
     }
     public function viewpayment(Request $request){
+        $notif = tblnotif::where('uniqCode',$request->val)->where('statusid',1)->get();
+        foreach ($notif as $n) {
+            $n->update(['statusid' => 9]);
+        }
         $trans = tbltrans::select('notrans','tblcomp.companyname','tblagenda.text','tbluser.userid','tbluser.nama','tbluser.email','tbluser.hp','tbluser.alamatSingkat','tbltrans.companyid','tbltrans.statusid','jatuhTempoTagihan','tbltrans.Pokok',DB::raw('tbltrans.SPokok + tbltrans.SBunga + tbltrans.SLateFee as Amount'),DB::raw('CONCAT(tblagenda.productCode, tblagenda.companyid) as kodebarang'))
         ->addSelect(DB::raw('(SELECT COUNT(notrans) FROM tbltrans s WHERE AppointmentId = tbltrans.AppointmentId AND userid = tbltrans.userid AND jatuhTempoTagihan <= tbltrans.jatuhTempoTagihan) as angsuran'))
         ->join('tbluser','tbluser.userid','=','tbltrans.userid')
@@ -107,7 +112,7 @@ class ViewtabController extends Controller
         ->where(DB::raw('tbltrans.SPokok + tbltrans.SBunga + tbltrans.SLateFee'),'>',0)
         ->first();
         $transactioController = new TransactionController;
-        $MID = $transactioController->cekstatusMID($trans->notrans);
+        $MID = $transactioController->cekstatusMID($trans->notrans,$trans->companyid);
         if(isset($trans)){
             $file = '';
             $path = storage_path('app/public/user/'.$trans->userid.'/notrans/'.$trans->notrans.'.*');
@@ -128,8 +133,9 @@ class ViewtabController extends Controller
                     $us->update(['snap_token' => $snapToken]);
                 }
             }//jika expire req ulang
-            $us->update(['isreject' => 0]);   
-            $clientKey = tblcomp::find($trans->companyid)->Client_Key;
+            $us->update(['isreject' => 0]);  
+            $controller = new Controller; 
+            $clientKey = $controller->decrypt(tblcomp::find($trans->companyid)->Client_Key);
             $isMID = 1;
             if($MID->status_code == 401){
                 $isMID = 0;
@@ -285,5 +291,20 @@ class ViewtabController extends Controller
 
     public function modalpembayaran(Request $request){
         return view('admin.modal.pembayaranpengelola')->render();
+    }
+
+    public function modalMidtrans(Request $request){
+        $user = tbluser::where('userid',$request->userid)->join('tblcomp','tblcomp.companyid','=','tbluser.companyid')->first();
+        $controller = new Controller;
+        $data = [
+            'companyid' => $user->companyid,
+            'nama' => $user->nama,
+            'email' => $user->email,
+            'companyname' => $user->companyname,
+            'serverkey' => $controller->decrypt($user->Server_Key),
+            'clientkey' => $controller->decrypt($user->Client_Key),
+            'merchantid' => $controller->decrypt($user->Merchant_ID),
+        ];
+        return view('admin.modal.midtransPengelola',compact('data'))->render();
     }
 }

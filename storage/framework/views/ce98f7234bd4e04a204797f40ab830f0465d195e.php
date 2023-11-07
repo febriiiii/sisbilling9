@@ -103,6 +103,10 @@
                     dataType: "number",
                 },
                 {
+                    dataField: 'disc',
+                    dataType: "number",
+                },
+                {
                     dataField: 'rangeDuration',
                     caption: 'Jangka Waktu',
                     dataType: "number" 

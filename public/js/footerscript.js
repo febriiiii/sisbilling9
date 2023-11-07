@@ -213,6 +213,11 @@ function payment(notrans){
           }
         }else if(data.type == 'pengumumanforum'){
           createpengumumanforum(data.data)
+        }else if(data.type == 'reload'){
+          if(data.authuser == UIDGlob.userid){
+            window.location.href = "{{url('/')}}"
+          }
+          createpengumumanforum(data.data)
         }else if(data.type == 'renderMyBilling'){
           if(data.authuser == UIDGlob.userid){
             loadbilling()

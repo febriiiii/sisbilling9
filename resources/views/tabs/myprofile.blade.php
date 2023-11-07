@@ -150,7 +150,11 @@
     <button class="btn btn-secondary mt-2 me-2" onclick="opnmdlcustomer()">Tambah Customer</button>
     @endif
     {{-- <button class="btn btn-secondary mt-2 me-2" onclick="opnmdlpengelola()">Tambah Pengelola</button> --}}
-    
+    @if (session('UIDGlob')->companyid != '')
+    <div class="mt-4 card p-2">
+        @include('iklan')
+    </div>
+    @endif
     <!-- Modal popup -->
     <div class="modal fade" id="myprofile_companySetting" tabindex="-1" aria-labelledby="myprofile_companySettingLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -345,14 +349,16 @@
                 xhr.setRequestHeader('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
             },
             success: function(data) {
-                showNty(data,10000)
-                $('#loader').hide('slow')
-                setTimeout(() => {
-                    window.location.href = '{{url("/")}}'
-                }, 10000);
+                if(data == 'view'){
+                    window.location.href = '{{url("/success")}}'
+                }else{
+                    showNty(data)
+                    $('#loader').hide('slow')
+                }
             },
             error: function(xhr, status, error) {
                 showNty(error,10000)
+                $('#loader').hide('slow')
             }
         });
     });

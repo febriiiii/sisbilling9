@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendMail;
 use App\Models\tblbilling;
+use App\Models\tblmasterproduct;
 use App\Models\tblsyspara;
 use App\Models\tbluser;
 use DateInterval;
@@ -371,7 +372,7 @@ class TransactionController extends Controller
                             $controller->notifUpdate($tbltrans->userid,"Pembayaran Berhasil ".$tbltrans->notrans,$tbltrans->notrans);
                             $controller->notifInsert($user->userid,"Pembayaran Berhasil ".$tbltrans->notrans,$tbltrans->notrans);
                             $this->nextTransaction($tbltrans->AppointmentId,$tbltrans->userid,$tbltrans->jatuhTempoTagihan,$user->companyid);
-                            $transMail = tbltrans::select('notrans','tblcomp.companyname','tblagenda.text','tbluser.userid','tbluser.nama','tbluser.email','tbluser.hp','tbluser.alamatSingkat','tbltrans.companyid','tbltrans.statusid','jatuhTempoTagihan','tbltrans.Pokok',DB::raw('tbltrans.SPokok + tbltrans.SBunga + tbltrans.SLateFee as Amount'),DB::raw('CONCAT(tblagenda.productCode, tblagenda.companyid) as kodebarang'))
+                            $transMail = tbltrans::select('tblagenda.productCode','notrans','tblcomp.companyname','tblagenda.text','tbluser.userid','tbluser.nama','tbluser.email','tbluser.hp','tbluser.alamatSingkat','tbltrans.companyid','tbltrans.statusid','jatuhTempoTagihan','tbltrans.Pokok',DB::raw('tbltrans.SPokok + tbltrans.SBunga + tbltrans.SLateFee as Amount'),DB::raw('CONCAT(tblagenda.productCode, tblagenda.companyid) as kodebarang'))
                                                     ->addSelect(DB::raw('(SELECT COUNT(notrans) + 1 FROM tbltrans s WHERE AppointmentId = tbltrans.AppointmentId AND userid = tbltrans.userid AND jatuhTempoTagihan <= tbltrans.jatuhTempoTagihan) as angsuran'))
                                                     ->addSelect(DB::raw('CASE WHEN tbltrans.paymentid = 2 THEN MIDpaymenttype ELSE paymentName END AS paymentname'))
                                                     ->join('tbluser','tbluser.userid','=','tbltrans.userid')
@@ -390,6 +391,10 @@ class TransactionController extends Controller
                                 'trans' => $transMail,
                             ];
                             $this->sendMailPayment($arrayMail2,'mailpayment');
+                            $produk = tblmasterproduct::find($transMail->productCode);
+                            if($produk->isSubscribe == 1){
+                                $chatcontroller->GlobalPush("reload",$tbltrans->userid);
+                            }
                         }
                     }else{
                         $status = 3;
@@ -679,6 +684,7 @@ class TransactionController extends Controller
         
     }
     private function MIDsuccess($tbltrans,$payType,$user){
+        $chatcontroller = new ChatController;
         $tbltrans->update(['statusid' => 7,'paymentid' => 2]);
         tblpaymenttrans::create([
             'notrans' => $tbltrans->notrans,
@@ -696,7 +702,7 @@ class TransactionController extends Controller
         ]);
         $this->nextTransaction($tbltrans->AppointmentId,$tbltrans->userid,$tbltrans->jatuhTempoTagihan,$tbltrans->companyid);
         
-        $transMail = tbltrans::select('notrans','tblcomp.companyname','tblagenda.text','tbluser.userid','tbluser.nama','tbluser.email','tbluser.hp','tbluser.alamatSingkat','tbltrans.companyid','tbltrans.statusid','jatuhTempoTagihan','tbltrans.Pokok',DB::raw('tbltrans.SPokok + tbltrans.SBunga + tbltrans.SLateFee as Amount'),DB::raw('CONCAT(tblagenda.productCode, tblagenda.companyid) as kodebarang'))
+        $transMail = tbltrans::select('tblagenda.productCode','notrans','tblcomp.companyname','tblagenda.text','tbluser.userid','tbluser.nama','tbluser.email','tbluser.hp','tbluser.alamatSingkat','tbltrans.companyid','tbltrans.statusid','jatuhTempoTagihan','tbltrans.Pokok',DB::raw('tbltrans.SPokok + tbltrans.SBunga + tbltrans.SLateFee as Amount'),DB::raw('CONCAT(tblagenda.productCode, tblagenda.companyid) as kodebarang'))
                                         ->addSelect(DB::raw('(SELECT COUNT(notrans) + 1 FROM tbltrans s WHERE AppointmentId = tbltrans.AppointmentId AND userid = tbltrans.userid AND jatuhTempoTagihan <= tbltrans.jatuhTempoTagihan) as angsuran'))
                                         ->join('tbluser','tbluser.userid','=','tbltrans.userid')
                                         ->join('tblagenda','tblagenda.AppointmentId','=','tbltrans.AppointmentId')
@@ -712,6 +718,10 @@ class TransactionController extends Controller
             'trans' => $transMail,
         ];
         $this->sendMailPayment($arrayMail2,'mailpayment');
+        $produk = tblmasterproduct::find($transMail->productCode);
+        if($produk->isSubscribe == 1){
+            $chatcontroller->GlobalPush("reload",$tbltrans->userid);
+        }
     }
     private function MIDexpire($tbltrans,$user){
         $tblcomp = tblcomp::find($tbltrans->companyid);

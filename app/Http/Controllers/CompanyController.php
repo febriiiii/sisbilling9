@@ -49,7 +49,8 @@ class CompanyController extends Controller
                 $adminController->createSubscribe($request->subscribe,auth()->user()->userid);
 
                 session(['UIDGlob' => tbluser::find(auth()->user()->userid)]);
-                return view('success');
+                session(['track' => 'mybilling']);
+                return 'view';
             }
 
             $msg="Success";

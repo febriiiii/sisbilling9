@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\tblagenda;
 use App\Models\tblbilling;
+use App\Models\tblcomp;
 use App\Models\tblmasterproduct;
 use App\Models\tblpaketakun;
 use App\Models\tbltrans;
@@ -105,6 +106,24 @@ class adminController extends Controller
         ]);
         return true;
     }
+    public function updateMidtrans(Request $request){
+        $controller = new Controller;
+        $data = [
+            'Server_Key' => $controller->encrypt($request->serverkey),
+            'Client_Key' => $controller->encrypt($request->clientkey),
+            'Merchant_ID' => $controller->encrypt($request->merchantid),
+        ];
+        tblcomp::find($request->companyid)->update($data);
+        return "Success";
+    }
+    public function checkMidtrans(Request $request){
+        $transactionController = new TransactionController;
+        $MID = $transactionController->cekstatusMID("1",$request->companyid);
+        if($MID->status_code == 401){
+            return "Connection Failed";
+        }
+        return "Connection Success";
+    }
     public function dataPembayaran(Request $request){
         $where = "";
         if($request->userid != ''){
@@ -118,6 +137,15 @@ class adminController extends Controller
                 JOIN tblmasterproduct p ON p.productCode=a.productCode
                 LEFT JOIN tblpaymentmethod on t.paymentid=tblpaymentmethod.paymentid
                 WHERE t.statusid != 4 AND u.companyid IS NOT NULL AND u.superadmin <> 1 {$where}");
+    }
+    public function subscribeIklan(Request $request){
+        if(auth()->user()->companyid != null){
+            $this->createSubscribe($request->productCode,auth()->user()->userid);
+            session(['UIDGlob' => tbluser::find(auth()->user()->userid)]);
+            session(['track' => 'mybilling']);
+            return 'view';
+        }
+        return "Gagal";
     }
     public function subscribe(Request $request){
         $this->createSubscribe($request->productCode,$request->userid);
@@ -144,7 +172,9 @@ class adminController extends Controller
         }else{
             $finishDt = $now;
         }
-
+        if(carbon::parse($finishDt) < Carbon::now(config('app.GMT'))){
+            $finishDt = Carbon::now(config('app.GMT'))->setTime(0, 0, 0);
+        }
         $recur ='FREQ=DAILY;COUNT=1';
         if($produk->duration == 'Minggu'){
             $recur ='FREQ=WEEKLY;COUNT=1';
@@ -163,7 +193,7 @@ class adminController extends Controller
             'statusid' => 1,
             'isBilling' => 1,
             'productCode' => $productCode,
-            'Pokok' => $produk->price,
+            'Pokok' => $produk->price - ($produk->price*$produk->disc / 100),
             'lateFeePercent' => 0,
             'BungaPercent' => 0,
             'companyid' => 1,
@@ -191,12 +221,12 @@ class adminController extends Controller
             'companyid' => 1,
             'userid' => $userid,
             'statusid' => 5,
-            'SisaPok' => $produk->price,
-            'Pokok' => $produk->price,
+            'SisaPok' => $produk->price - ($produk->price*$produk->disc / 100),
+            'Pokok' => $produk->price - ($produk->price*$produk->disc / 100),
             'Bunga' => 0,
             'LateFee' => 0,
             'JHT' => 0,
-            'SPokok' => $produk->price,
+            'SPokok' => $produk->price - ($produk->price*$produk->disc / 100),
             'SBunga' => 0,
             'SLateFee' => 0,
             'transdate' => $finishDt,

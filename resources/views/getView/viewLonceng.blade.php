@@ -30,7 +30,7 @@
             <li onclick=""><a class="dropdown-item card mt-1" href="#">{{$i->text}} </a></li>
         @endforeach
         @foreach ($notif['tblnotif'] as $i)
-            <li onclick=""><a class="dropdown-item card mt-1" href="#">{{$i->deskripsi}} </a></li>
+            <li onclick="payment('{{$i->notrans}}"><a class="dropdown-item card mt-1" href="#">{{$i->deskripsi}} </a></li>
         @endforeach
         @foreach ($notif['pengumuman'] as $p)
             @php

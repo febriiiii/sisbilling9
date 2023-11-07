@@ -16,7 +16,6 @@ class Midtrans {
         $this->isProduction = $conf['isProduction'];
         $this->isSanitized = $conf['isSanitized'];
         $this->is3ds = $conf['is3ds'];
-
         $this->_configureMidtrans();
     }
 

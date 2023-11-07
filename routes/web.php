@@ -34,6 +34,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/dd', function (Request $request) {
     return view('MailTagihan');
 });
+
 Route::get('/encriipie', function (Request $request) {
     $iv = random_bytes(16); // Generate initial vector
     $cipherText = openssl_encrypt($request->text, 'AES-256-CFB', "as4s%2s&7", 0, $iv);
@@ -41,7 +42,13 @@ Route::get('/encriipie', function (Request $request) {
 });
 // MAIL
 Route::get('/aprovalfile', [MailController::class, 'aprovalfile'])->name('aprovalfile');
-
+Route::get('/success', function () {
+    return view('success');
+});
+Route::get('/track', function () {
+    session(['track' => null]);
+    return 1;
+});
 
 // FCM 
 Route::patch('/fcm-token', [ChatController::class, 'updateToken'])->name('fcmToken');
@@ -122,9 +129,6 @@ Route::get('/viewpolling', [ViewtabController::class, 'viewpolling'])->middlewar
 Route::get('/viewkomentarpengumuman', [ViewtabController::class, 'viewkomentarpengumuman'])->middleware('auth');
 Route::get('/viewlonceng', [ViewtabController::class, 'viewlonceng'])->middleware('auth');
 Route::get('/pusher', [ViewtabController::class, 'pusher'])->middleware('auth');
-// administrator------------------------------------------------------------------------------------
-Route::get('/adminindex', [ViewtabController::class, 'adminindex'])->middleware('auth');
-Route::get('/modalbill', [ViewtabController::class, 'modalbill'])->middleware('auth');
 
 Route::get('/readpengumuman', [ChatController::class, 'readpengumuman'])->middleware('auth');
 Route::get('/getchatLawan', [ChatController::class, 'getchatLawan'])->middleware('auth');
@@ -180,5 +184,14 @@ Route::middleware(['superadmin'])->group(function () {
     Route::post('/dataTagihanUpdate', [adminController::class, 'dataTagihanUpdate'])->middleware('auth');
     Route::post('/dataTagihanDelete', [adminController::class, 'dataTagihanDelete'])->middleware('auth');
     Route::get('/dataPembayaran', [adminController::class, 'dataPembayaran'])->middleware('auth');
+    Route::get('/checkMidtrans', [adminController::class, 'checkMidtrans'])->middleware('auth');
+    Route::post('/updateMidtrans', [adminController::class, 'updateMidtrans'])->middleware('auth');
+
+    // Administrator View------------------------------------------------------------------------------------
+    Route::get('/adminindex', [ViewtabController::class, 'adminindex'])->middleware('auth');
+    Route::get('/modalbill', [ViewtabController::class, 'modalbill'])->middleware('auth');
+    Route::get('/modalmidtrans', [ViewtabController::class, 'modalmidtrans'])->middleware('auth');
 });
+Route::post('/subscribeIklan', [adminController::class, 'subscribeIklan'])->middleware('auth');
+
 

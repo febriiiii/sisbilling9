@@ -62,6 +62,21 @@
         @include('layout.footerlink')
     </body>
     <script>
-        alert('jika issucbscribe load ulang')
+        if('{{session("track")}}' == 'mybilling'){
+            UIkit.switcher('.uk-switcher').show(1)
+            if (activeItem) {
+                activeItem.classList.remove("active");
+            }
+            activeItem = menuItems[1] //untuk set aktiv variable global navbar Mobile (activeItem harus diperbarui valuenya)
+            activeItem.classList.add("active")
+            offsetMenuBorder(activeItem, menuBorder);
+            loadbilling()
+            $.ajax({
+                url: '{{ url("/track") }}',
+                method: 'GET',
+                cache: false,
+            });
+
+        }
     </script>
 </html>

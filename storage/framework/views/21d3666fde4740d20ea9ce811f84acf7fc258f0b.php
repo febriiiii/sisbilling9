@@ -77,9 +77,9 @@
                     if(options.data.billAktif == null){
                         bA = "Tidak Ada"
                     }
-                    var editButton = $('<span class="badge badge-success rounded-pill d-inline">'+bA+'<span>');
-                    editButton.css('cursor','pointer');
-                    editButton.on('click', function() {
+                    var historyButton = $('<span class="badge badge-success rounded-pill d-inline">'+bA+'<span>');
+                    historyButton.css('cursor','pointer');
+                    historyButton.on('click', function() {
                         var val = options.data.billAktif
                         if(val == null){
                             return false;
@@ -102,7 +102,7 @@
                         });
                     });
 
-                    container.append(editButton);
+                    container.append(historyButton);
                 } 
             },
             {
@@ -164,11 +164,11 @@
             {
                 caption: 'Action',
                 cellTemplate: function(container, options) {
-                    var editButton = $('<i class="las la-history"></i>');
-                    editButton.css('font-size','1.5em');
-                    editButton.css('cursor','pointer');
-                    editButton.css('color','blue');
-                    editButton.on('click', function() {
+                    var historyButton = $('<i class="las la-history me-2"></i>');
+                    historyButton.css('font-size','1.5em');
+                    historyButton.css('cursor','pointer');
+                    historyButton.css('color','blue');
+                    historyButton.on('click', function() {
                         var data = options.data;
                         $.ajax({
                             type: 'GET',
@@ -182,11 +182,11 @@
                             }
                         });
                     });
-                    var deleteButton = $('<i class="las la-file-invoice-dollar"></i>');
-                    deleteButton.css('font-size','1.5em');
-                    deleteButton.css('cursor','pointer');
-                    deleteButton.css('color','green');
-                    deleteButton.on('click', function() {
+                    var invoiceButton = $('<i class="las la-file-invoice-dollar me-2"></i>');
+                    invoiceButton.css('font-size','1.5em');
+                    invoiceButton.css('cursor','pointer');
+                    invoiceButton.css('color','green');
+                    invoiceButton.on('click', function() {
                         var data = options.data;
                         $.ajax({
                             type: 'GET',
@@ -200,9 +200,29 @@
                             }
                         });
                     });
+                    var midButton = $('<i class="las la-credit-card me-2"></i>');
+                    midButton.css('font-size','1.5em');
+                    midButton.css('cursor','pointer');
+                    midButton.css('color','green');
+                    midButton.on('click', function() {
+                        var data = options.data;
+                        console.log(data);
+                        $.ajax({
+                            type: 'GET',
+                            cache: false,
+                            url: '<?php echo e(url("/modalmidtrans?userid=")); ?>'+data.userid,
+                            success: function(content) {
+                                GModal('Midtrans Key Update',content)
+                            },
+                            error: function(xhr, status, error) {
+                            showNty(error,10000)
+                            }
+                        });
+                    });
 
-                    container.append(editButton);
-                    container.append(deleteButton);
+                    container.append(historyButton);
+                    container.append(invoiceButton);
+                    container.append(midButton);
                 }
             }
         ],

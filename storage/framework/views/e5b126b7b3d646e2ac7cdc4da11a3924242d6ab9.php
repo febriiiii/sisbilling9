@@ -62,7 +62,22 @@
         <?php echo $__env->make('layout.footerlink', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
     </body>
     <script>
-        alert('jika issucbscribe load ulang')
+        if('<?php echo e(session("track")); ?>' == 'mybilling'){
+            UIkit.switcher('.uk-switcher').show(1)
+            if (activeItem) {
+                activeItem.classList.remove("active");
+            }
+            activeItem = menuItems[1] //untuk set aktiv variable global navbar Mobile (activeItem harus diperbarui valuenya)
+            activeItem.classList.add("active")
+            offsetMenuBorder(activeItem, menuBorder);
+            loadbilling()
+            $.ajax({
+                url: '<?php echo e(url("/track")); ?>',
+                method: 'GET',
+                cache: false,
+            });
+
+        }
     </script>
 </html>
 <?php /**PATH C:\xampp\htdocs\sisbilling9\resources\views/layout/main.blade.php ENDPATH**/ ?>

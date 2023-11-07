@@ -26,6 +26,8 @@ class Controller extends BaseController
     use AuthorizesRequests, ValidatesRequests;
 
     public function index(){
+        session(['UIDGlob' => tbluser::find(auth()->user()->userid)]);
+
         $controller = new Controller;
         $tblproducttype = tblproducttype::where('statusid','!=',4)->where('companyid',1)->get();
         $tblcomp = tblcomp::where('companyid',session('UIDGlob')->companyid)->first();
@@ -72,6 +74,26 @@ class Controller extends BaseController
                                 WHERE (t.statusid IN (7) OR (t.SPokok + t.SBunga + t.SLateFee < 1 AND t.statusid IN (5)))
                                 AND p.isSubscribe = 1 AND t.userid={$useridQ}"));
         $paket = tblmasterproduct::where('isSubscribe',1)->where('price','>',1)->get();
+        $kataKataPromosi = array(
+            "Langganan Sekarang, Hemat Waktu dan Tenaga.",
+            "Manajemen Tagihan Lebih Mudah dengan Berlangganan.",
+            "Diskon Spesial 20% untuk Pelanggan Berlangganan.",
+            "Coba Berlangganan Gratis Selama 30 Hari.",
+            "Dapatkan Akses Premium dengan Berlangganan Bulanan.",
+            "Sistem Penagihan Otomatis dengan Berlangganan.",
+            "Tidak Perlu Repot, Langganan Sekarang!",
+            "Pantau Tagihan Anda dengan Mudah.",
+            "Hemat Biaya dengan discount, Ayo Berlangganan.",
+            "Bergabung dengan Ribuan Pelanggan yang Telah Berlangganan.",
+            "Penagihan Tanpa Khawatir dengan Berlangganan SisBilling.",
+            "Lacak Tagihan Anda dengan Aplikasi Tagihan Terbaik Kami.",
+            "Penagihan Cepat dan Tepat dengan SisBilling.",
+            "Langganan Sekarang dan Nikmati Manfaatnya!"
+        );
+        foreach ($paket as $pkt) {
+            $indeksAcak = array_rand($kataKataPromosi);
+            $pkt->kataPromo = $kataKataPromosi[$indeksAcak];
+        }
         return view('layout/main',compact('tblproducttype','cid','tblcomp','tblpengumuman','paket'));
     }
     public function inCidSelf(){
@@ -115,7 +137,6 @@ class Controller extends BaseController
         if (Auth::attempt($credentials)) {
             session_start();
             $request->session()->regenerate();
-            session(['UIDGlob' => auth()->user()]);
             return redirect()->intended('/');
         }
         Out:
@@ -312,9 +333,6 @@ class Controller extends BaseController
         $conf['serverKey'] = $this->decrypt($comp->Server_Key);
         $conf['isProduction'] = config('app.isProduction');
         $conf['isSanitized'] = config('app.isSanitized');
-        if($companyid == 1){
-            $conf['isProduction'] = true;
-        }
         $conf['is3ds'] = config('app.is3ds');
         return new CreateSnapTokenService($trans,$conf);
     }
