@@ -35,13 +35,13 @@ class Controller extends BaseController
             'companyid' => isset($tblcomp->companyid)? $tblcomp->companyid : '',
             'companyname' => isset($tblcomp->companyname)? $tblcomp->companyname : '',
             'productTypeName' => isset($tblcomp->productTypeName)? $tblcomp->productTypeName : '',
-            'email' => isset($tblcomp->email)? $tblcomp->email : '',
+            'email' => isset($tblcomp->email)? $tblcomp->email : session('UIDGlob')->email,
             'hp' => isset($tblcomp->hp)? $tblcomp->hp : '',
             'companyaddress' => isset($tblcomp->companyaddress)? $tblcomp->companyaddress : '',
             'producttypeArray' => isset($tblcomp->producttypeArray)? $tblcomp->producttypeArray : '',
-            'Server_Key' => isset($tblcomp->Server_Key)? $this->decrypt($tblcomp->Server_Key) : 'Hub CS Sisbilling untuk Mengisi ini',
-            'Client_Key' => isset($tblcomp->Client_Key)? $this->decrypt($tblcomp->Client_Key) : 'Hub CS Sisbilling untuk Mengisi ini',
-            'Merchant_ID' => isset($tblcomp->Merchant_ID)? $this->decrypt($tblcomp->Merchant_ID) : 'Hub CS Sisbilling untuk Mengisi ini',
+            'Server_Key' => isset($tblcomp->Server_Key)? 1 : 0,
+            // 'Client_Key' => isset($tblcomp->Client_Key)? $this->decrypt($tblcomp->Client_Key) : 'Hub CS Sisbilling untuk Mengisi ini',
+            // 'Merchant_ID' => isset($tblcomp->Merchant_ID)? $this->decrypt($tblcomp->Merchant_ID) : 'Hub CS Sisbilling untuk Mengisi ini',
         ];
         
         $cid = $this->inCidSelf();
@@ -72,8 +72,16 @@ class Controller extends BaseController
                                 JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
                                 JOIN tblmasterproduct p ON p.productCode=a.productCode
                                 WHERE (t.statusid IN (7) OR (t.SPokok + t.SBunga + t.SLateFee < 1 AND t.statusid IN (5)))
-                                AND p.isSubscribe = 1 AND t.userid={$useridQ}"));
+                                AND p.isSubscribe = 1 AND t.userid={$useridQ}
+                                AND GETDATE() < CASE
+                                                    WHEN p.duration = 'Hari' THEN DATEADD(DAY, CAST(p.rangeDuration AS INT), t.jatuhTempoTagihan)
+                                                    WHEN p.duration = 'Minggu' THEN DATEADD(WEEK, CAST(p.rangeDuration AS INT), t.jatuhTempoTagihan)
+                                                    WHEN p.duration = 'Bulan' THEN DATEADD(MONTH, CAST(p.rangeDuration AS INT), t.jatuhTempoTagihan)
+                                                    WHEN p.duration = 'Tahun' THEN DATEADD(YEAR, CAST(p.rangeDuration AS INT), t.jatuhTempoTagihan)
+                                                END  
+                                AND GETDATE() >= jatuhTempoTagihan"));
         $paket = tblmasterproduct::where('isSubscribe',1)->where('price','>',1)->get();
+        $paketFree = tblmasterproduct::where('isSubscribe',1)->where('price',0)->get();
         $kataKataPromosi = array(
             "Langganan Sekarang, Hemat Waktu dan Tenaga.",
             "Manajemen Tagihan Lebih Mudah dengan Berlangganan.",
@@ -94,7 +102,7 @@ class Controller extends BaseController
             $indeksAcak = array_rand($kataKataPromosi);
             $pkt->kataPromo = $kataKataPromosi[$indeksAcak];
         }
-        return view('layout/main',compact('tblproducttype','cid','tblcomp','tblpengumuman','paket'));
+        return view('layout/main',compact('tblproducttype','cid','tblcomp','tblpengumuman','paket','paketFree'));
     }
     public function inCidSelf(){
         $arr = explode(',', session('UIDGlob')->companyidArray);

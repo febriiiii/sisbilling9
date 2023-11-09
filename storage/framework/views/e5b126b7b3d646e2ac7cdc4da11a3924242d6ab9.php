@@ -33,7 +33,7 @@
                 <div class="uk-alert-danger" uk-alert style="position: fixed; top:50px; right:5px;vw;z-index:99999">
                     <a href class="uk-alert-close" uk-close></a>
                     <p>Akun Anda Telah Habis Masa Aktif, Tolong Lakukan Pembayaran</p>
-                    <p>Jika Butuh Bantuan Hubungi CS SisBilling.</p>
+                    <p>Jika Butuh Bantuan Hubungi Suport Center.</p>
                 </div>
             <?php endif; ?>
         <?php endif; ?>
@@ -61,23 +61,6 @@
         <?php echo $__env->make('layout.footer', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
         <?php echo $__env->make('layout.footerlink', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
     </body>
-    <script>
-        if('<?php echo e(session("track")); ?>' == 'mybilling'){
-            UIkit.switcher('.uk-switcher').show(1)
-            if (activeItem) {
-                activeItem.classList.remove("active");
-            }
-            activeItem = menuItems[1] //untuk set aktiv variable global navbar Mobile (activeItem harus diperbarui valuenya)
-            activeItem.classList.add("active")
-            offsetMenuBorder(activeItem, menuBorder);
-            loadbilling()
-            $.ajax({
-                url: '<?php echo e(url("/track")); ?>',
-                method: 'GET',
-                cache: false,
-            });
-
-        }
-    </script>
+    
 </html>
 <?php /**PATH C:\xampp\htdocs\sisbilling9\resources\views/layout/main.blade.php ENDPATH**/ ?>

@@ -2,7 +2,7 @@
 @section('content')
 <button onclick="window.location.href='{{url('/')}}'" class="btn btn-primary m-3" style="padding:5px 10px 5px 5px; border-radius:100%;"><i class="las la-backspace" style="font-size: 40px;"></i></button>
     <div class="container" style="padding-bottom: 15vh;"> 
-        <form class="container" style="margin-top:8vh; z-index:3;" method="POST" action="{{url('register')}}">
+        <form id="submitRgstr" class="container" style="margin-top:8vh; z-index:3;" method="POST" action="{{url('register')}}">
             @csrf
             <center>
                 <div style="max-width: 500px">
@@ -21,28 +21,23 @@
                       @error('email')
                           <div class="alert alert-danger mt-3">{{ $message }}</div>
                       @enderror
-                      <div class="row" style="margin:0;">
-                          <div class="form-outline col mt-3">
-                              <input name="otp" type="text" id="displayRegister_otp" class="form-control" autocomplete="off"/>
-                              <label class="form-label" for="displayRegister_otp">Email OTP</label>
-                          </div>
-                          <div style="width: 5px;"></div>
-                          <button type="button" id="sendotp" class="btn btn-primary mt-3" style="width: 39px; height:39px;padding:0;">
-                            <img width="18" height='18' src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAsTAAALEwEAmpwYAAAEdUlEQVR4nO2aTW/TWBSGLdggVsOSDWKFRpo/gBBL+A1sWLNlx441rNDsoapACNQWcCFVStqkJpA2bXHrxl83uLHDR1WVxmZgpEGiaDjIgbSJ61zf61x/xO2RzqZxrvWcnuQ9fnM47jAO48CE/O7ziZqxdXVZ3njJHZQAgKOaaV/QLWdcVDa+z1UboDVaE1zWQ1t3/kKmfRNZzpZm2lB+3YT8CwTKeutHs/nvn1xWWxxZzhVkOSKyHHBzVd+CvKDD1JwGK9omINPZ5LLa4siyv3XAkWXDvPgWJmeUNnyhYrT/rln2DS5rLY52oX9l7c1HKJTrwBfkNvzDqRVApg26Zf8vinCcy1KLI09WpfcwOavswo+MLYDaaP16vWGvctlpcacnFaMFsxWjDd6Bvz1WgWXlw9411udLXBZaHHlySd6AZ0V1H3y+rO1dZ9pfuSy0OOpKt7VL1fVd8G74B0+XQTf3rtUtm+eGucWRJ1fUTZgqab7wIxMVUIztnutTp/0aRYt3Z2eomZyRfeHdXJDe9b4vLdovU7a4NztDTTe4F/5ZSdlftCS1H0K2eG/uDTU4+Lu8+7m3e96bmPZrIVscN9Tg4N2s1T/uPyNO7ZcHbHHcUBME/0ps+s8HUWs/MGlx/FATBM/P1ED3OytK7dcYtXjQUBMEP8pX28rgdxZz7ZcZt3jQUBME76akb/U9k4n2QwQtTjLUkMALS43+5w6q/VpELU4y1JDAj+dX8WeH0X45whYnHWpI4EcnFl1fr+/ZobRfN52/kWXvRA2OG2pI4N1sW1u4e4TRftX8dEo3bTNKeNxQQwrfsbZwGVr71QiLgBtqSOE71hb2XoNqv8q4CEFDDSl8j7WFSSbarzIqQtBQQwrvtbZwyey5Xx2gCCRDDQ18j7WFbX/Gz/1qiCKQDDU08F5rC5eRPPerhEUgHWpo4P2sLcxnP7rnfjWgCKRDDQ28r7WFy6if+1XfIpAPNbTwftYWVm3i8PzVriLQDDW08H7WFv7LL0bPHzX/Ob0gvf9COtTsgxfw8H2trai1nyZyJW0niv88ztqKRftJQhCaxyYL7D/zWGsrTu0PimLVuBgFPM7ail37cSEsWddZwwdZW4lof78oLqw/Zg2PtbaS1H6/mK0Yayzhg6ytxLXfG9Nl1GIFH2RtpUb7aSSQFJ7I2kqT9pNIIA08ibWVGu0nkUAaeCJrK03aHySBNPCk1laqtB8ngTTwNNZWqrS/nwTSwhNbW2nT/k48L9e3w8Df4xe/TUxLht5oDfzbYqK7frnfEoiDvzM2D/efLv/3aFpayxWVW8J8fffbWm9+OTvQr09J7voJvyXQCz/yaP7Hw5zo8IW1F7k55ZogSH/gzhmkCInu+hWrxkUX/h6/uDOel0y+VHsyJWiXAeAI7Vlhi5Dorp8obp+cfWmeYXUeeuuc0037e+q1P8qg6YTM7PmHKcLQ7/kPXIRh3PNnWYSh2vNnXoRh2POPsgip3fOPqwip2/OPK+rmp/N6w5Ziu+FhcAczfgImbNaj6l8OQQAAAABJRU5ErkJggg==">
-                          </button>
-                          @error('otp')
-                                  <div class="alert alert-danger mt-3">{{ $message }}</div>
-                          @enderror
+                      <div class="form-outline col mt-3">
+                          <input name="otp" type="text" id="displayRegister_otp" class="form-control" autocomplete="off"/>
+                          <label class="form-label" for="displayRegister_otp">One Time Password</label>
+                          <i class="card" style="background-color:white; color: red;font-size:.7em;">* OTP Didapatkan Setelah Anda Mendaftar</i>
                       </div>
+                      @error('otp')
+                        <div class="alert alert-danger mt-3">{{ $message }}</div>
+                      @enderror
                       <div class="row" style="margin:0;">
                           <div class="form-outline col mt-3">
-                              <input name="password" type="password" id="displayRegister_password" class="form-control @error('password') is-invalid @enderror" required/>
+                              <input @error('otp') value='******' @enderror name="password" type="password" id="displayRegister_password" class="form-control @error('password') is-invalid @enderror" required/>
                               <label class="form-label" for="displayRegister_password">Password</label>
                             </div>
                             
                           <div style="width: 5px;"></div>
                           <div class="form-outline col mt-3">
-                              <input name="password2" type="password" id="displayRegister_password2" class="form-control @error('password2') is-invalid @enderror" required/>
+                              <input @error('otp') value='******' @enderror name="password2" type="password" id="displayRegister_password2" class="form-control @error('password2') is-invalid @enderror" required/>
                               <label class="form-label" for="displayRegister_password2">Confirm Password</label>
                             </div>
                             <div class="row" style="margin:0;">
@@ -74,8 +69,8 @@
                       <label class="form-label" for="displayRegister_AlamatLengkap">Alamat Lengkap</label>
                     </div>
                     @error('alamatLengkap')
-                          <div class="alert alert-danger mt-3">{{ $message }}</div>
-                      @enderror
+                      <div class="alert alert-danger mt-3">{{ $message }}</div>
+                    @enderror
                     <div class="form-outline mt-3">
                         <textarea name="InfoTambahan" type="text" id="displayRegister_InfoTambahan" class="form-control @error('InfoTambahan') is-invalid @enderror" value="-"/>{{ old('InfoTambahan') }}</textarea>
                         <label class="form-label" for="displayRegister_InfoTambahan">Info Tambahan</label>
@@ -84,7 +79,7 @@
                       <div class="alert alert-danger mt-3">{{ $message }}</div>
                       @enderror
                     <div class="mt-4">
-                        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault"/>
+                        <input class="form-check-input" name="term" type="checkbox" role="switch" id="flexSwitchCheckDefault" @if ($errors->any()) checked @endif />
                         <label class="form-check-label" for="flexSwitchCheckDefault">Terms & Conditions</label>
                     </div>
                     <button id="submitR" type="submit" class="btn btn-primary col-12 mt-3" style="z-index: 3;">Daftar</button>
@@ -97,6 +92,9 @@
       $(document).ready(function() {
           $('body').css('background-color','transparent')
       });
+      $('#submitRgstr').click(function(){
+        $('#loader').show('slow')
+      })
       $('#sendotp').click(function(){
         var nama = $('#displayRegister_Nama').val()
         var email = $('#displayRegister_email').val()
@@ -115,10 +113,11 @@
           if(!check){
             e.preventDefault()
             showNty("Please Checked Terms & Conditions")
-          }else if($('#displayRegister_otp').val() == ''){
-            e.preventDefault()
-            showNty("Please Input OTP")
           }
+          // else if($('#displayRegister_otp').val() == ''){
+          //   e.preventDefault()
+          //   showNty("Please Input OTP")
+          // }
       })
       $('#flexSwitchCheckDefault').change(function(){
           var check = $(this).prop('checked');

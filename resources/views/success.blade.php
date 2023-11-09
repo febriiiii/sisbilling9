@@ -94,7 +94,12 @@ button:hover::before {
       <div style="border-radius:200px; height:200px; width:200px; background: #F8FAF5; margin:0 auto;">
         <i class="checkmark">✓</i>
       </div>
-        <h1>Success</h1>  <br>
+      @if (isset($msg))
+          <h1>{{$msg}}</h1>
+      @else
+        <h1>Success</h1>    
+      @endif  
+        <br>
         <p>Terima kasih <br> telah memilih SIS Billing sebagai solusi untuk kebutuhan Anda. <br> <strong>Kami siap membantu Anda dengan segala yang kami miliki.</strong> </p>
     </div>
     <center> <br><br><br>

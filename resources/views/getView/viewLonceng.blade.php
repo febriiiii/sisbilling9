@@ -22,7 +22,7 @@
             @if (session('UIDGlob')->superadmin != 1)
                 <div class="uk-alert-danger" uk-alert>
                     <p>Akun Anda Telah Habis Masa Aktif, Tolong Lakukan Pembayaran</p>
-                    <p>Jika Butuh Bantuan Hubungi CS SisBilling.</p>
+                    <p>Jika Butuh Bantuan Hubungi Suport Center.</p>
                 </div>
             @endif
         @endif
@@ -61,7 +61,11 @@
             <li onclick="opnchat({{$c->chatid}})"><a class="dropdown-item card mt-1" href="#">{{$c->total}} Pesan Dari {{$limitedString}} </a></li>
         @endforeach
         @foreach ($notif['invoice'] as $i)
-            <li onclick="payment('{{$i->notrans}}')"><a class="dropdown-item card mt-1" href="#">Tagihan : {{$i->Text}} </a></li>
+            @if ($i->RowNumber == 1)
+                <li onclick="payment('{{$i->notrans}}')"><a class="dropdown-item card mt-1" href="#">Tagihan : {{$i->Text}} </a></li>
+            @else
+                <li onclick="showNty('{{$i->notrans}} Belum Bisa Dibayarkan')"><a class="dropdown-item card mt-1" href="#">Tagihan : {{$i->Text}} </a></li>
+            @endif
         @endforeach
         @foreach ($notif['invoiceReject'] as $i)
             <li onclick="payment('{{$i->notrans}}')"><a class="dropdown-item card mt-1" href="#">Reject {{$i->Text}} : {{$i->notrans}} </a></li>

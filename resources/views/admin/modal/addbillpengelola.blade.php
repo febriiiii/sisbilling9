@@ -3,127 +3,135 @@
     cursor: pointer;
   }
 </style>
-<h6>Informasi</h6>
-<div class="card p-3">
-    <div class="row">
-        <div class="col-6 row">
-          <div class="col-4">
-            Nama Lengkap 
+<div id="myaddbill">
+  <h6>Informasi</h6>
+  <div class="card p-3">
+      <div class="row">
+          <div class="col-6 row">
+            <div class="col-4">
+              Nama Lengkap 
+            </div>
+            <div class="col-auto">
+              : <b>{{$data->namaU}}</b>
+            </div>
           </div>
-          <div class="col-auto">
-            : <b>{{$data->namaU}}</b>
+          <div class="col-6 row">
+            <div class="col-4">
+              Nama Perusahaan
+            </div>
+            <div class="col-auto">
+              : <b>{{$data->companyname}}</b>
+            </div>
           </div>
-        </div>
-        <div class="col-6 row">
-          <div class="col-4">
-            Nama Perusahaan
+          <div class="col-6 row">
+            <div class="col-4">
+              Alamat Akun 
+            </div>
+            <div class="col-auto">
+              : <b>{{$data->alamatU}}</b>
+            </div>
           </div>
-          <div class="col-auto">
-            : <b>{{$data->companyname}}</b>
+          <div class="col-6 row">
+            <div class="col-4">
+              Alamat Perusahaan
+            </div>
+            <div class="col-auto">
+              : <b>{{$data->companyaddress}}</b>
+            </div>
           </div>
-        </div>
-        <div class="col-6 row">
-          <div class="col-4">
-            Alamat Akun 
+          <div class="col-6 row">
+            <div class="col-4">
+              Email Akun
+            </div>
+            <div class="col-auto">
+              : <b>{{$data->emailU}}</b>
+            </div>
           </div>
-          <div class="col-auto">
-            : <b>{{$data->alamatU}}</b>
+          <div class="col-6 row">
+            <div class="col-4">
+              Email Perusahaan
+            </div>
+            <div class="col-auto">
+              : <b>{{$data->emailP}}</b>
+            </div>
           </div>
-        </div>
-        <div class="col-6 row">
-          <div class="col-4">
-            Alamat Perusahaan
+      </div>
+  </div>
+  
+  <h6 class="mt-4">Buat Tagihan</h6>
+  <div class="card">
+      <div class="row m-3">
+          <div class="col-5">
+              <label for="">Tagihan</label>
+              <select class="form-select" id="addbillpengelolaProduk" style="font-size: .85em">
+                  @foreach ($produk as $p)
+                      <option value="{{$p->productCode}}">{{$p->productName}}</option>
+                  @endforeach
+              </select>
           </div>
-          <div class="col-auto">
-            : <b>{{$data->companyaddress}}</b>
+          <div class="col-5">
+              <label for="">Deskripsi</label>
+              <input type="text" id="addbillpengelolaDeskripsi" class="form-control" style="z-index: ">
           </div>
-        </div>
-        <div class="col-6 row">
-          <div class="col-4">
-            Email Akun
+          <div class="col-1 mt-3">
+              <button onclick="addbillpengelola()" class="btn btn-info">add</button>
           </div>
-          <div class="col-auto">
-            : <b>{{$data->emailU}}</b>
-          </div>
-        </div>
-        <div class="col-6 row">
-          <div class="col-4">
-            Email Perusahaan
-          </div>
-          <div class="col-auto">
-            : <b>{{$data->emailP}}</b>
-          </div>
-        </div>
-    </div>
-</div>
-
-<h6 class="mt-4">Buat Tagihan</h6>
-<div class="card">
-    <div class="row m-3">
-        <div class="col-5">
-            <label for="">Tagihan</label>
-            <select class="form-select" id="addbillpengelolaProduk" style="font-size: .85em">
-                @foreach ($produk as $p)
-                    <option value="{{$p->productCode}}">{{$p->productName}}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="col-5">
-            <label for="">Deskripsi</label>
-            <input type="text" id="addbillpengelolaDeskripsi" class="form-control" style="z-index: ">
-        </div>
-        <div class="col-1 mt-3">
-            <button onclick="addbillpengelola()" class="btn btn-info">add</button>
-        </div>
-    </div>
-
-</div>
-<h6 class="mt-4">Daftar Tagihan</h6>
-<div class="card">
-    <table class="table align-middle mb-0 bg-white">
-        <thead class="bg-light">
-          <tr>
-            <th>Nama Tagihan</th>
-            <th>Aktif</th>
-            <th>Tgl Mulai</th>
-            <th>Tgl Selesai</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="addbillpengelolatbody">
-          @if (count($tagihan) != 0)
-            @foreach ($tagihan as $t)
-            <tr id="TR{{$t->AppointmentId}}">
-              <td>
-                  <p class="fw-bold mb-1">{{$t->productName}}</p>
-                  <p class="text-muted mb-0">{{$t->description}}</p>
-              </td>
-              <td>
-                <span class="badge badge-success rounded-pill d-inline" onclick="openVP('{{$t->notrans}}')">{{$t->Aktif}}</span>
-              </td>
-              <td>{{Carbon\Carbon::parse($t->jatuhTempoTagihan)->format('j F Y')}}</td>
-              <td>{{Carbon\Carbon::parse($t->FinishDate)->format('j F Y')}}</td>
-              <td>
-                <button type="button" class="btn btn-link btn-sm btn-rounded addbillpengelolaDelTrans" onclick="unsubscribe('{{$t->AppointmentId}}')">
-                  Delete
-                </button>
+      </div>
+  
+  </div>
+  <h6 class="mt-4">Daftar Tagihan</h6>
+  <div id="lst" class="card">
+      <table class="table align-middle mb-0 bg-white">
+          <thead class="bg-light">
+            <tr>
+              <th>Nama Tagihan</th>
+              <th>Aktif</th>
+              <th>Tgl Mulai</th>
+              <th>Tgl Selesai</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="addbillpengelolatbody">
+            @if (count($tagihan) != 0)
+              @foreach ($tagihan as $t)
+              <tr id="TR{{$t->AppointmentId}}">
+                <td>
+                    <p class="fw-bold mb-1">{{$t->productName}}</p>
+                    <p class="text-muted mb-0">{{$t->description}}</p>
+                </td>
+                <td>
+                  <span class="badge badge-success rounded-pill d-inline" onclick="openVP('{{$t->notrans}}')">{{$t->Aktif}}</span>
+                </td>
+                <td>{{Carbon\Carbon::parse($t->jatuhTempoTagihan)->format('j F Y')}}</td>
+                <td>{{Carbon\Carbon::parse($t->FinishDate)->format('j F Y')}}</td>
+                <td>
+                  <button type="button" class="btn btn-link btn-sm btn-rounded addbillpengelolaDelTrans" onclick="unsubscribe('{{$t->AppointmentId}}')">
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            @endforeach
+            @else
+            <tr>
+              <td colspan="5">
+                <center><b>Tidak Ada Data</b></center>
               </td>
             </tr>
-          @endforeach
-          @else
-          <tr>
-            <td colspan="5">
-              <center><b>Tidak Ada Data</b></center>
-            </td>
-          </tr>
-          @endif
-          
-        </tbody>
-      </table>
+            @endif
+            
+          </tbody>
+        </table>
+  </div>
 </div>
 
 
 <script>
+$("#myaddbill").dxScrollView({
+        height: "100%",
+        width: "100%",
+    }).dxScrollView("instance");
+$('#myCreateModal').dxPopup('instance').option('fullScreen', true);
+
   openAddbillpengelola = true;
   function openVP(notrans){
     var val = notrans

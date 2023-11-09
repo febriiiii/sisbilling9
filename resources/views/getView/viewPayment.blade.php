@@ -135,6 +135,7 @@
         @else
         <div class="onpay">
             <button type="button" onclick="voidtrans()" class="btn btn-danger mt-4" name="reject" value="0">Void</button>
+            <button type="button" onclick="lunaskan()" class="btn btn-danger mt-4" name="reject" value="0">Lunaskan</button>
         </div>
         @endif
     @elseif($trans->statusid == 6)
@@ -156,6 +157,34 @@
 </form>
 
 <script>
+    function lunaskan(){
+        var notrans = transG;
+        var typeByr = $('#viewpayment-paymentid').val()
+        $.ajax({
+            type: 'GET',
+            cache: false,
+            url: '{{url("/confirmPemilik")}}', 
+            data: {notrans,typeByr},
+            success: function(response) {
+                showNty(response)
+                if(response == 'Success'){
+                    closemodal2()
+                    renderlonceng()
+                    loadbilling()
+                    
+                    if (typeof querysaled === 'function') {
+                        querysaled()
+                    }
+                    if (typeof querysaledBil === 'function') {
+                        querysaledBil()
+                    }
+                }
+            },
+            error: function(xhr, status, error) {
+                showNty(error,10000)
+            }
+        });
+    }
     if (typeof renderlonceng === 'function') {
         renderlonceng()
     }
@@ -236,18 +265,22 @@
         }
         snap.pay(snapToken, {
             onSuccess: function(result) {
-                paymentsuccess()
+                result.preventDefault()
+                // paymentsuccess()
             },
             onPending: function(result) {
-                paymentsuccess()
+                // paymentsuccess()
+                result.preventDefault()
                 $('#gatewayClose').hide()
                 $('#gatewayOpen').show()
             },
             onError: function(result) {
-                paymentsuccess()
+                result.preventDefault()
+                // paymentsuccess()
             },
             onClose: function(result){
-                paymentsuccess()
+                result.preventDefault()
+                // paymentsuccess()
             }
         });
     }
@@ -261,22 +294,22 @@
         $.ajax({
             type: 'POST',
             cache: false,
-            url: '{{url("/confirmPembayaranMID")}}',
-            data: {'notrans' : transG, 'type' : 'expire'},
+            url: '{{url("/expirePembayaranMID")}}',
+            data: {'notrans' : transG},
             success: function(data) {
-                snapToken = data.snapToken //update dari tbltrans terbaru 
-                transG = data.transG //update dari tbltrans terbaru
-                $('#transG').val(transG)
-                $('#transGR').html(' : '+transG)
-                $('#gatewayClose').show()
-                $('#gatewayOpen').hide()
-                $('#loader').hide('slow')
-                loadbilling()
+                // alert(data.transG)
+                // snapToken = data.snapToken //update dari tbltrans terbaru 
+                // transG = data.transG //update dari tbltrans terbaru
+                // $('#transG').val(transG)
+                // $('#transGR').html(' : '+transG)
+                // $('#gatewayClose').show()
+                // $('#gatewayOpen').hide()
+                // loadbilling()
             },
-            error: function(xhr, status, error) {
-                showNty(error,10000)
-                $('#loader').hide('slow')
-            }
+            // error: function(xhr, status, error) {
+            //     showNty(error,10000)
+            //     $('#loader').hide('slow')
+            // }
         });
     }
     

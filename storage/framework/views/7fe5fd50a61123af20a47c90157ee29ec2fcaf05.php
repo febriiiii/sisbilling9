@@ -120,33 +120,60 @@
             </div>
             <button id="myprofile_savepass" type="button" class="btn btn-primary mt-2" style="right:0;" disabled>Konfirmasi Password</button>
         </div>
-        <?php if(session('UIDGlob')->companyid != ''): ?>
-        <div style="max-width: 500px">
-            <hr>
-            <h4>Midtrans (Gateway)</h4>
-            <div class="form-outline mt-3">
-                <input type="password" id="clientKey" class="form-control seemid" value="<?php echo e($tblcomp['Client_Key']); ?>" readonly/>
-                <label class="form-label" for="clientKey">Client Key</label>
-            </div>
-            <div class="form-outline mt-3">
-                <input type="password" id="ServerKey" class="form-control seemid" value="<?php echo e($tblcomp['Server_Key']); ?>" readonly/>
-                <label class="form-label" for="ServerKey">Server Key</label>
-            </div>
-            <div class="form-outline mt-3">
-                <input type="password" id="IDMerchat" class="form-control seemid" value="<?php echo e($tblcomp['Merchant_ID']); ?>" readonly/>
-                <label class="form-label" for="IDMerchat">Merchant ID</label>
-            </div>
-            <button onclick="toggleSeeMID()" class="btn btn-info mt-2" id="seemid">Lihat</button> <!-- Tombol untuk mengganti tipe input -->
+        <div class="p-2 m-3 ">
+            <?php if(session('UIDGlob')->companyid != ''): ?>
+                <?php if($tblcomp['Server_Key'] == 1): ?>
+                    <div class="row card p-2" style="width: fit-content;">
+                        <div class="image-grid" style="display: grid; grid-template-columns: 70% 30%; grid-gap: 50px;">
+                            <img src="<?php echo e(asset('public/midtrans.png')); ?>" style="height: 40px; width: 100%;">
+                            <img style="height: 35px; width:50px;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAAEaUlEQVR4nO1ZzW9bRRB/7X8AiBbvmohDb5UQnDghUAWUNP1QWxnuSFA+eufAoYhLkeCUponJ231tihpRVC40ggMVFLWqhBDUsR07Tl9b7zoprWigoWm+7HiqWduJX/0cr9d+SZA80kr22m/fb2Z+Mzuza1kd6UhH2iJd/eKJ6u/Uzh0iTEwSLnL4ufo3MjT5lHUMtlqbQbafcbcRLkYpl0C5/DNki9cpExHKRKE8B5SLPGFif8gRByr/JUzE8dmNxm9RJpxVoCuAl2vmmCj6zLF1Bxx25G7C5eeUi/fCtnyTcLlUq4DeIFwuEJ7dG7LlUVwT1wsUPOW5bl9LtmswXDvXvc50afcQPEAF5OXgFZAXg6ANo0z+RJicD1oBwuVCyVCCt0wnDKpAOc8bxwQmDWMFStlmg8DzskeYPG6sAKa3jVaA2uKIsQKUZXvWD+gtINEJoPZN77yT22NaHgyqgAqW40CiLpDeBETOT0Dk2zSQkykvhUob5Sn9suMYbMU6JXBuR13o6ovDxxezkPr7IXzys4BQ3xhQlq0TCyKuVQBipRg0VUInkvDhDzdgcmYRZhYKcPDcOJCBjPLIWs+GbfmklhMIE7FgrH4dXnKScEXOAMrd2SV47euUmteg2zX97OOIA/6LZJUF1WhgrRqun0zDkRFXWRzln7k8vDo0pqiks0ZT+wGxxT6/DYz0j0PPcBp2n03DC3YSQr1xBYwM3qyvECtx+4urk1CR2aUC9AyntMFjeU64eEsLfJjLg9iA1KPAiywBv9y6r4BMz+XhQmYa3h9xoetEvBZQGbz9x50V8EUAeOf763q04Z61CpTlDje2PraADYIQ096nlyQsFRBOSab+W1SBWZ1J0Duf/SqhWnp/u63mjWKIi1zrClQ4PZCB/d+k4d/5vAfgyMQ07OhPKAtHzmdgeVVHiN2ZhWf7Es3FD/e8VzZUAN3k7WfXyiouvHw6CX89WPQo8fvUA3g+GgN3en5lDr2168xY7U7LdYfII7214oA44m3fvraOEq8MJeHenNcTlWxTkS+vTpVyvZnli5hYtMArLzjZXU1xM+rCnuE0LOSXwU9wp8Vd15g6XAKmdn0FmLjWdIANZODojzd8FcBYUKnWEDwtlRIxPfqYlhJqs0rBd6l7HvCXsvdLmakF8LQ8Hj88a38xx7Kw86vESjxgAsKNzzxw5aoHuBi1ALZoeQFLVyxhTc58MH2+e8GFQrEIQ7G7NeWx2dmRGHyG337aalawmTB6af84PNc3umZ53IRXeyxTIVx8YP5i84xDqwa2teYKMHm8HSA2rKkPb4JjlRATb1itSDkOTlEurwTeI3Nl8Xk8RMPDtJbOhHyVwYUDt7q83FbQXgUEWwfaOP/r4/Vwu2lT74KDcPkR5uhWDnyJ2ihz3Xj6hmu2HLAmgrtkLTi/Utz32smxNtMlH1aMeJmH10aevlr1syJSvgBUlS4+s30zXPIpAdjyeKWI3RO2p37XrOq/uoVZRzrSEWsteQSvy7fNY6MAtQAAAABJRU5ErkJggg==">
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <div class="row card" style="background-color:#332D2D; width:fit-content">
+                        <div class="col p-2" style="color: white;font-size:1.1em;">
+                            Midtrans Tidak Digunakan, Hub Suport Center Via 
+                            <button onclick="chatCS()" class="btn btn-dark" style="padding:0px;">
+                                <img style="height:30px; width:30px;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAABOUlEQVR4nO2XQWrDMBBFdYWSiKwME7rwtUqwN71Al+2mJ0ilQ4SCTxCsbnKQ7pvEFnTrMm0KJditiqXgD/NgdkL+bzRgSSlBEITJcm3eMzL+mYxvl9Z3seq0X0W2yZOGXxr/FjN4T+35O0kEuPOJw3/XJpVA1LEZHCfrmyQCF+p+xyUCfcgJWBmhccgI2fAR0qXrqbqdF66arbY5qID7qqLeX928ZLgCJUu4DbhA3WALlO7/f2sRsGHdp/UR+wSyx1dggfWhW9zu8AToqfns/CIwfDQBsu39+brQAGNLjRXoCw8jQAPhIQTol/CTF6A/wk9bwPiHkHWTFQiF7+3QAvPCVdACs9U250cHrADDLyZ+dPC9HVIgJrpwd9ACQxIKDX0moRDRPyQUKvokoZDRZR10KxAEQVAX5wMxV/Fz2PxQkQAAAABJRU5ErkJggg==">
+                            </button>
+                            <a href="https://api.whatsapp.com/send?phone=<?php echo e($tblcomp['hp']); ?>" target="_blank" class="btn btn-dark" style="padding:0px;">
+                                <img style="height:30px; width:30px;" src="data:image/png;base64,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">
+                            </a>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            <?php endif; ?>
         </div>
-        <?php endif; ?>
+        <script>
+            function chatCS(){
+                userid = 1;
+                if(userid == null){
+                    showNty("Tolong Pilih User")
+                    return false
+                }
+                $.ajax({
+                    type: 'GET',
+                    cache: false,
+                    url: '<?php echo e(url("/getchatLawan")); ?>',
+                    data:{userid},
+                    success: function(chatid) {
+                        opnchat(chatid)
+                    },
+                    error: function(xhr, status, error) {
+                        showNty(error,10000)
+                    }
+                });
+            }
+        </script>
+        
     </center>
     <hr>
     <h4>Pengaturan</h4>
     <button class="btn btn-secondary mt-2 me-2" data-mdb-toggle="modal" data-mdb-target="#myprofile_companySetting">Perusahaan</button>
     <?php if(session('UIDGlob')->companyid != ''): ?>
-    <button class="btn btn-secondary mt-2 me-2" onclick="opnMasterProduct()">Master Produk</button>
-    <button class="btn btn-secondary mt-2 me-2" onclick="opnProductType()">Produk Type</button>
-    <button class="btn btn-secondary mt-2 me-2" onclick="opnPaymentMethod()">Payment Method</button>
+    <button class="btn btn-secondary mt-2 me-2" onclick="opnMasterProduct()">Produk</button>
+    <button class="btn btn-secondary mt-2 me-2" onclick="opnProductType()">Tipe Produk</button>
+    <button class="btn btn-secondary mt-2 me-2" onclick="opnPaymentMethod()">Metode Pembayaran</button>
     <button class="btn btn-secondary mt-2 me-2" onclick="opnmdlcustomer()">Tambah Customer</button>
     <?php endif; ?>
     
@@ -169,8 +196,8 @@
                     <div class='mt-3'>
                         <label class='form-label' for='myprofile_companynameP'>Subsribe</label>
                         <select name="subscribe" id="myprofile_subscribe" class="form-select" style="background-color: red;color:white;font-weight:bold;">
-                            <?php $__currentLoopData = $paket; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <option value="<?php echo e($p->productCode); ?>"><?php echo e($p->productName); ?> <?php echo e(number_format($p->price,2)); ?>  disc <?php echo e($p->disc); ?>% (<?php echo e(number_format($p->price - ($p->price * $p->disc / 100),2)); ?>)</option>
+                            <?php $__currentLoopData = $paketFree; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($p->productCode); ?>"><?php echo e($p->productName); ?></option>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
@@ -214,7 +241,7 @@
                     <button type="submit" class="btn btn-primary">Simpan</button>
                     <?php else: ?>
                     <button type="submit" class="col-12 btn btn-danger" name="subscribe" value="1">Subscribe</button>
-                    <a href="https://api.whatsapp.com/send?phone=<?php echo e(App\Models\tbluser::find(1)->hp); ?>" target="_blank" class="col-12 btn btn-outline-secondary" style="height: 35px;">
+                    <a href="https://api.whatsapp.com/send?phone=<?php echo e($tblcomp['hp']); ?>" target="_blank" class="col-12 btn btn-outline-secondary" style="height: 35px;">
                         <i class="fab fa-whatsapp"></i> Follow Up? <span style="color:red; font-size:0.8em;">*Menunggu Persetujuan Admin Sis Billing</span>
                     </a>
                     <?php endif; ?>
@@ -224,18 +251,18 @@
     </div>  
 </div>
 <script>
-    function toggleSeeMID() {
-        var inputs = document.querySelectorAll('.seemid');
-        inputs.forEach(function(input) {
-            if (input.type === 'password') {
-                input.type = 'text'; // Ganti ke tipe teks
-                $('#seemid').text("Sembunyikan")
-            } else {
-                input.type = 'password'; // Ganti ke tipe sandi (password)
-                $('#seemid').text("Lihat")
-            }
-        });
-    }
+    // function toggleSeeMID() {
+    //     var inputs = document.querySelectorAll('.seemid');
+    //     inputs.forEach(function(input) {
+    //         if (input.type === 'password') {
+    //             input.type = 'text'; // Ganti ke tipe teks
+    //             $('#seemid').text("Sembunyikan")
+    //         } else {
+    //             input.type = 'password'; // Ganti ke tipe sandi (password)
+    //             $('#seemid').text("Lihat")
+    //         }
+    //     });
+    // }
     function opnmdlcustomer(){
         $.ajax({
             type: 'GET',

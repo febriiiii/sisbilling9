@@ -31,17 +31,11 @@ class UserController extends Controller
         return session('otp');
     }
     public function register(Request $request){
-        if(session('otp') == null){
-            return redirect()->back()->withInput();
-        }
+        $tbluser = tbluser::where('email',$request->email)->first();
         $controller = new Controller;
-        $decryptedOTP = $controller->decrypt(session('otp'));
-        if ($request->otp != $decryptedOTP) {
-            return redirect()->back()->withErrors(['otp' => 'OTP tidak sama'])->withInput();
-        }
         $request->validate(
         [    
-            'email' => 'required|email|unique:tbluser,email',
+            'email' => 'required|email',
             'password' => 'required|min:6',
             'password2' => 'required|same:password',
             'nama' => 'required',
@@ -63,11 +57,11 @@ class UserController extends Controller
             'alamatLengkap.required' => 'Alamat lengkap wajib diisi.',
         ]);
 
-
+        $otp = random_int(100000, 999999);
         $data = [
             'companyidArray' => '1,',
             'companyid' => null,
-            'statusid' => 1,
+            'statusid' => 4,
             'email' => $request->email,
             'password' => hash::make($request->password),
             'nama' => $request->nama,
@@ -76,25 +70,50 @@ class UserController extends Controller
             'alamatLengkap' => $request->alamatLengkap,
             'infoTambahan' => $request->InfoTambahan,
             'profileImg' => "user/user.png",
-        ];
-        $data = tbluser::create($data);
-        $data->update([
-            'UserInsert' => $data->userid,
-            'UserUpdate' => $data->userid,
             'InsertDT' => Carbon::now(config('app.GMT')),
-            'UpdateDT' => Carbon::now(config('app.GMT')),
-        ]);
-        $credentials = [
-            'email' => $data->email,
-            'password' => $request->password,
+            'TokenOTP' => $controller->encrypt('not set'),
+            'OtpDT' => Carbon::parse('2020-01-01'),
         ];
-        if (Auth::attempt($credentials)) {
-            session_start();
-            $request->session()->regenerate();
-            session(['UIDGlob' => auth()->user()]);
-            return redirect()->intended('/');
+        if(!isset($tbluser)){
+            tbluser::create($data);
+            $tbluser = tbluser::where('email',$request->email)->first();
         }
-        return redirect()->back()->withInput();
+        if($request->otp != $controller->decrypt($tbluser->TokenOTP)){
+            if(Carbon::parse($tbluser->OtpDT)->setTime(0, 0, 0)->format('ymd') != Carbon::now(config('app.GMT'))->setTime(0, 0, 0)->format('ymd')){
+                if($request->password != '******'){
+                    $pasword = hash::make($request->password);
+                }else{
+                    $pasword = $tbluser->password;
+                }
+                $tbluser->update([
+                    'email' => $request->email,
+                    'password' => $pasword,
+                    'nama' => $request->nama,
+                    'hp' => $request->hp,
+                    'alamatSingkat' => $request->alamatSingkat,
+                    'alamatLengkap' => $request->alamatLengkap,
+                    'infoTambahan' => $request->InfoTambahan,
+                    'TokenOTP' => $controller->encrypt($otp),
+                    'OtpDT' => Carbon::now(config('app.GMT')),
+                    'UpdateDT' => Carbon::now(config('app.GMT')),
+                ]);
+                $mail = [
+                    'type' => 'otp',
+                    'name' => $request->nama,
+                    'otp' => $otp,
+                ];
+                Mail::to($request->email)->send(new SendMail($mail));
+                return redirect()->back()->withErrors(['otp' => 'OTP Sudah Dikirim Ke Email Anda'])->withInput();
+            }
+            return redirect()->back()->withErrors(['otp' => 'OTP yang anda masukan salah'])->withInput();
+        }else{
+            $tbluser->update([
+                'statusid' => 1,
+                'UpdateDT' => Carbon::now(config('app.GMT')),
+            ]);
+            $msg = "Pendaftaran Berhasil, Akun anda sudah bisa login";
+            return view('success',compact('msg'));
+        }
     }
 
     public function forgot(){

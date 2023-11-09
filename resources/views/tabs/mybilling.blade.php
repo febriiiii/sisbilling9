@@ -50,6 +50,16 @@
     <div class="col-auto me-4">
       <div class="row">
         <div class="col-auto" style="padding:0">
+          <div class="scedulerketDot" style="background-color: #8afd8c; height:20px; width:20px; border-radius:100%;"></div>
+        </div>
+        <div class="col" style="padding:0 0 0 5px;">
+          <div>Belum bisa dibayar</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-auto me-4">
+      <div class="row">
+        <div class="col-auto" style="padding:0">
           <div class="scedulerketDot" style="background-color: #08e7fb; height:20px; width:20px; border-radius:100%;"></div>
         </div>
         <div class="col" style="padding:0 0 0 5px;">
@@ -82,6 +92,11 @@
                         productName = productName.substring(0, 17) + "...";
                       }
                       selisihH = "";
+                      var fungsi = `onclick="payment('`+e.notrans+`')"`
+                      if(e.RowNumber != 1){
+                        color = '#8afd8c';
+                        fungsi = `onclick="showNty('Hanya Bisaya Membayar Tagihan Pertama (`+productName+`)')"`
+                      }
                       if(parseInt(e.selisih) == 0){
                         selisihH = `<i style="color: red; font-size:.7em;">* Jatuh Tempo Hari Ini</i>`;
                       }else if(parseInt(e.selisih) > 0){
@@ -92,7 +107,7 @@
                       var content = `<div class="card box" style="border-radius:15px; margin-top:0;margin-bottom:15px;">` +
                                       `<div class="ribbon-2" style="background:`+color+`">`+productName+`</div>` +
                                       `<div class="row">` +
-                                          `<div onclick="payment('`+e.notrans+`')" class="col-auto p-2 btn" style="border-radius:15px 0 0 15px; background-color: `+color+`">` +
+                                          `<div `+fungsi+` class="col-auto p-2 btn" style="border-radius:15px 0 0 15px; background-color: `+color+`">` +
                                               `<img style="height:40px;width:40px;" src="{{asset('public/payment.png')}}">` +
                                           `</div>` +
                                           `<div class="col p-2">` +

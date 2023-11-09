@@ -33,7 +33,7 @@
                 <div class="uk-alert-danger" uk-alert style="position: fixed; top:50px; right:5px;vw;z-index:99999">
                     <a href class="uk-alert-close" uk-close></a>
                     <p>Akun Anda Telah Habis Masa Aktif, Tolong Lakukan Pembayaran</p>
-                    <p>Jika Butuh Bantuan Hubungi CS SisBilling.</p>
+                    <p>Jika Butuh Bantuan Hubungi Suport Center.</p>
                 </div>
             @endif
         @endif
@@ -61,7 +61,7 @@
         @include('layout.footer')
         @include('layout.footerlink')
     </body>
-    <script>
+    {{-- <script>
         if('{{session("track")}}' == 'mybilling'){
             UIkit.switcher('.uk-switcher').show(1)
             if (activeItem) {
@@ -78,5 +78,5 @@
             });
 
         }
-    </script>
+    </script> --}}
 </html>

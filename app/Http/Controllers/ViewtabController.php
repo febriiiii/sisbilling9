@@ -112,8 +112,8 @@ class ViewtabController extends Controller
         ->where(DB::raw('tbltrans.SPokok + tbltrans.SBunga + tbltrans.SLateFee'),'>',0)
         ->first();
         $transactioController = new TransactionController;
-        $MID = $transactioController->cekstatusMID($trans->notrans,$trans->companyid);
         if(isset($trans)){
+            $MID = $transactioController->cekstatusMID($trans->notrans,$trans->companyid);
             $file = '';
             $path = storage_path('app/public/user/'.$trans->userid.'/notrans/'.$trans->notrans.'.*');
             $files = glob($path);
@@ -170,13 +170,16 @@ class ViewtabController extends Controller
                                             AND ".session('UIDGlob')->userid." NOT IN (SELECT value FROM STRING_SPLIT(usersRead, ','))                                    
                                             AND statusid NOT IN (4,13)");
         
-        $notif['invoice'] = DB::select("SELECT t.*, a.Text FROM tbltrans t
+        $notif['invoice'] = DB::select("SELECT 
+                                        ROW_NUMBER() OVER(PARTITION BY a.productCode ORDER BY t.jatuhTempoTagihan ASC) AS RowNumber,
+                                        t.*, a.Text FROM tbltrans t
                                         JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
                                         WHERE t.statusid NOT IN (7, 8, 9, 4, 13) 
                                         AND t.companyid IN (".$cid.") 
                                         AND t.userid = ".session('UIDGlob')->userid." 
                                         AND t.SPokok + t.SBunga + t.SLateFee <> 0
-                                        AND DATEADD(DAY, -7, t.jatuhTempoTagihan) < '".now(config('app.GMT'))->toDateTimeString()."'");
+                                        AND DATEADD(DAY, -7, t.jatuhTempoTagihan) < '".now(config('app.GMT'))->toDateTimeString()."'
+                                        ORDER BY a.productCode, t.jatuhTempoTagihan ASC");
 
         $notif['invoiceReject'] = DB::select("SELECT t.*, a.Text FROM tbltrans t
                                         JOIN tblagenda a ON a.AppointmentId=t.AppointmentId

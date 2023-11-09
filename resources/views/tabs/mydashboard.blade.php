@@ -567,7 +567,13 @@
               var dateData = new Date(w.date)
               if(w.id == e.appointmentData.AppointmentId){
                 $(e.appointmentElement[0]).css('background-color', '#FD8A8A');
-                if(dateContent < dateData){
+                console.log(dateContent+ dateData);
+                // if(dateContent < dateData){
+                //   setTimeout(() => {
+                //     $(e.appointmentElement[0]).css('background-color', '#7AA874');
+                //   }, 200);
+                // }
+                if(w.statusid == 7){
                   setTimeout(() => {
                     $(e.appointmentElement[0]).css('background-color', '#7AA874');
                   }, 200);

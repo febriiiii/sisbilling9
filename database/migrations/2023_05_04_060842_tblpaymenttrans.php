@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreign('paymentid')->references('paymentid')->on('tblpaymentmethod');
             $table->unsignedInteger('statusid');
             $table->foreign('statusid')->references('statusid')->on('tblstatus');
+            $table->boolean('pelunasanOlehPemilik')->default(0);
             $table->date('tglBayar');
             $table->date('tglVerifikasi')->nullable();
             $table->double('total')->default(0.00);

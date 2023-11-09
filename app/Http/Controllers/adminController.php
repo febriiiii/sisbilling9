@@ -148,7 +148,7 @@ class adminController extends Controller
         return "Gagal";
     }
     public function subscribe(Request $request){
-        $this->createSubscribe($request->productCode,$request->userid);
+        return $this->createSubscribe($request->productCode,$request->userid);
     }
     public function createSubscribe($productCode,$userid){
         $produk = tblmasterproduct::find($productCode);

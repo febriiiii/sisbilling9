@@ -93,8 +93,6 @@ const myCreateModal = $('#myCreateModal').dxPopup({
                                 openAddbillpengelola = false
                             }
                         }); 
-
-
 function GModal(title,content){
     myCreateModal.option('title', title);
     if (DevExpress.devices.current().deviceType === "phone" || DevExpress.devices.current().deviceType === "tablet") {

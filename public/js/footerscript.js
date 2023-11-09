@@ -25,6 +25,7 @@ document.addEventListener('keydown', function(event) {
   }
 });
 var transG = null
+
 function paymentsuccess(){
   if(transG == null){
       return false;
@@ -41,6 +42,7 @@ function paymentsuccess(){
       url: URLconfirmPembayaranMID,
       data: {'notrans' : transG},
       success: function(data) {
+        alert('Manual Control: '+ data.transG)
           if(data.msg == 'settlement'){
             showNty(data.msg)
           }
@@ -245,7 +247,8 @@ function payment(notrans){
           }
         }else if(data.type == 'midtransHook'){
           if(data.authuser == UIDGlob.userid){
-            transG = data.type.split('|')[1]
+            alert('midtranshook: '+ transG+' , status :'+data.status)
+            console.log(data);
             if(data.msg == 'settlement'){
               showNty(data.msg)
             }
@@ -264,6 +267,7 @@ function payment(notrans){
                 $('#transGR').html(' : '+transG)
                 $('#gatewayClose').show()
                 $('#gatewayOpen').hide()
+                $('#loader').hide('slow')
             }else if(data.status == 200){
                 $('.onpay').html(`<center>
                                       <h3 class="mt-4" style="color:red;">LUNAS</h3>

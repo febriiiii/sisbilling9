@@ -61,7 +61,7 @@
                         <a class="nav-link navAdministrator" id="adminlistpengelola" href="#" onclick="CallAdminPage('adminlistpengelola')" style="color: blue">List Pengelola</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link navAdministrator" id="admintagihan" href="#" onclick="CallAdminPage('admintagihan')">Tagihan</a>
+                        <a class="nav-link navAdministrator" id="admintagihan" href="#" onclick="CallAdminPage('admintagihan')">Daftar Paket</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link navAdministrator" id="adminpembayaran" href="#" onclick="CallAdminPage('adminpembayaran')">Pembayaran</a>

@@ -22,7 +22,7 @@
             <?php if(session('UIDGlob')->superadmin != 1): ?>
                 <div class="uk-alert-danger" uk-alert>
                     <p>Akun Anda Telah Habis Masa Aktif, Tolong Lakukan Pembayaran</p>
-                    <p>Jika Butuh Bantuan Hubungi CS SisBilling.</p>
+                    <p>Jika Butuh Bantuan Hubungi Suport Center.</p>
                 </div>
             <?php endif; ?>
         <?php endif; ?>
@@ -30,7 +30,7 @@
             <li onclick=""><a class="dropdown-item card mt-1" href="#"><?php echo e($i->text); ?> </a></li>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         <?php $__currentLoopData = $notif['tblnotif']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <li onclick=""><a class="dropdown-item card mt-1" href="#"><?php echo e($i->deskripsi); ?> </a></li>
+            <li onclick="payment('<?php echo e($i->notrans); ?>"><a class="dropdown-item card mt-1" href="#"><?php echo e($i->deskripsi); ?> </a></li>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         <?php $__currentLoopData = $notif['pengumuman']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <?php
@@ -61,7 +61,11 @@
             <li onclick="opnchat(<?php echo e($c->chatid); ?>)"><a class="dropdown-item card mt-1" href="#"><?php echo e($c->total); ?> Pesan Dari <?php echo e($limitedString); ?> </a></li>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         <?php $__currentLoopData = $notif['invoice']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <li onclick="payment('<?php echo e($i->notrans); ?>')"><a class="dropdown-item card mt-1" href="#">Tagihan : <?php echo e($i->Text); ?> </a></li>
+            <?php if($i->RowNumber == 1): ?>
+                <li onclick="payment('<?php echo e($i->notrans); ?>')"><a class="dropdown-item card mt-1" href="#">Tagihan : <?php echo e($i->Text); ?> </a></li>
+            <?php else: ?>
+                <li onclick="showNty('<?php echo e($i->notrans); ?> Belum Bisa Dibayarkan')"><a class="dropdown-item card mt-1" href="#">Tagihan : <?php echo e($i->Text); ?> </a></li>
+            <?php endif; ?>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         <?php $__currentLoopData = $notif['invoiceReject']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <li onclick="payment('<?php echo e($i->notrans); ?>')"><a class="dropdown-item card mt-1" href="#">Reject <?php echo e($i->Text); ?> : <?php echo e($i->notrans); ?> </a></li>

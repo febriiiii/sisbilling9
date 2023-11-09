@@ -165,8 +165,10 @@ Route::get('/eod', [TransactionController::class, 'eod']);
 Route::get('/voidtrans', [TransactionController::class, 'voidtrans']);
 Route::get('/getbill', [TransactionController::class, 'getbill']);
 Route::get('/gettransaction', [TransactionController::class, 'gettransaction']);
+Route::get('/confirmPemilik', [TransactionController::class, 'confirmPemilik']);
 Route::post('/confirmPembayaran', [TransactionController::class, 'confirmPembayaran']);
 Route::post('/confirmPembayaranMID', [TransactionController::class, 'confirmPembayaranMID']);
+Route::post('/expirePembayaranMID', [TransactionController::class, 'expirePembayaranMID']);
 
 Route::get('/pivot', [ReportController::class, 'pivot']);
 
