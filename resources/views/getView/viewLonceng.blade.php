@@ -17,7 +17,7 @@
             <span class="badge" style="background-color: whitesmoke;color:black; position: absolute; margin-left:-10px; margin-top:-7px">{{$notif['count']}}</span>
         @endif
     </a>
-    <ul class="dropdown-menu" style="position: absolute; left:-170px; box-shadow:-3px 3px 6px rgb(221, 221, 221)">
+    <ul class="dropdown-menu navlonceng" style="position: fixed; top:50px; overflow:hidden; box-shadow:-3px 3px 6px rgb(221, 221, 221)">
         @if (session('UIDGlob')->companyid != '' && session('UIDGlob')->scrb < 1)
             @if (session('UIDGlob')->superadmin != 1)
                 <div class="uk-alert-danger" uk-alert>
@@ -30,7 +30,7 @@
             <li onclick=""><a class="dropdown-item card mt-1" href="#">{{$i->text}} </a></li>
         @endforeach
         @foreach ($notif['tblnotif'] as $i)
-            <li onclick="payment('{{$i->notrans}}"><a class="dropdown-item card mt-1" href="#">{{$i->deskripsi}} </a></li>
+            <li onclick="payment('{{$i->uniqCode}}')"><a class="dropdown-item card mt-1" href="#">{{$i->deskripsi}} </a></li>
         @endforeach
         @foreach ($notif['pengumuman'] as $p)
             @php

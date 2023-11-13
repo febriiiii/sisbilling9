@@ -48,6 +48,9 @@
             <p>Berikut adalah One-Time Password (OTP) Anda:</p>
             <center>
                 <h1>{{ $otp }}</h1>
+                @if (isset($hit))
+                <a style="color:red;" href="{{$hit}}">Klik ini untuk konfirmasi</a>
+                @endif
             </center>
             <small>
                 <i style="color:red;">*Harap jangan berikan informasi ini kepada siapapun dan pastikan untuk menjaga kerahasiaan OTP ini.</i>

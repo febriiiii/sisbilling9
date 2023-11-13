@@ -48,6 +48,9 @@
             <p>Berikut adalah One-Time Password (OTP) Anda:</p>
             <center>
                 <h1><?php echo e($otp); ?></h1>
+                <?php if(isset($hit)): ?>
+                <a style="color:red;" href="<?php echo e($hit); ?>">Klik ini untuk konfirmasi</a>
+                <?php endif; ?>
             </center>
             <small>
                 <i style="color:red;">*Harap jangan berikan informasi ini kepada siapapun dan pastikan untuk menjaga kerahasiaan OTP ini.</i>

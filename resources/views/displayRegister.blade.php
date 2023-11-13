@@ -2,7 +2,7 @@
 @section('content')
 <button onclick="window.location.href='{{url('/')}}'" class="btn btn-primary m-3" style="padding:5px 10px 5px 5px; border-radius:100%;"><i class="las la-backspace" style="font-size: 40px;"></i></button>
     <div class="container" style="padding-bottom: 15vh;"> 
-        <form id="submitRgstr" class="container" style="margin-top:8vh; z-index:3;" method="POST" action="{{url('register')}}">
+        <form id="submitRgstr" class="container" style="margin-top:8vh; z-index:3;" method="POST" action="{{url('register')}}?stmp={{time()}}">
             @csrf
             <center>
                 <div style="max-width: 500px">
@@ -632,6 +632,8 @@
     </div>
   </div>
 
-    <img src="{{asset('public/wave.svg')}}" style="bottom:0; position: fixed; z-index:-1;">
-
+    {{-- <img src="{{asset('public/wave.svg')}}" style="bottom:0; position: fixed; z-index:-1;"> --}}
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" style="bottom:0; position: fixed; z-index:-1">
+      <path fill="#0099ff" fill-opacity="1" d="M0,288L1440,64L1440,320L0,320Z"></path>
+    </svg>
 @endsection

@@ -29,8 +29,14 @@
     <div class="container row" style="margin-top:20vh;">
         <div class="col-lg-4 col-1"></div>
         <div class="col">
-            <h2 class="blueFont text-end">Selamat Datang</h2>
-            <h4 class="blueFont text-end">Sis Billing</h4>
+            <center>
+                <img src="<?php echo e(asset('/public/Sisbilling_final.png')); ?>" style="height:90px;">
+            </center>
+            
+
+            
+
+            
         </div>
         <div class="col-lg-4 col-1"></div>
     </div>
@@ -75,7 +81,10 @@ unset($__errorArgs, $__bag); ?>
         <div class="col-lg-4"></div>
     </div>
 </div>
-<img src="<?php echo e(asset('public/wave.svg')); ?>" style="bottom:0; position: fixed; z-index:-1">
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" style="bottom:0; position: fixed; z-index:-1">
+    <path fill="#0099ff" fill-opacity="1" d="M0,288L1440,64L1440,320L0,320Z"></path>
+</svg>
 
 <script>
     // if (caches && caches.keys) {

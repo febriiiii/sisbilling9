@@ -76,6 +76,10 @@ input:focus {
   font-weight: 500 !important;
   color: #747474 !important;
 }
+.navlonceng{
+  left:70vw !important; 
+  right:10px !important;
+}
 @media screen and (max-width: 450px) {
   .dx-popup-flex-height{
     width: fit-content !important;
@@ -89,10 +93,14 @@ input:focus {
     width: 15px !important;
   }
 }
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 700px) {
   /* .dx-scheduler-date-table-container.dx-draggable {
     pointer-events: none !important;
   } */
+  .navlonceng{
+    left:10px !important;;
+    right:10px !important;;
+  }
 }
 @media screen and (max-width: 400px) {
   .navbarCustomIcon{

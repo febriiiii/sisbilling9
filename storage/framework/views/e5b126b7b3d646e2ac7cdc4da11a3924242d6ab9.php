@@ -4,8 +4,8 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
         <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
-        <link rel="icon" type="image/png" href="<?php echo e(asset('public/icon.png')); ?>">
         <link rel="apple-touch-startup-image" href="<?php echo e(asset('public/icon.png')); ?>">
+        <link rel="icon" href="<?php echo e(asset('public/logo.png')); ?>" type="image/x-icon">
 
         <title>Sis Billing</title>
         <?php echo $__env->make('layout.headerlink', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>

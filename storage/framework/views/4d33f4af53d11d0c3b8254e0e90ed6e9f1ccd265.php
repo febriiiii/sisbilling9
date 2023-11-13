@@ -17,7 +17,7 @@
             <span class="badge" style="background-color: whitesmoke;color:black; position: absolute; margin-left:-10px; margin-top:-7px"><?php echo e($notif['count']); ?></span>
         <?php endif; ?>
     </a>
-    <ul class="dropdown-menu" style="position: absolute; left:-170px; box-shadow:-3px 3px 6px rgb(221, 221, 221)">
+    <ul class="dropdown-menu navlonceng" style="position: fixed; top:50px; overflow:hidden; box-shadow:-3px 3px 6px rgb(221, 221, 221)">
         <?php if(session('UIDGlob')->companyid != '' && session('UIDGlob')->scrb < 1): ?>
             <?php if(session('UIDGlob')->superadmin != 1): ?>
                 <div class="uk-alert-danger" uk-alert>
@@ -30,7 +30,7 @@
             <li onclick=""><a class="dropdown-item card mt-1" href="#"><?php echo e($i->text); ?> </a></li>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         <?php $__currentLoopData = $notif['tblnotif']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <li onclick="payment('<?php echo e($i->notrans); ?>"><a class="dropdown-item card mt-1" href="#"><?php echo e($i->deskripsi); ?> </a></li>
+            <li onclick="payment('<?php echo e($i->uniqCode); ?>')"><a class="dropdown-item card mt-1" href="#"><?php echo e($i->deskripsi); ?> </a></li>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         <?php $__currentLoopData = $notif['pengumuman']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <?php

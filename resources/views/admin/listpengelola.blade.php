@@ -36,6 +36,7 @@
         headerFilter: {
           visible: true,
         },
+        filterPanel: { visible: true },
         columns: [
             {
                 dataField: 'userid',
@@ -47,6 +48,10 @@
             },
             {
                 dataField: 'nama',
+                dataType: "string" 
+            },
+            {
+                dataField: 'hp',
                 dataType: "string" 
             },
             {
@@ -68,6 +73,21 @@
             },
             {
                 dataField: 'alamatP',
+                dataType: "string" 
+            },
+            {
+                dataField: 'perusahaanTerkait',
+                dataType: "string",
+                cellTemplate: function(container, options) {
+                    var comp = options.data.perusahaanTerkait.split(',')
+                    comp.forEach(c => {
+                        var historyButton = $('<span class="badge badge-info rounded-pill d-inline">'+c+'<span>');
+                        container.append(historyButton);                    
+                    });
+                } 
+            },
+            {
+                dataField: 'statusBayar',
                 dataType: "string" 
             },
             {

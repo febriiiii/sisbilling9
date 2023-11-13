@@ -29,6 +29,10 @@ class SendMail extends Mailable
             return new Envelope(
                 subject: 'One Time-Password',
             );
+        }else if($this->data['type'] == 'otpLogin'){
+            return new Envelope(
+                subject: 'Company Subscribe',
+            );
         }else if($this->data['type'] == 'subscribe'){
             return new Envelope(
                 subject: 'Company Subscribe',
@@ -62,6 +66,11 @@ class SendMail extends Mailable
     public function content(): Content
     {
         if($this->data['type'] == 'otp'){
+            return new Content(
+                view: 'MailOtp',
+                with: $this->data,
+            );
+        }else if($this->data['type'] == 'otpLogin'){
             return new Content(
                 view: 'MailOtp',
                 with: $this->data,

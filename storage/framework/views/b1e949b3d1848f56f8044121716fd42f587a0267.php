@@ -9,7 +9,7 @@
       <div class="mt-3" id="tabeltransaction"  style="min-height: 300px; height:500px; resize: vertical; overflow: auto;"></div>
     </div>    
   </div>
-  <?php if(session('UIDGlob')->companyid != '' && session('UIDGlob')->scrb > 0): ?>
+  <?php if((session('UIDGlob')->companyid != '' && session('UIDGlob')->scrb > 0) || session('UIDGlob')->companyid == 1): ?>
   <div class="card mt-4 p-1">
     <ul style="background-color: rgb(192, 218, 151);color:black; font-weight:bold; border-radius:7px; cursor: pointer;" onclick="$('#contentbill2').slideToggle()">My Customer Billing</ul>
     <div id="contentbill2" style="display: nones;">

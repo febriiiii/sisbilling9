@@ -30,6 +30,21 @@ class UserController extends Controller
         Mail::to($request->email)->send(new SendMail($data));
         return session('otp');
     }
+    public function loginotp(Request $request){
+        $controller = new Controller;
+        $tbluser = tbluser::find($request->id);
+        if(isset($tbluser)){
+            if($request->otp == $controller->decrypt($tbluser->TokenOTP)){
+                $tbluser->update([
+                    'statusid' => 1,
+                    'UpdateDT' => Carbon::now(config('app.GMT')),
+                ]);
+                $msg = "Pendaftaran Berhasil, Akun anda sudah bisa login";
+                return view('success',compact('msg'));
+            }
+        }
+        return "OTP TIDAK DIKENAL !";
+    }
     public function register(Request $request){
         $tbluser = tbluser::where('email',$request->email)->first();
         $controller = new Controller;
@@ -98,9 +113,10 @@ class UserController extends Controller
                     'UpdateDT' => Carbon::now(config('app.GMT')),
                 ]);
                 $mail = [
-                    'type' => 'otp',
+                    'type' => 'otpLogin',
                     'name' => $request->nama,
                     'otp' => $otp,
+                    'hit' => url('/loginotp') .'?id='. $tbluser->userid . '&otp='. $otp,
                 ];
                 Mail::to($request->email)->send(new SendMail($mail));
                 return redirect()->back()->withErrors(['otp' => 'OTP Sudah Dikirim Ke Email Anda'])->withInput();

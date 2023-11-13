@@ -29,8 +29,19 @@
     <div class="container row" style="margin-top:20vh;">
         <div class="col-lg-4 col-1"></div>
         <div class="col">
+            <center>
+                <img src="{{asset('/public/Sisbilling_final.png')}}" style="height:90px;">
+            </center>
+            {{-- <center>
+                <img src="{{asset('/public/logo.png')}}" style="position: absolute; z-index:-1; margin-top:-200px;">
+                <img src="{{asset('/public/logoText.png')}}" style="height:70px; margin-left:70px; margin-top:20px;">
+            </center> --}}
+
+            {{-- <img src="{{asset('/public/logo.png')}}" style="position: absolute; z-index:-1; margin-top:-180px; margin-left:70px;">
             <h2 class="blueFont text-end">Selamat Datang</h2>
-            <h4 class="blueFont text-end">Sis Billing</h4>
+            <img src="{{asset('/public/logoText.png')}}" style="float: right; height:55px;"> --}}
+
+            {{-- <img src="{{asset('/public/Sisbilling_final.png')}}" style="float: right; height:70px;"> --}}
         </div>
         <div class="col-lg-4 col-1"></div>
     </div>
@@ -68,7 +79,10 @@
         <div class="col-lg-4"></div>
     </div>
 </div>
-<img src="{{asset('public/wave.svg')}}" style="bottom:0; position: fixed; z-index:-1">
+{{-- <img src="{{asset('public/wave.svg')}}" style="bottom:0; position: fixed; z-index:-1"> --}}
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" style="bottom:0; position: fixed; z-index:-1">
+    <path fill="#0099ff" fill-opacity="1" d="M0,288L1440,64L1440,320L0,320Z"></path>
+</svg>
 
 <script>
     // if (caches && caches.keys) {

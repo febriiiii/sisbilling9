@@ -68,6 +68,7 @@ Route::get('/companytouser', [UserController::class, 'companytouser']);
 Route::get('/registerView', [UserController::class, 'registerView'])->middleware('guest');
 Route::get('/forgot', [UserController::class, 'forgot'])->middleware('guest');
 Route::post('/register', [UserController::class, 'register']);
+Route::get('/loginotp', [UserController::class, 'loginotp']);
 Route::post('/otp', [UserController::class, 'otp']);
 Route::get('/otpSET', [UserController::class, 'otpSET']);
 Route::post('/confirmotp', [UserController::class, 'confirmotp']);

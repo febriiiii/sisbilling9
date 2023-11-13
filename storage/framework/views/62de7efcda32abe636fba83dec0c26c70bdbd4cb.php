@@ -49,7 +49,7 @@
                     <!-- Navbar brand -->
                     <a class="navbar-brand mt-2 mt-lg-0" href="#">
                     <img
-                        src="<?php echo e(asset('public/icon.png')); ?>"
+                        src="<?php echo e(asset('public/Sisbilling_final.png')); ?>"
                         alt="SissBilling"
                         loading="lazy"
                         style="height: 30px;"
@@ -58,7 +58,7 @@
                     <!-- Left links -->
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link navAdministrator" id="adminlistpengelola" href="#" onclick="CallAdminPage('adminlistpengelola')" style="color: blue">List Pengelola</a>
+                        <a class="nav-link navAdministrator" id="adminlistpengelola" href="#" onclick="CallAdminPage('adminlistpengelola')" style="color: blue">Master User</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link navAdministrator" id="admintagihan" href="#" onclick="CallAdminPage('admintagihan')">Daftar Paket</a>

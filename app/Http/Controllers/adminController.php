@@ -35,22 +35,33 @@ class adminController extends Controller
     public function dataPengelola(Request $request){
         $selected = "tbluser.userid,
                     tbluser.nama, 
+                    tbluser.hp, 
                     tbluser.email as emailU, 
                     tbluser.alamatLengkap as alamatU, 
                     tblcomp.companyname, 
                     tblcomp.email as emailP, 
                     tblcomp.companyaddress as alamatP,
-                    (SELECT top 1 t.notrans
+                    (SELECT top 1 concat(t.notrans,' ', p.productName)
                         FROM tbltrans t
                         JOIN tblstatus s ON t.statusid=s.statusid
                         JOIN tbluser u ON u.userid=t.userid
                         JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
                         JOIN tblmasterproduct p ON p.productCode=a.productCode
                         WHERE t.statusid != 4 AND p.isSubscribe = 1 AND t.userid=tbluser.userid) as billAktif,
+                    (SELECT top 1 s.deskripsi
+                        FROM tbltrans t
+                        JOIN tblstatus s ON t.statusid=s.statusid
+                        JOIN tbluser u ON u.userid=t.userid
+                        JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
+                        JOIN tblmasterproduct p ON p.productCode=a.productCode
+                        WHERE t.statusid != 4 AND p.isSubscribe = 1 AND t.userid=tbluser.userid) as statusBayar,
+                    (SELECT STRING_AGG(c.companyname, ', ')
+                        FROM STRING_SPLIT(tbluser.companyidArray, ',') AS s
+                        JOIN tblcomp c ON c.companyid = TRY_CAST(s.value AS INT) ) AS perusahaanTerkait,
                     isAktif";
         $from = "tbluser";
-        $join = "JOIN tblcomp ON tblcomp.companyid=tbluser.companyid";
-        $where = "WHERE tbluser.statusid != 4 AND tbluser.companyid IS NOT NULL AND tbluser.superadmin <> 1";
+        $join = "LEFT JOIN tblcomp ON tblcomp.companyid=tbluser.companyid";
+        $where = "WHERE tbluser.statusid != 4 AND tbluser.superadmin <> 1";
         
         $controller = new Controller;
         return $controller->grid($selected,$from,$join,$where,$request);
