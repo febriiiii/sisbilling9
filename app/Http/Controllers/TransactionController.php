@@ -341,8 +341,10 @@ class TransactionController extends Controller
                                                                                     join tblagenda a on a.AppointmentId=t.AppointmentId
                                                                                     where notrans = '{$request->notrans}')
                                             order by t.jatuhTempoTagihan");
-            if($cekTransPertama[0]->notrans != $request->notrans){
-                return "Dilarang Melakukan Pembayraan Tagihan Masadepan";
+            if(count($cekTransPertama) > 0){
+                if($cekTransPertama[0]->notrans != $request->notrans){
+                    return "Dilarang Melakukan Pembayraan Tagihan Masadepan";
+                }
             }
             $user = tbluser::find(session('UIDGlob')->userid);
             $status = 1;
@@ -649,8 +651,10 @@ class TransactionController extends Controller
                                                                                     join tblagenda a on a.AppointmentId=t.AppointmentId
                                                                                     where notrans = '{$request->notrans}')
                                             order by t.jatuhTempoTagihan");
-            if($cekTransPertama[0]->notrans != $request->notrans){
-                return "Dilarang Melakukan Pembayraan Tagihan Masadepan";
+            if(count($cekTransPertama) > 0){
+                if($cekTransPertama[0]->notrans != $request->notrans){
+                    return "Dilarang Melakukan Pembayraan Tagihan Masadepan";
+                }
             }
             $MID = $this->cekstatusMID($request->notrans,$tbltrans->companyid);
             if($MID->status_code == 404){// 404 TRANSAKSI TIDAK DITEMUKAN
@@ -973,7 +977,7 @@ class TransactionController extends Controller
                                         JOIN tbluser u ON u.userid=t.userid
                                         JOIN tblagenda a ON a.AppointmentId=t.AppointmentId 
                                         JOIN tblmasterproduct p ON a.productCode=p.productCode
-                                        WHERE t.statusid <> 4
+                                        WHERE t.statusid <> 4 AND t.SPokok + t.SBunga + t.SLateFee > 1
                                         AND (
                                             CONVERT(DATE, DATEADD(day, -7, GETDATE())) = CONVERT(DATE, jatuhTempoTagihan) 
                                             OR CONVERT(DATE, DATEADD(day, -1, GETDATE())) = CONVERT(DATE, jatuhTempoTagihan) 

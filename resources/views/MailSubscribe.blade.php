@@ -127,6 +127,7 @@
             </div>
         </div>
       <center><br>
+        <strong>Email ini dikirimkan secara otomatis. Mohon tidak membalas email ini.</strong>
           <a style="font-size: 1.5em; font-weight:bold;" href="{{url('/')}}">Sis Billing</a>
       </center>
 </body>

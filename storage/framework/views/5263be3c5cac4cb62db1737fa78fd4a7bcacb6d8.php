@@ -6,7 +6,7 @@
       </center><!--End InvoiceTop-->
     
       <?php if($trans->statusid == 7): ?>
-        <h6 style="border-bottom: 1px solid #EEE;">Bukti Bayar</h6>
+        <h6 style="border-bottom: 1px solid #EEE;">Notifikasi Pembayaran Berhasil</h6>
       <?php else: ?>
         <h6 style="border-bottom: 1px solid #EEE;">Tagihan</h6>
       <?php endif; ?>
@@ -28,13 +28,10 @@
                 <td> : <?php echo e(Carbon\Carbon::parse($trans->jatuhTempoTagihan)->format('Y-m-d')); ?></td>
             </tr>
             <tr>
-                <td>No Trans </td>
+                <td>Invoice No </td>
                 <td id="transGR"> : <?php echo e($trans->notrans); ?></td>
             </tr>
-            <tr>
-                <td>Angsuran </td>
-                <td> : <?php echo e($trans->angsuran); ?>/~</td>
-            </tr>
+            
             <tr>
                 <td>Pembayaran </td>
                 <td> : <span id="pembayaranRecipt"><?php echo e($trans->paymentname); ?></span></td>
@@ -76,7 +73,13 @@
             <div id="legalcopy" style="margin-top: 5mm;">
               <?php echo QrCode::size(30)->generate($trans->notrans); ?>
 
-              <p class="legal" style="font-size: 0.7em;color: #666;line-height: 1.2em;"><strong>Terima kasih!</strong><br> atas kepercayaan Anda dalam menggunakan layanan kami. 
+              <p class="legal" style="font-size: 0.7em;color: #666;line-height: 1.2em;">
+                <?php if(isset($type)): ?>
+                <br>Simpan email ini sebagai referensi transaksi anda, Terimakasih telah bertransaksi di aplikasi sisbilling.
+                <?php else: ?>
+                <strong>Terima kasih!</strong>
+                <br> atas kepercayaan Anda dalam menggunakan layanan kami. 
+                <?php endif; ?>
               </p>
             </div>
     

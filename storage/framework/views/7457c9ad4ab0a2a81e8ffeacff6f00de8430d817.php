@@ -63,33 +63,34 @@
 <body>
     <div class="container">
         <h1>Reminder Tagihan</h1>
-        <p>Terimakasih, {{$trans->nama}}, telah berlangganan produk </strong>{{$trans->productName}}</strong>. <br> Berikut detail tagihan Anda:</p>
+        <p>Terimakasih, <?php echo e($trans->nama); ?>, telah berlangganan produk "<?php echo e($trans->productName); ?>". <br> Berikut detail tagihan Anda:</p>
         <table>
             <tr>
                 <th>Email</th>
-                <td>{{$trans->email}}</td>
+                <td><?php echo e($trans->email); ?></td>
             </tr>
             <tr>
                 <th>Nama</th>
-                <td>{{$trans->nama}}</td>
+                <td><?php echo e($trans->nama); ?></td>
             </tr>
             <tr>
                 <th>Jatuh Tempo Tagihan</th>
-                <td>{{$trans->jatuhTempoTagihan}}</td>
+                <td><?php echo e($trans->jatuhTempoTagihan); ?></td>
             </tr>
             <tr>
                 <th>Amount</th>
-                <td>{{number_format($trans->Amount, 2, '.', ',')}}</td>
+                <td><?php echo e(number_format($trans->Amount, 2, '.', ',')); ?></td>
             </tr>
             <tr>
                 <th>ProductName</th>
-                <td>{{$trans->productName}}</td>
+                <td><?php echo e($trans->productName); ?></td>
             </tr>
         </table>
-        <p>Untuk melakukan pembayaran <strong>{{$trans->productName}}</strong>, harap melalui aplikasi <a href="{{url('/')}}">SisBilling</a>, Harap abaikan email ini apabila sudah lakukan pembayaran.</p>
+        <p>Silakan bayar tagihan sebesar <?php echo e(number_format($trans->Amount, 2, '.', ',')); ?> sebelum tanggal jatuh tempo. Terimakasih!</p>
         <br>
-        <br><strong>Email ini dikirimkan secara otomatis. Mohon tidak membalas email ini.</strong>
-        <a style="font-size: 1.5em; font-weight:bold;" href="{{url('/')}}">Sis Billing</a>
+        <br>
+        <a style="font-size: 1.5em; font-weight:bold;" href="<?php echo e(url('/')); ?>">Sis Billing</a>
     </div>
 </body>
 </html>
+<?php /**PATH C:\xampp\htdocs\sisbilling9\resources\views/MailTagihan.blade.php ENDPATH**/ ?>

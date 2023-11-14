@@ -58,13 +58,16 @@
                     <!-- Left links -->
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link navAdministrator" id="adminlistpengelola" href="#" onclick="CallAdminPage('adminlistpengelola')" style="color: blue">Master User</a>
+                        <a class="nav-link navAdministrator" id="adminlistpengelola" href="#" onclick="CallAdminPage('adminlistpengelola')" style="color: blue">List Pengelola</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link navAdministrator" id="admintagihan" href="#" onclick="CallAdminPage('admintagihan')">Daftar Paket</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link navAdministrator" id="adminpembayaran" href="#" onclick="CallAdminPage('adminpembayaran')">Pembayaran</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link navAdministrator" id="adminmasteruser" href="#" onclick="CallAdminPage('adminmasteruser')">List User</a>
                     </li>
                     </ul>
                     <!-- Left links -->

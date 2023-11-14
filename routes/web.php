@@ -179,8 +179,10 @@ Route::middleware(['superadmin'])->group(function () {
     Route::post('/unsubscribe', [adminController::class, 'unsubscribe'])->middleware('auth');
     Route::get('/updateisAktif', [adminController::class, 'updateisAktif'])->middleware('auth');
     Route::get('/adminlistpengelola', [adminController::class, 'adminlistpengelola'])->middleware('auth');
+    Route::get('/adminmasteruser', [adminController::class, 'adminmasteruser'])->middleware('auth');
     Route::get('/admintagihan', [adminController::class, 'admintagihan'])->middleware('auth');
     Route::get('/adminpembayaran', [adminController::class, 'adminpembayaran'])->middleware('auth');
+    Route::get('/datamasteruser', [adminController::class, 'datamasteruser'])->middleware('auth');
     Route::get('/dataPengelola', [adminController::class, 'dataPengelola'])->middleware('auth');
     Route::get('/dataTagihan', [adminController::class, 'dataTagihan'])->middleware('auth');
     Route::post('/dataTagihanInsert', [adminController::class, 'dataTagihanInsert'])->middleware('auth');

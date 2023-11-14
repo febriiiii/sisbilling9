@@ -31,7 +31,7 @@ class SendMail extends Mailable
             );
         }else if($this->data['type'] == 'otpLogin'){
             return new Envelope(
-                subject: 'Company Subscribe',
+                subject: 'One Time-Password',
             );
         }else if($this->data['type'] == 'subscribe'){
             return new Envelope(
@@ -39,7 +39,7 @@ class SendMail extends Mailable
             );
         }else if($this->data['type'] == 'mailpayment'){
             return new Envelope(
-                subject: 'Pembayaran SisBilling',
+                subject: 'Notifikasi Pembayaran',
             );
         }else if($this->data['type'] == 'mailaprovepayment'){
             return new Envelope(
@@ -47,11 +47,7 @@ class SendMail extends Mailable
             );
         }else if($this->data['type'] == 'mailarejectpayment'){
             return new Envelope(
-                subject: 'Pembayaran Di Tolak Pengelola',
-            );
-        }else if($this->data['type'] == 'mailarejectpayment'){
-            return new Envelope(
-                subject: 'Pembayaran Di Tolak Pengelola',
+                subject: 'Pembayaran Tidak Berhasil',
             );
         }else if($this->data['type'] == 'reminderTagihan'){
             return new Envelope(

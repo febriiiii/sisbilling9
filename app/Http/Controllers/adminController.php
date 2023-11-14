@@ -21,6 +21,9 @@ class adminController extends Controller
     public function adminlistpengelola() {
         return view('admin.listpengelola');
     }
+    public function adminmasteruser() {
+        return view('admin.masteruser');
+    }
     public function admintagihan() {
         return view('admin.tagihan');
     }
@@ -32,23 +35,23 @@ class adminController extends Controller
         tbluser::find($request->userid)->update(['isAktif' => $request->val]);
         return true;
     }
-    public function dataPengelola(Request $request){
+    public function datamasteruser(Request $request){
         $selected = "tbluser.userid,
                     tbluser.nama, 
-                    tbluser.hp, 
+                    tblcomp.hp, 
                     tbluser.email as emailU, 
                     tbluser.alamatLengkap as alamatU, 
                     tblcomp.companyname, 
                     tblcomp.email as emailP, 
                     tblcomp.companyaddress as alamatP,
-                    (SELECT top 1 concat(t.notrans,' ', p.productName)
+                    (SELECT TOP 1 concat(t.notrans,' ', p.productName)
                         FROM tbltrans t
                         JOIN tblstatus s ON t.statusid=s.statusid
                         JOIN tbluser u ON u.userid=t.userid
                         JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
                         JOIN tblmasterproduct p ON p.productCode=a.productCode
                         WHERE t.statusid != 4 AND p.isSubscribe = 1 AND t.userid=tbluser.userid) as billAktif,
-                    (SELECT top 1 s.deskripsi
+                    (SELECT TOP 1 CASE WHEN t.SPokok + t.SBunga + t.SLateFee > 0 THEN s.deskripsi else 'Free Trial' END
                         FROM tbltrans t
                         JOIN tblstatus s ON t.statusid=s.statusid
                         JOIN tbluser u ON u.userid=t.userid
@@ -57,11 +60,47 @@ class adminController extends Controller
                         WHERE t.statusid != 4 AND p.isSubscribe = 1 AND t.userid=tbluser.userid) as statusBayar,
                     (SELECT STRING_AGG(c.companyname, ', ')
                         FROM STRING_SPLIT(tbluser.companyidArray, ',') AS s
-                        JOIN tblcomp c ON c.companyid = TRY_CAST(s.value AS INT) ) AS perusahaanTerkait,
-                    isAktif";
+                        JOIN tblcomp c ON c.companyid = TRY_CAST(s.value AS INT) WHERE c.companyid <> 1 ) AS perusahaanTerkait";
         $from = "tbluser";
         $join = "LEFT JOIN tblcomp ON tblcomp.companyid=tbluser.companyid";
         $where = "WHERE tbluser.statusid != 4 AND tbluser.superadmin <> 1";
+        
+        $controller = new Controller;
+        return $controller->grid($selected,$from,$join,$where,$request);
+    }
+    public function dataPengelola(Request $request){
+        $selected = "tbluser.userid,
+                    tbluser.nama, 
+                    tbluser.email as emailU, 
+                    tbluser.alamatLengkap as alamatU, 
+                    tblcomp.companyname, 
+                    tblcomp.email as emailP, 
+                    tblcomp.companyaddress as alamatP,
+                    (SELECT TOP 1 concat(t.notrans,' ', p.productName)
+                        FROM tbltrans t
+                        JOIN tblstatus s ON t.statusid=s.statusid
+                        JOIN tbluser u ON u.userid=t.userid
+                        JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
+                        JOIN tblmasterproduct p ON p.productCode=a.productCode
+                        WHERE t.statusid != 4 AND p.isSubscribe = 1 AND t.userid=tbluser.userid) as billAktif,
+                    (SELECT TOP 1 CASE WHEN t.SPokok + t.SBunga + t.SLateFee > 0 THEN s.deskripsi else 'Free Trial' END
+                        FROM tbltrans t
+                        JOIN tblstatus s ON t.statusid=s.statusid
+                        JOIN tbluser u ON u.userid=t.userid
+                        JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
+                        JOIN tblmasterproduct p ON p.productCode=a.productCode
+                        WHERE t.statusid != 4 AND p.isSubscribe = 1 AND t.userid=tbluser.userid) as statusBayar,
+                    (SELECT TOP 1 CASE WHEN t.SPokok + t.SBunga + t.SLateFee > 0 THEN s.statusid else '7' END
+                        FROM tbltrans t
+                        JOIN tblstatus s ON t.statusid=s.statusid
+                        JOIN tbluser u ON u.userid=t.userid
+                        JOIN tblagenda a ON a.AppointmentId=t.AppointmentId
+                        JOIN tblmasterproduct p ON p.productCode=a.productCode
+                        WHERE t.statusid != 4 AND p.isSubscribe = 1 AND t.userid=tbluser.userid) as kodebayar,
+                    isAktif";
+        $from = "tbluser";
+        $join = "LEFT JOIN tblcomp ON tblcomp.companyid=tbluser.companyid";
+        $where = "WHERE tbluser.statusid != 4 AND tbluser.companyid IS NOT NULL AND tbluser.superadmin <> 1";
         
         $controller = new Controller;
         return $controller->grid($selected,$from,$join,$where,$request);

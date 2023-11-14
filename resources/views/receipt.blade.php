@@ -6,7 +6,7 @@
       </center><!--End InvoiceTop-->
     
       @if ($trans->statusid == 7)
-        <h6 style="border-bottom: 1px solid #EEE;">Bukti Bayar</h6>
+        <h6 style="border-bottom: 1px solid #EEE;">Notifikasi Pembayaran Berhasil</h6>
       @else
         <h6 style="border-bottom: 1px solid #EEE;">Tagihan</h6>
       @endif
@@ -28,13 +28,13 @@
                 <td> : {{Carbon\Carbon::parse($trans->jatuhTempoTagihan)->format('Y-m-d')}}</td>
             </tr>
             <tr>
-                <td>No Trans </td>
+                <td>Invoice No </td>
                 <td id="transGR"> : {{$trans->notrans}}</td>
             </tr>
-            <tr>
+            {{-- <tr>
                 <td>Angsuran </td>
                 <td> : {{$trans->angsuran}}/~</td>
-            </tr>
+            </tr> --}}
             <tr>
                 <td>Pembayaran </td>
                 <td> : <span id="pembayaranRecipt">{{$trans->paymentname}}</span></td>
@@ -75,13 +75,21 @@
     
             <div id="legalcopy" style="margin-top: 5mm;">
               {!! QrCode::size(30)->generate($trans->notrans) !!}
-              <p class="legal" style="font-size: 0.7em;color: #666;line-height: 1.2em;"><strong>Terima kasih!</strong><br> atas kepercayaan Anda dalam menggunakan layanan kami. 
+              <p class="legal" style="font-size: 0.7em;color: #666;line-height: 1.2em;">
+                @if (isset($type))
+                <br>Simpan email ini sebagai referensi transaksi anda, Terimakasih telah bertransaksi di aplikasi sisbilling.
+                @else
+                <strong>Terima kasih!</strong>
+                <br> atas kepercayaan Anda dalam menggunakan layanan kami. 
+                @endif
               </p>
             </div>
     
           </div><!--End InvoiceBot-->
     </div><!--End Invoice-->
-
+    @if (isset($type))
+    <strong>Email ini dikirimkan secara otomatis. Mohon tidak membalas email ini.</strong>
+    @endif
     <script>
       // downloadReceipt()
       // function downloadReceipt() {

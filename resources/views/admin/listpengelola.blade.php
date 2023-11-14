@@ -51,10 +51,6 @@
                 dataType: "string" 
             },
             {
-                dataField: 'hp',
-                dataType: "string" 
-            },
-            {
                 dataField: 'emailU',
                 dataType: "string" 
             },
@@ -76,19 +72,14 @@
                 dataType: "string" 
             },
             {
-                dataField: 'perusahaanTerkait',
-                dataType: "string",
-                cellTemplate: function(container, options) {
-                    var comp = options.data.perusahaanTerkait.split(',')
-                    comp.forEach(c => {
-                        var historyButton = $('<span class="badge badge-info rounded-pill d-inline">'+c+'<span>');
-                        container.append(historyButton);                    
-                    });
-                } 
+                dataField: 'statusBayar',
+                caption: 'Status Bill',
+                dataType: "string" 
             },
             {
-                dataField: 'statusBayar',
-                dataType: "string" 
+                dataField: 'kodebayar',
+                dataType: "string",
+                visible: false,
             },
             {
                 dataField: 'billAktif',
@@ -97,7 +88,11 @@
                     if(options.data.billAktif == null){
                         bA = "Tidak Ada"
                     }
-                    var historyButton = $('<span class="badge badge-success rounded-pill d-inline">'+bA+'<span>');
+                    var badge = 'badge-danger';
+                    if(options.data.kodebayar == 7){
+                        badge = 'badge-success';
+                    }   
+                    var historyButton = $('<span class="badge '+badge+' rounded-pill d-inline">'+bA+'<span>');
                     historyButton.css('cursor','pointer');
                     historyButton.on('click', function() {
                         var val = options.data.billAktif

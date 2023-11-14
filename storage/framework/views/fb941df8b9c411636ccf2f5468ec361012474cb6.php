@@ -490,6 +490,9 @@
                       if(new Date(contentDate) < new Date(w.date)){
                         childElements[i].style.backgroundColor = '#7AA874';
                       }
+                      if(w.statusid == 7 && w.free == 1){
+                        childElements[i].style.backgroundColor = '#7AA874';
+                      }
                       if (w.statusid == 6) {
                         if (formatDate(contentDate) == formatDate(w.date)) {
                           childElements[i].style.backgroundColor = '#FFE569';
@@ -568,12 +571,12 @@
               if(w.id == e.appointmentData.AppointmentId){
                 $(e.appointmentElement[0]).css('background-color', '#FD8A8A');
                 console.log(dateContent+ dateData);
-                // if(dateContent < dateData){
-                //   setTimeout(() => {
-                //     $(e.appointmentElement[0]).css('background-color', '#7AA874');
-                //   }, 200);
-                // }
-                if(w.statusid == 7){
+                if(dateContent < dateData){
+                  setTimeout(() => {
+                    $(e.appointmentElement[0]).css('background-color', '#7AA874');
+                  }, 200);
+                }
+                if(w.statusid == 7 && w.free == 1){
                   setTimeout(() => {
                     $(e.appointmentElement[0]).css('background-color', '#7AA874');
                   }, 200);

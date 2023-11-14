@@ -132,11 +132,17 @@ class AgendaController extends Controller
         ]);
     }
     public function dataStatus(){
-        return DB::select("SELECT max(a.AppointmentId) as id, max(text) as title,max(jatuhTempoTagihan) as date,t.statusid
-                            FROM tbltrans t
-                            join tblagenda a on t.AppointmentId=a.AppointmentId
-                            where t.userid = '".session('UIDGlob')->userid."'
-                            group by t.statusid, t.AppointmentId ORDER BY t.statusid ASC");
+        return DB::select("SELECT max(a.AppointmentId) as id, max(text) as title,max(jatuhTempoTagihan) as date,t.statusid, '0' as free
+                                FROM tbltrans t
+                                join tblagenda a on t.AppointmentId=a.AppointmentId
+                                where t.userid = '".session('UIDGlob')->userid."' and t.SPokok + t.SBunga + t.SLateFee > 0
+                                group by t.statusid, t.AppointmentId
+                            UNION SELECT max(a.AppointmentId) as id, max(text) as title,max(jatuhTempoTagihan) as date, '7' as statusid, '1' as free
+                                FROM tbltrans t
+                                join tblagenda a on t.AppointmentId=a.AppointmentId
+                                where t.userid = '".session('UIDGlob')->userid."' and t.SPokok + t.SBunga + t.SLateFee < 1
+                                group by t.statusid, t.AppointmentId
+                            ORDER BY t.statusid ASC");
     }
     public function insertAgenda(Request $request)
     {

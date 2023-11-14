@@ -45,19 +45,19 @@
             <h1>Hai {{$name}},</h1>
         </div>
         <div class="content">
+            @if (isset($hit))
+            <a style="color:red; font-size:1.5em;" href="{{$hit}}">Klik ini untuk konfirmasi</a>
+            @endif
             <p>Berikut adalah One-Time Password (OTP) Anda:</p>
             <center>
                 <h1>{{ $otp }}</h1>
-                @if (isset($hit))
-                <a style="color:red;" href="{{$hit}}">Klik ini untuk konfirmasi</a>
-                @endif
             </center>
             <small>
-                <i style="color:red;">*Harap jangan berikan informasi ini kepada siapapun dan pastikan untuk menjaga kerahasiaan OTP ini.</i>
+                <i style="color:red;">*Otp ini hanya berlaku dalam 24 jam, Harap jangan berikan informasi ini kepada siapapun dan pastikan untuk menjaga kerahasiaan OTP ini.</i>
             </small>
         </div>
         <div class="footer">
-            <strong>Email ini dikirimkan secara otomatis. Jangan membalas email ini.</strong>
+            <strong>Email ini dikirimkan secara otomatis. Mohon tidak membalas email ini.</strong>
             
             <center><br>
                 <a style="font-size: 1.5em; font-weight:bold;" href="{{url('/')}}">Sis Billing</a>

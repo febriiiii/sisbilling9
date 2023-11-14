@@ -45,15 +45,15 @@
             <h1>Hai <?php echo e($name); ?>,</h1>
         </div>
         <div class="content">
+            <?php if(isset($hit)): ?>
+            <a style="color:red; font:size:1.5em;" href="<?php echo e($hit); ?>">Klik ini untuk konfirmasi</a>
+            <?php endif; ?>
             <p>Berikut adalah One-Time Password (OTP) Anda:</p>
             <center>
                 <h1><?php echo e($otp); ?></h1>
-                <?php if(isset($hit)): ?>
-                <a style="color:red;" href="<?php echo e($hit); ?>">Klik ini untuk konfirmasi</a>
-                <?php endif; ?>
             </center>
             <small>
-                <i style="color:red;">*Harap jangan berikan informasi ini kepada siapapun dan pastikan untuk menjaga kerahasiaan OTP ini.</i>
+                <i style="color:red;">*Otp ini hanya berlaku dalam 24 jam, Harap jangan berikan informasi ini kepada siapapun dan pastikan untuk menjaga kerahasiaan OTP ini.</i>
             </small>
         </div>
         <div class="footer">
